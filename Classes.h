@@ -1,3 +1,5 @@
+// Kommentare zu Klassen in Classes.cpp
+
 #ifndef Classes_h
 #define Classes_h
 
@@ -16,7 +18,7 @@ class AnalogSensor
     float _boardVoltage;
     int _analogResolution;
     float _analogStep;
-  };
+};
 
 class PT1000 : public AnalogSensor
 {
@@ -36,10 +38,10 @@ class PT1000 : public AnalogSensor
     float _temperatures[5];
     float _voltage;
     float _r;
-  };
+};
 
- class Potentiometer : public AnalogSensor
- {
+class Potentiometer : public AnalogSensor
+{
   public:
     Potentiometer(byte pin, int lowerLimit, int upperLimit, bool reverse);
     float getValue();
@@ -48,6 +50,16 @@ class PT1000 : public AnalogSensor
     int _upperLimit;
     float _val;
     bool _reverse;
+};
+
+class Timer {
+  public:
+    Timer(unsigned long delay);
+    bool checkTimer(unsigned long now);
+  private:
+    unsigned long _now;
+    unsigned long _lastTime;
+    unsigned long _delay;
   };
 
 #endif

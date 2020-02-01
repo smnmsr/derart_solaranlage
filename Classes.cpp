@@ -54,13 +54,11 @@ void PT1000::calculateTemperature() {
 
 //Berechnet Temperatur und diese zurück
 float PT1000::getLastTemperature() {
-  calculateTemperature();
   return _temperatures[0];
 }
 
 //Berechnet Temperatur und gibt Mittelwert der letzten fünf Messungen zurück
 float PT1000::getMeanTemperature() {
-  calculateTemperature();
   return (_temperatures[0] + _temperatures[1] + _temperatures[2] + _temperatures[3] + _temperatures[4]) / 5;
 }
 
@@ -88,3 +86,21 @@ float Potentiometer::getValue() {
   }
   return _val;
 }
+
+//____________________________________________
+//Konstruktr der Klasse Timer
+Timer::Timer(unsigned long delay) {
+  _now = 0; //Zeit der Abfrage
+  _lastTime = 0; //Zeit der letzten Ausführung
+  _delay = delay; //Zeitabstand zwischen Ausführungen
+  }
+
+//Nimmt aktuellen millis() Wert und Prüft, ob eine nächste Ausführung notwendig ist
+bool Timer::checkTimer (unsigned long now){
+  _now = now;
+  if ((unsigned long)(_now - _lastTime) >= _delay){
+    _lastTime = _now;
+    return true;
+    }
+    else return false;
+  }
