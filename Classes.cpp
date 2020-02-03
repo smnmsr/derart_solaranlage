@@ -64,7 +64,7 @@ float PT1000::getMeanTemperature() {
 
 //____________________________________________
 //Konstruktor der Potentiometer Klasse
-Potentiometer::Potentiometer(byte pin, int lowerLimit = 5, int upperLimit = 95, bool reverse = false) : AnalogSensor(pin) {
+Potentiometer::Potentiometer(byte pin, int lowerLimit, int upperLimit, bool reverse) : AnalogSensor(pin) {
   _lowerLimit = lowerLimit; //erst wenn dieses Limit überschritten wird, steigt der Wert
   _upperLimit = upperLimit; //erst wenn dieses Limit unterschritten wird, sinkt der Wert
   _val = 0;
@@ -89,18 +89,41 @@ float Potentiometer::getValue() {
 
 //____________________________________________
 //Konstruktr der Klasse Timer
-Timer::Timer(unsigned long delay) {
+Timer::Timer(unsigned long delay, char mode) {
   _now = 0; //Zeit der Abfrage
   _lastTime = 0; //Zeit der letzten Ausführung
-  _delay = delay; //Zeitabstand zwischen Ausführungen
+  switch (mode) {
+    case 's':
+      _delay = delay * 1000;
+      break;
+    case 'm':
+      _delay = delay * 60000;
+      break;
+    case 'h':
+      _delay = delay * 3600000;
+      break;
+    case 'd':
+      _delay = delay * 86400000;
+      break;
+    default:
+      _delay = delay;
   }
+}
 
 //Nimmt aktuellen millis() Wert und Prüft, ob eine nächste Ausführung notwendig ist
-bool Timer::checkTimer (unsigned long now){
+bool Timer::checkTimer (unsigned long now) {
   _now = now;
-  if ((unsigned long)(_now - _lastTime) >= _delay){
-    _lastTime = _now;
+  if ((unsigned long)(_now - _lastTime) >= _delay) {
     return true;
-    }
-    else return false;
   }
+  else return false;
+}
+
+void Timer::executed(){
+  _lastTime = _now;
+  }
+
+//Setzt die lastTime Variable
+void Timer::setLastTime(unsigned long lastTime) {
+  _lastTime = lastTime;
+}
