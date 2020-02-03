@@ -4,9 +4,6 @@
 #define Classes_h
 
 #include "Arduino.h" //Arduino Standard Header
-#include "Wire.h" //Für I2C Bus
-#include "PID_v1.h" //Für PID-Regelung
-#include "Adafruit_LiquidCrystal.h" //Für Displays
 
 class AnalogSensor
 {
@@ -43,7 +40,7 @@ class PT1000 : public AnalogSensor
 class Potentiometer : public AnalogSensor
 {
   public:
-    Potentiometer(byte pin, int lowerLimit, int upperLimit, bool reverse);
+    Potentiometer(byte pin, int = 5, int = 95, bool = false);
     float getValue();
   private:
     int _lowerLimit;
@@ -54,8 +51,10 @@ class Potentiometer : public AnalogSensor
 
 class Timer {
   public:
-    Timer(unsigned long delay);
+    Timer(unsigned long delay, char = 'x');
     bool checkTimer(unsigned long now);
+    void executed();
+    void setLastTime(unsigned long lastTime);
   private:
     unsigned long _now;
     unsigned long _lastTime;
