@@ -210,6 +210,8 @@ void turnOffModusStart()
 // ================
 void setup()
 {
+  Serial.println('Setup gestartet');
+  
   // Setup der PINS
   // Input
   pinMode(DISPLAY_BUTTON, INPUT);
@@ -403,11 +405,12 @@ void loop()
         if (!tooLowValue)
         {
           tooLowValue = true;
-          exitTimeout.executed();
+          exitTimeout.setLastTime(now);
         }
         else if (tooLowValue && exitTimeout.checkTimer(now))
         {
           turnOffModusStart();
+          exitTimeout.executed();
         }
       }
     }
@@ -424,11 +427,12 @@ void loop()
         if (!tooLowValue)
         {
           tooLowValue = true;
-          exitTimeout.executed();
+          exitTimeout.setLastTime(now);
         }
         else if (tooLowValue && exitTimeout.checkTimer(now))
         {
           turnOffModusStart();
+          exitTimeout.executed();
         }
       }
     }
@@ -450,7 +454,7 @@ void loop()
   {
     digitalWrite(STELLWERK_BOILER_TEMP, HIGH); //Boiler auf höhere Temperatur stellen
     boilerHighTemperatur = true;
-    boilerTimeout.executed();                    //Timer stellen
+    boilerTimeout.setLastTime(now);                    //Timer stellen
     timer7d.executed();                        //Timer zurücksetzen
   }
 
