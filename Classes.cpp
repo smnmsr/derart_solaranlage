@@ -127,3 +127,24 @@ void Timer::executed(){
 void Timer::setLastTime(unsigned long lastTime) {
   _lastTime = lastTime;
 }
+
+//____________________________________________
+//Konstruktor der Pumope Klasse
+Pump::Pump(byte relaisPin, byte PWMPin){
+  _relaisPin = relaisPin;
+  _PWMPin = PWMPin;
+}
+
+void Pump::setSpeed(int speed){
+  if (speed >= 255) {speed = 255;}
+  if (speed <= 0) {speed = 0;}
+
+  speed = abs(speed-255);
+  analogWrite(_PWMPin, speed);
+  digitalWrite(_relaisPin, HIGH);
+}
+
+void Pump::stop() {
+  analogWrite(_PWMPin, 255);
+  digitalWrite(_relaisPin, LOW);
+}
