@@ -61,4 +61,14 @@ class Timer {
     unsigned long _delay;
   };
 
+  class Pump {
+    public:
+    Pump(byte relaisPin, byte PWMPin);
+    void setSpeed(int speed);
+    void stop();
+  private:
+    byte _relaisPin;
+    byte _PWMPin;
+  };
+
 #endif
