@@ -130,6 +130,7 @@ Potentiometer potentiometer2(POTENTIOMETER_2_PIN);
 // Setup der Displays
 
 // Setup der LUX-Meter
+Adafruit_TSL2591 luxMeter1 = Adafruit_TSL2591(2591);
 
 // Setup der Pumpen
 Pump kollektorPumpe(RELAIS_KOLLEKTOR_PUMPE, PWM_KOLLEKTOR_PUMPE);
@@ -228,6 +229,10 @@ void setup()
   PIDReglerKollektorPumpe.SetSampleTime(800);
   PIDReglerSolePumpe.SetOutputLimits(25, 255);
   PIDReglerSolePumpe.SetSampleTime(800);
+
+  //Luxmeter Setup
+  luxMeter1.setGain(TSL2591_GAIN_LOW);
+  luxMeter1.setTiming(TSL2591_INTEGRATIONTIME_200MS);
 }
 
 // ===================
@@ -437,7 +442,7 @@ void loop()
 
   if (timer3m.checkTimer(now))
   {
-    //checkBrightness(); //Aktuelle Helligkeit messen
+    brightness = luxMeter1.getLuminosity(TSL2591_FULLSPECTRUM); //
     timer3m.executed();
   }
 
