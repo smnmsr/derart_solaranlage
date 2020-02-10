@@ -420,14 +420,14 @@ void loop()
     break;
     case 2: //Im Modus Boiler?
     {
-      if (fuehlerBoilerVL.getMeanTemperature() < boilerDirectExitTemperature)
+      if (fuehlerBoilerVL.getMeanTemperature() < boilerDirectExitTemperature) //Vorlauftemperatur viel zu tief? --> direkter Abbruch
       {
         soleModusStart();
       }
 
       if (fuehlerBoilerVL.getMeanTemperature() > boilerExitTemperature && tooLowValue) //ausreichende Temperatur?
       {
-        tooLowValue = false;
+        tooLowValue = false; //Abbruch abbrechen
       }
 
       if (fuehlerBoilerVL.getMeanTemperature() < boilerExitTemperature && !initializing) //zu Tiefe Temperatur im Boilermodus
@@ -474,7 +474,7 @@ void loop()
   if (boilerHighTemperatur && boilerTimeout.checkTimer(now))
   {
     boilerHighTemperatur = false;
-    digitalWrite(STELLWERK_BOILER_TEMP, true);
+    digitalWrite(STELLWERK_BOILER_TEMP, LOW);
   }
 
   now = millis();
