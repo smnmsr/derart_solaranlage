@@ -38,7 +38,8 @@ const int ALARMTEMPERATUR_KOLLEKTOR_LUFT = 90; //Alarmtemperatur für Kollektor 
 const int ALARMTEMPERATUR_KOLLEKTOR_VL = 90;   //Alarmtemperatur für Kollektor (Vorlauftemperatur)
 const int ALARMTEMPERATUR_SOLE = 30;           //Alarmtemperatur für Sole-Pumpe
 const int MIN_DIFFERENZ_NACH_ALARM = 3;        //erst wenn die Temperatur um diesen Wert gesunken ist, geht der Alarmmodus aus
-const int SOLE_EXIT_TEMPERATURE = 12;          //Temperatur, bei der der Solemodus abgebrochen wird
+const int SOLE_EXIT_TEMPERATURE = 12;          //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
+const int SOLE_VL_EXIT_TEMPERATURE = 18;       //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
 const int SOLL_KOLLEKTOR_VL_BOILERMODUS = 80;  //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Boilermodus
 const int SOLL_KOLLEKTOR_VL_SOLEMODUS = 60;    //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
 const int SOLL_SOLE_VL_SOLEMODUS = 20;         //Solltemperatur, auf die der Sole VL geregelt werden soll
@@ -64,6 +65,7 @@ bool boilerHighTemperatur = false; //true, wenn Boiler auf höherer Temperatur i
 bool kollektorAlarm = false;       //true, wenn kollektor zu heiss ist
 bool soleAlarm = false;            //true, wenn solepumpe zu heiss ist
 float boilerExitTemperature;       //Temperatur, bei der der Boilermodus abgebrochen wird
+float boilerDirectExitTemperature; //Temperatur, bei der der Boilermodus direkt (ohne Verzögerung abgebrochen wird)
 int brightness;                    //gemessene Helligkeit
 bool initializing = false;         //Ist derzeit ein neuer Modus am Initialisieren?
 bool tooLowValue = false;          //True, wenn Sollwert das erste mal unterschritten
@@ -153,8 +155,8 @@ Timer displayTimeout(15, 's');             //Display-Ausschaltzeit
 Timer boilerTimeout(1, 'd');               //Boiler-Ausschaltzeit
 
 //PWM Setup
-PID PIDReglerKollektorPumpe(&PIDInputKollektorPumpe, &PIDOutputKollektorPumpe, &PIDSetpointKollektorPumpe, PID_P_KOLLEKTOR, PID_I_KOLLEKTOR, PID_D_KOLLEKTOR, DIRECT);
-PID PIDReglerSolePumpe(&PIDInputSolePumpe, &PIDOutputSolePumpe, &PIDSetpointSolePumpe, PID_P_SOLE, PID_I_SOLE, PID_D_SOLE, DIRECT);
+PID PIDReglerKollektorPumpe(&PIDInputKollektorPumpe, &PIDOutputKollektorPumpe, &PIDSetpointKollektorPumpe, PID_P_KOLLEKTOR, PID_I_KOLLEKTOR, PID_D_KOLLEKTOR, REVERSE);
+PID PIDReglerSolePumpe(&PIDInputSolePumpe, &PIDOutputSolePumpe, &PIDSetpointSolePumpe, PID_P_SOLE, PID_I_SOLE, PID_D_SOLE, REVERSE);
 
 // =============
 // 5. FUNKTIONEN
@@ -211,7 +213,7 @@ void turnOffModusStart()
 void setup()
 {
   Serial.println('Setup gestartet');
-  
+
   // Setup der PINS
   // Input
   pinMode(DISPLAY_BUTTON, INPUT);
@@ -372,6 +374,7 @@ void loop()
     }
 
     boilerExitTemperature = fuehlerBoiler.getMeanTemperature() + MIN_WAERMER_BOILER; //Mindest Boilertemperatur
+    boilerDirectExitTemperature = fuehlerBoiler.getMeanTemperature();                 //Boilertemperatur für direkten Abbruch
 
     //Entscheidung Betriebsmodus
     switch (operationMode)
@@ -395,12 +398,12 @@ void loop()
         boilerModusStart();
       }
 
-      if (fuehlerSole.getMeanTemperature() > SOLE_EXIT_TEMPERATURE && tooLowValue) //ausreichende Temperatur?
+      if ((fuehlerSole.getMeanTemperature() > SOLE_EXIT_TEMPERATURE || fuehlerSoleVL.getMeanTemperature() > SOLE_VL_EXIT_TEMPERATURE) && tooLowValue) //ausreichende Temperatur?
       {
-        tooLowValue = false;
+        tooLowValue = false; //Abbruch abbrechen
       }
 
-      if (fuehlerSole.getMeanTemperature() < SOLE_EXIT_TEMPERATURE && !initializing) //zu tiefe Temperatur im Solemodus?
+      if ((fuehlerSole.getMeanTemperature() < SOLE_EXIT_TEMPERATURE || fuehlerSoleVL.getMeanTemperature() < SOLE_VL_EXIT_TEMPERATURE) && !initializing) //zu tiefe Temperatur im Solemodus?
       {
         if (!tooLowValue)
         {
@@ -417,6 +420,11 @@ void loop()
     break;
     case 2: //Im Modus Boiler?
     {
+      if (fuehlerBoilerVL.getMeanTemperature() < boilerDirectExitTemperature)
+      {
+        soleModusStart();
+      }
+
       if (fuehlerBoilerVL.getMeanTemperature() > boilerExitTemperature && tooLowValue) //ausreichende Temperatur?
       {
         tooLowValue = false;
@@ -431,7 +439,7 @@ void loop()
         }
         else if (tooLowValue && exitTimeout.checkTimer(now))
         {
-          turnOffModusStart();
+          soleModusStart();
           exitTimeout.executed();
         }
       }
@@ -454,8 +462,8 @@ void loop()
   {
     digitalWrite(STELLWERK_BOILER_TEMP, HIGH); //Boiler auf höhere Temperatur stellen
     boilerHighTemperatur = true;
-    boilerTimeout.setLastTime(now);                    //Timer stellen
-    timer7d.executed();                        //Timer zurücksetzen
+    boilerTimeout.setLastTime(now); //Timer stellen
+    timer7d.executed();             //Timer zurücksetzen
   }
 
   if (displayOn && displayTimeout.checkTimer(now))
