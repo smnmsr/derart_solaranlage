@@ -79,10 +79,14 @@ double PIDInputKollektorPumpe, PIDOutputKollektorPumpe, PIDSetpointKollektorPump
 // 3. PIN-Adressen und BUS-Definitionen
 // ==============================
 // i2c Adressen
-Adafruit_LiquidCrystal LCD_00(0x72);
-Adafruit_LiquidCrystal LCD_01(0x73);
-Adafruit_LiquidCrystal LCD_02(0x75);
-Adafruit_LiquidCrystal LCD_03(0x70);
+Adafruit_LiquidCrystal LCD_00(0x70);
+Adafruit_LiquidCrystal LCD_01(0x71);
+Adafruit_LiquidCrystal LCD_02(0x72);
+Adafruit_LiquidCrystal LCD_03(0x73);
+Adafruit_LiquidCrystal LCD_04(0x74);
+Adafruit_LiquidCrystal LCD_05(0x75);
+Adafruit_LiquidCrystal LCD_06(0x76);
+Adafruit_LiquidCrystal LCD_07(0x77);
 
 // Analog Pins
 const byte FUEHLER_KOLLEKTOR_VL_PIN = A7;   //S0
@@ -93,19 +97,19 @@ const byte FUEHLER_SOLE_VL_PIN = A5;        //S4S
 const byte FUEHLER_BOILER_RL_PIN = A3;      //S6B
 const byte FUEHLER_SOLE_RL_PIN = A6;        //S6S
 const byte FUEHLER_SOLE_PIN = A4;           //S7
-const byte POTENTIOMETER_1_PIN = A14;
-const byte POTENTIOMETER_2_PIN = A15;
+// const byte POTENTIOMETER_1_PIN = A14; //aktuell nicht gebraucht
+// const byte POTENTIOMETER_2_PIN = A15; //aktuell nicht gebraucht
 
 // Digital In Pins
-const byte DISPLAY_BUTTON = 22;
-const byte FLOW_METER_BOILER = 23;
-const byte FLOW_METER_SOLE = 24;
+const byte DISPLAY_BUTTON = 47;
+const byte FLOW_METER_BOILER = 45;
+const byte FLOW_METER_SOLE = 43;
 
 // Digital Out Pins
-const byte RELAIS_SOLE_PUMPE = 25;
-const byte RELAIS_KOLLEKTOR_PUMPE = 26;
+const byte RELAIS_SOLE_PUMPE = 23;
+const byte RELAIS_KOLLEKTOR_PUMPE = 25;
 const byte STELLWERK_SOLE_BOILER = 27; //high = höhere Temperatur?
-const byte STELLWERK_BOILER_TEMP = 28; //high = Boiler?
+const byte STELLWERK_BOILER_TEMP = 29; //high = Boiler?
 
 // PWM Pins
 const byte PWM_SOLE_PUMPE = 4;
@@ -128,13 +132,13 @@ PT1000 fuehlerSole(FUEHLER_SOLE_PIN, 1000, FUEHLER_SOLE_KORREKTURFAKTOR);
 
 // Setup aller Potentiometer
 // Schema: Potentiometer <Name des Poti>(<PIN>); oder Optional: Potentiometer <Name des Poti>(<PIN>,<Mindestwert>,<Höchstwert>,<Umgekehrt>);
-Potentiometer potentiometer1(POTENTIOMETER_1_PIN);
-Potentiometer potentiometer2(POTENTIOMETER_2_PIN);
+//Potentiometer potentiometer1(POTENTIOMETER_1_PIN); //aktuell unbenutzt
+//Potentiometer potentiometer2(POTENTIOMETER_2_PIN); //aktuell unbenutzt
 
 // Setup der Displays
 
 // Setup der LUX-Meter
-Adafruit_TSL2591 luxMeter1 = Adafruit_TSL2591(2591);
+Adafruit_TSL2591 luxMeter1 = Adafruit_TSL2591(0x29);
 
 // Setup der Pumpen
 Pump kollektorPumpe(RELAIS_KOLLEKTOR_PUMPE, PWM_KOLLEKTOR_PUMPE);
