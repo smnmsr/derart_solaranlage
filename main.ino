@@ -79,14 +79,14 @@ double PIDInputKollektorPumpe, PIDOutputKollektorPumpe, PIDSetpointKollektorPump
 // 3. PIN-Adressen und BUS-Definitionen
 // ==============================
 // i2c Adressen
-Adafruit_LiquidCrystal LCD_00(0x70);
-Adafruit_LiquidCrystal LCD_01(0x71);
-Adafruit_LiquidCrystal LCD_02(0x72);
-Adafruit_LiquidCrystal LCD_03(0x73);
-Adafruit_LiquidCrystal LCD_04(0x74);
-Adafruit_LiquidCrystal LCD_05(0x75);
-Adafruit_LiquidCrystal LCD_06(0x76);
-Adafruit_LiquidCrystal LCD_07(0x77);
+Adafruit_LiquidCrystal LCD_00(0x74);
+Adafruit_LiquidCrystal LCD_01(0x77);
+Adafruit_LiquidCrystal LCD_02(0x73);
+Adafruit_LiquidCrystal LCD_03(0x72);
+Adafruit_LiquidCrystal LCD_04(0x75);
+Adafruit_LiquidCrystal LCD_05(0x76);
+Adafruit_LiquidCrystal LCD_06(0x70);
+Adafruit_LiquidCrystal LCD_07(0x71);
 
 // Analog Pins
 const byte FUEHLER_KOLLEKTOR_VL_PIN = A7;   //S0
@@ -135,8 +135,6 @@ PT1000 fuehlerSole(FUEHLER_SOLE_PIN, 1000, FUEHLER_SOLE_KORREKTURFAKTOR);
 //Potentiometer potentiometer1(POTENTIOMETER_1_PIN); //aktuell unbenutzt
 //Potentiometer potentiometer2(POTENTIOMETER_2_PIN); //aktuell unbenutzt
 
-// Setup der Displays
-
 // Setup der LUX-Meter
 Adafruit_TSL2591 luxMeter1 = Adafruit_TSL2591(0x29);
 
@@ -170,7 +168,7 @@ PID PIDReglerSolePumpe(&PIDInputSolePumpe, &PIDOutputSolePumpe, &PIDSetpointSole
 
 void boilerModusStart()
 {
-  Serial.println('Boilermodus gestartet');
+  Serial.println("Boilermodus gestartet");
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH);                //Kollektorpumpe einschalten
   digitalWrite(RELAIS_SOLE_PUMPE, LOW);                      //Solepumpe ausschalten
   digitalWrite(STELLWERK_SOLE_BOILER, HIGH);                 //Stellwerk auf Boiler umschalten
@@ -186,7 +184,7 @@ void boilerModusStart()
 
 void soleModusStart()
 {
-  Serial.println('Solemodus gestartet');
+  Serial.println("Solemodus gestartet");
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, LOW);               //Kollektorpumpe ausschalten
   digitalWrite(RELAIS_SOLE_PUMPE, HIGH);                   //Solepumpe einschalten
   digitalWrite(STELLWERK_SOLE_BOILER, LOW);                //Stellwerk auf Sole umschalten
@@ -202,7 +200,7 @@ void soleModusStart()
 
 void turnOffModusStart()
 {
-  Serial.println('Modus Ausgeschaltet');
+  Serial.println("Modus Ausgeschaltet");
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, LOW); //Kollektorpumpe ausschalten
   digitalWrite(RELAIS_SOLE_PUMPE, LOW);      //Solepumpe ausschalten
   digitalWrite(STELLWERK_SOLE_BOILER, LOW);  //Stellwerk auf Sole umschalten
@@ -218,7 +216,9 @@ void turnOffModusStart()
 // ================
 void setup()
 {
-  Serial.println('Setup gestartet');
+  Serial.begin(9600);
+  delay(1000);
+  Serial.println("Setup gestartet");
 
   // Setup der PINS
   // Input
@@ -243,6 +243,7 @@ void setup()
   //Luxmeter Setup
   luxMeter1.setGain(TSL2591_GAIN_LOW);
   luxMeter1.setTiming(TSL2591_INTEGRATIONTIME_200MS);
+  delay('1000');
 }
 
 // ===================
@@ -361,7 +362,7 @@ void loop()
       if (fuehlerSole.getLastTemperature() < ALARMTEMPERATUR_SOLE - MIN_DIFFERENZ_NACH_ALARM)
       {
         soleAlarm = false;
-        Serial.println('Solealarm beendet');
+        Serial.println("Solealarm beendet");
       }
 
       //Kollektor VL und Luft Temperatur abfragen und prüfen, ob ausreichend abgekühlt
@@ -370,14 +371,14 @@ void loop()
       if (fuehlerKollektorVL.getLastTemperature() < ALARMTEMPERATUR_KOLLEKTOR_VL - MIN_DIFFERENZ_NACH_ALARM && fuehlerKollektorLuft.getLastTemperature() < ALARMTEMPERATUR_KOLLEKTOR_LUFT - MIN_DIFFERENZ_NACH_ALARM)
       {
         kollektorAlarm = false;
-        Serial.println('Boileralarm beendet');
+        Serial.println("Boileralarm beendet");
       }
     }
 
     //Prüfen, ob Initialisierung abgeschlossen ist
     if (initialOperationModeTimeout.checkTimer(now) && initializing)
     {
-      Serial.println('Inititialisierung abgeschlossen');
+      Serial.println("Inititialisierung abgeschlossen");
       initializing = false;
     }
 
@@ -392,12 +393,12 @@ void loop()
       if (brightness > BOILER_START_BRIGHTNESS && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE) //Kriterien für Boilermodus erfüllt?
       {
         boilerModusStart();
-        Serial.println('Boilermodus aus ausgeschaltenem Modus gestartet');
+        Serial.println("Boilermodus aus ausgeschaltenem Modus gestartet");
       }
       else if (brightness > SOLE_START_BRIGHTNESS) //Kriterien für Solemodus erfüllt?
       {
         soleModusStart();
-        Serial.println('Solemodus aus ausgeschaltenem Modus gestartet');
+        Serial.println("Solemodus aus ausgeschaltenem Modus gestartet");
       }
     }
     break;
@@ -406,13 +407,13 @@ void loop()
       if (brightness > BOILER_START_BRIGHTNESS && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE) //Kriterien für Boilermodus erfüllt?
       {
         boilerModusStart();
-        Serial.println('Boilermodus aus Solemodus aufgrund Helligkeit gestartet');
+        Serial.println("Boilermodus aus Solemodus aufgrund Helligkeit gestartet");
       }
 
       if (fuehlerKollektorVL.getMeanTemperature() > boilerLowerExitTemperature && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE) //Temperatur so hoch, dass Boiler geheizt werden könnte?
       {
         boilerModusStart();
-        Serial.println('Boilermodus aus Solemodus aufgrund hoher Vorlauftemperatur gestartet');
+        Serial.println("Boilermodus aus Solemodus aufgrund hoher Vorlauftemperatur gestartet");
       }
 
       if ((fuehlerSole.getMeanTemperature() > SOLE_EXIT_TEMPERATURE || fuehlerSoleVL.getMeanTemperature() > SOLE_VL_EXIT_TEMPERATURE) && tooLowValue) //ausreichende Temperatur?
@@ -431,7 +432,7 @@ void loop()
         {
           turnOffModusStart();
           exitTimeout.executed();
-          Serial.println('Solemodus abgebrochen, da zu lange zu kühl');
+          Serial.println("Solemodus abgebrochen, da zu lange zu kühl");
         }
       }
     }
@@ -441,7 +442,7 @@ void loop()
       if (fuehlerBoilerVL.getMeanTemperature() < boilerDirectExitTemperature) //Vorlauftemperatur viel zu tief? --> direkter Abbruch
       {
         soleModusStart();
-        Serial.println('von Boilermodus zu Solemodus da Boiler VL viel zu klühl');
+        Serial.println("von Boilermodus zu Solemodus da Boiler VL viel zu klühl");
         break;
       }
 
@@ -461,7 +462,7 @@ void loop()
         {
           soleModusStart();
           exitTimeout.executed();
-          Serial.println('von Boilermodus zu Solemodus da Boiler VL zu lange zu kühl');
+          Serial.println("von Boilermodus zu Solemodus da Boiler VL zu lange zu kühl");
         }
       }
     }
@@ -477,9 +478,9 @@ void loop()
   {
     brightness = luxMeter1.getLuminosity(TSL2591_FULLSPECTRUM); //
     timer3m.executed();
-    Serial.print('Helligkeitmessung abgeschlossen. Helligkeit :');
+    Serial.print("Helligkeitmessung abgeschlossen. Helligkeit :");
     Serial.print(brightness);
-    Serial.print(' lux');
+    Serial.print(" lux");
   }
 
   if (timer7d.checkTimer(now))
@@ -488,20 +489,20 @@ void loop()
     boilerHighTemperatur = true;
     boilerTimeout.setLastTime(now); //Timer stellen
     timer7d.executed();             //Timer zurücksetzen
-    Serial.println('Boiler hohe Temperatur abgefangen ');
+    Serial.println("Boiler hohe Temperatur angefangen");
   }
 
   if (displayOn && displayTimeout.checkTimer(now))
   {
     displayOn = false;
-    Serial.println('Display ausgeschaltet');
+    Serial.println("Display ausgeschaltet");
   }
 
   if (boilerHighTemperatur && boilerTimeout.checkTimer(now))
   {
     boilerHighTemperatur = false;
     digitalWrite(STELLWERK_BOILER_TEMP, LOW);
-    Serial.println('Boiler zurück zu normaler Temperatur');
+    Serial.println("Boiler zurück zu normaler Temperatur");
   }
 
   now = millis();
