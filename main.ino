@@ -240,10 +240,28 @@ void setup()
   PIDReglerSolePumpe.SetOutputLimits(25, 255);
   PIDReglerSolePumpe.SetSampleTime(800);
 
+  //Display Setup
+  LCD_00.begin(16, 2);
+  LCD_00.println(0);
+  LCD_01.begin(16, 2);
+  LCD_01.println(1);
+  LCD_02.begin(16, 2);
+  LCD_02.println(2);
+  LCD_03.begin(16, 2);
+  LCD_03.println(3);
+  LCD_04.begin(16, 2);
+  LCD_04.println(4);
+  LCD_05.begin(16, 2);
+  LCD_05.println(5);
+  LCD_06.begin(16, 2);
+  LCD_06.println(6);
+  LCD_07.begin(16, 2);
+  LCD_07.println(7);
+
   //Luxmeter Setup
   luxMeter1.setGain(TSL2591_GAIN_LOW);
   luxMeter1.setTiming(TSL2591_INTEGRATIONTIME_200MS);
-  delay('1000');
+  delay(1000);
 }
 
 // ===================
