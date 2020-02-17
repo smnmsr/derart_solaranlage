@@ -22,11 +22,10 @@ PT1000::PT1000(byte pin, int rVor = 1000, float correctionFactor = 1.0) : Analog
   _A = 0.00390802; //Konstante für PT1000 Berechnung
   _B = -0.0000005802; //Konstante für PT1000 Berechnung
   _RN = 1000; //Normwiderstand des PT1000 bei 0 °C
-  _temperatures[0] = 0; //Temperaturen (immer die letzten fünf)
-  _temperatures[1] = 0;
-  _temperatures[2] = 0;
-  _temperatures[3] = 0;
-  _temperatures[4] = 0;
+  for (size_t i = 0; i < 10; i++)
+  {
+    _temperatures[i] = 0; //Temperaturen (immer die letzten zehn)
+  }
   _voltage = 0; //Spannung am Analogeingang
   _r = 0; //Widerstand des PT1000
 }
@@ -59,7 +58,7 @@ float PT1000::getLastTemperature() {
 
 //Berechnet Temperatur und gibt Mittelwert der letzten fünf Messungen zurück
 float PT1000::getMeanTemperature() {
-  return (_temperatures[0] + _temperatures[1] + _temperatures[2] + _temperatures[3] + _temperatures[4]) / 5;
+  return (_temperatures[0] + _temperatures[1] + _temperatures[2] + _temperatures[3] + _temperatures[4]) / 10;
 }
 
 //____________________________________________

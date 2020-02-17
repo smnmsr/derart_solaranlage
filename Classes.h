@@ -32,7 +32,7 @@ class PT1000 : public AnalogSensor
     float _A;
     float _B;
     int _RN;
-    float _temperatures[5];
+    float _temperatures[10];
     float _voltage;
     float _r;
 };
