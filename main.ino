@@ -473,8 +473,9 @@ void loop()
   {
     brightness = luxMeter1.getLuminosity(TSL2591_FULLSPECTRUM); //
     timer3m.executed();
-    Serial.println('Helligkeitmessung abgeschlossen');
-    Serial.println(brightness);
+    Serial.print('Helligkeitmessung abgeschlossen. Helligkeit :');
+    Serial.print(brightness);
+    Serial.print(' lux');
   }
 
   if (timer7d.checkTimer(now))
