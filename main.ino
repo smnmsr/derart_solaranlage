@@ -64,7 +64,7 @@ const double PID_I_SOLE = 5;
 const double PID_D_SOLE = 0;
 
 // Ethernet Konstanten
-byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+byte mac[] = {0xA8, 0x61, 0x0A, 0xAE, 0x3D, 0xB7};
 
 //Variabeln
 byte operationMode = 0;            //Betriebsmodus: 0=aus, 1=Solemodus, 2=Boilermodus
@@ -81,7 +81,7 @@ bool initializing = false;         //Ist derzeit ein neuer Modus am Initialisier
 bool tooLowValue = false;          //True, wenn Sollwert das erste mal unterschritten
 
 //PID Variabeln
-double PIDInputKollektorPumpe, PIDOutputKollektorPumpe, PIDSetpointKollektorPumpe, PIDInputSolePumpe, PIDOutputSolePumpe, PIDSetpointSolePumpe;
+double PIDInputKollektorPumpe, PIDOutputKollektorPumpe, PIDSetpointKollektorPumpe;
 
 // ==============================
 // 3. PIN-Adressen und BUS-Definitionen
@@ -129,7 +129,6 @@ const byte STELLWERK_SOLE_BOILER = 27; //high = höhere Temperatur?
 const byte STELLWERK_BOILER_TEMP = 29; //high = Boiler?
 
 // PWM Pins
-//const byte PWM_SOLE_PUMPE = 4;
 const byte PWM_KOLLEKTOR_PUMPE = 9;
 
 
@@ -158,7 +157,6 @@ Adafruit_TSL2591 luxMeter1 = Adafruit_TSL2591(0x29);
 
 // Setup der Pumpen
 Pump kollektorPumpe(RELAIS_KOLLEKTOR_PUMPE, PWM_KOLLEKTOR_PUMPE);
-Pump solePumpe(RELAIS_SOLE_PUMPE, PWM_SOLE_PUMPE);
 
 // Setup der Timer (leer für ms, 's' für s, 'm' für min, 'd' für Tage)
 // Timer über normale Clock
@@ -179,7 +177,6 @@ Timer boilerTimeout(1, 'd');               //Boiler-Ausschaltzeit
 
 //PWM Setup
 PID PIDReglerKollektorPumpe(&PIDInputKollektorPumpe, &PIDOutputKollektorPumpe, &PIDSetpointKollektorPumpe, PID_P_KOLLEKTOR, PID_I_KOLLEKTOR, PID_D_KOLLEKTOR, REVERSE);
-PID PIDReglerSolePumpe(&PIDInputSolePumpe, &PIDOutputSolePumpe, &PIDSetpointSolePumpe, PID_P_SOLE, PID_I_SOLE, PID_D_SOLE, REVERSE);
 
 //MQTT Setup
 EthernetClient client;
@@ -207,8 +204,6 @@ void boilerModusStart()
   digitalWrite(RELAIS_SOLE_PUMPE, LOW);                      //Solepumpe ausschalten
   digitalWrite(STELLWERK_SOLE_BOILER, HIGH);                 //Stellwerk auf Boiler umschalten
   PIDReglerKollektorPumpe.SetMode(1);                        //PID-Regler Kollektorpumpe einschalten
-  PIDReglerSolePumpe.SetMode(0);                             //PID-Regler Solepumpe ausschalten
-  PIDOutputSolePumpe = 0;                                    //Output der Solepumpe auf 0 stellen
   PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_BOILERMODUS; //Kollektor Vorlauf Sollwert setzen
   initializing = true;                                       //Initialisierung starten
   initialOperationModeTimeout.setLastTime(now);              //Initialisierungs Timer starten
@@ -223,9 +218,7 @@ void soleModusStart()
   digitalWrite(RELAIS_SOLE_PUMPE, HIGH);                   //Solepumpe einschalten
   digitalWrite(STELLWERK_SOLE_BOILER, LOW);                //Stellwerk auf Sole umschalten
   PIDReglerKollektorPumpe.SetMode(1);                      //PID-Regler Kollektorpumpe einschalten
-  PIDReglerSolePumpe.SetMode(1);                           //PID-Regler Solepumpe einschalten
   PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_SOLEMODUS; //Kollektor Vorlauf Sollwert setzen
-  PIDSetpointSolePumpe = SOLL_SOLE_VL_SOLEMODUS;           //Sole Vorlauf Sollwert setzen
   initializing = true;                                     //Initialisierung starten
   initialOperationModeTimeout.setLastTime(now);            //Initialisierungs Timer starten
   operationMode = 1;                                       //Modus auf Sole schalten
@@ -239,7 +232,6 @@ void turnOffModusStart()
   digitalWrite(RELAIS_SOLE_PUMPE, LOW);      //Solepumpe ausschalten
   digitalWrite(STELLWERK_SOLE_BOILER, LOW);  //Stellwerk auf Sole umschalten
   PIDReglerKollektorPumpe.SetMode(0);        //PID-Regler Kollektorpumpe ausschalten
-  PIDReglerSolePumpe.SetMode(0);             //PID-Regler Solepumpe ausschalten
   initializing = false;                      //Initialisierung stoppen
   operationMode = 0;                         //Modus auf aus schalten
   tooLowValue = false;                       //tooLowValue zurücksetzen
@@ -326,14 +318,11 @@ void setup()
   pinMode(RELAIS_KOLLEKTOR_PUMPE, OUTPUT);
   pinMode(STELLWERK_SOLE_BOILER, OUTPUT);
   pinMode(STELLWERK_BOILER_TEMP, OUTPUT);
-  pinMode(PWM_SOLE_PUMPE, OUTPUT);
   pinMode(PWM_KOLLEKTOR_PUMPE, OUTPUT);
 
   //PWM Setup
   PIDReglerKollektorPumpe.SetOutputLimits(70, 255);
   PIDReglerKollektorPumpe.SetSampleTime(800);
-  PIDReglerSolePumpe.SetOutputLimits(70, 255);
-  PIDReglerSolePumpe.SetSampleTime(800);
 //Display Setup
   // i2cSelect(MUX_IN,0);
   // LCD_06.begin(16, 2);
@@ -449,10 +438,7 @@ void loop()
     if (operationMode == 1)
     {
       kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);
-      solePumpe.setSpeed(PIDOutputSolePumpe);
-      PIDInputSolePumpe = fuehlerSole.getMeanTemperature();             //Sole-Temperatur auslesen;
       PIDInputKollektorPumpe = fuehlerKollektorVL.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
-      PIDReglerSolePumpe.Compute();
       PIDReglerKollektorPumpe.Compute();
     }
     if (operationMode == 2)
@@ -484,7 +470,6 @@ void loop()
     if (soleAlarm)
     {
       //Solepumpe ausschalten
-      analogWrite(PWM_SOLE_PUMPE, 0);
       digitalWrite(RELAIS_SOLE_PUMPE, LOW);
       Serial.println("SOLE ALARM!!");
     }
