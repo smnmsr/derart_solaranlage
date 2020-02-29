@@ -162,7 +162,7 @@ Pump kollektorPumpe(RELAIS_KOLLEKTOR_PUMPE, PWM_KOLLEKTOR_PUMPE);
 Timer timer200ms(500); //500ms Timer
 Timer timer1s(1, 's'); //1s Timer
 Timer timer5s(5, 's'); //5s Timer
-Timer timer3m(3, 'm'); //3min Timer
+Timer timer3m(30, 's'); //3min Timer
 Timer timer7d(7, 'd'); //7d Timer
 
 //Timer für bestimmte Funktionen
@@ -648,7 +648,6 @@ void loop()
   {
     // Helligkeit auslesen
     brightness = luxMeter1.getLuminosity(TSL2591_FULLSPECTRUM); //
-    timer3m.executed();
     Serial.print("Helligkeitmessung abgeschlossen. Helligkeit :");
     Serial.print(brightness);
     Serial.println(" lux");
@@ -657,6 +656,8 @@ void loop()
 
     //Ethernet aktuell halten
     Ethernet.maintain();
+
+    timer3m.executed();
   }
 
   // if (timer7d.checkTimer(now))
