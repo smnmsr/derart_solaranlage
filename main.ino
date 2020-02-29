@@ -18,6 +18,10 @@
 #include "Classes.h"                //Eigene Klassen
 #include "Adafruit_Sensor.h"        //Für Adafruit Sensoren
 #include "Adafruit_TSL2591.h"       //Für Adafruit LUX-Sensoren
+#include <SPI.h> //Ethernet
+#include <Ethernet.h> //Ethernet
+#include <ArduinoMqttClient.h> //MQTT
+#include "secrets.h" //MQTT Passwords
 
 // ===========================
 // 2. Variabeln und Konstanten
@@ -41,7 +45,7 @@ const int MIN_DIFFERENZ_NACH_ALARM = 3;        //erst wenn die Temperatur um die
 const int SOLE_EXIT_TEMPERATURE = 14;          //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
 const int SOLE_VL_EXIT_TEMPERATURE = 18;       //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
 const int SOLL_KOLLEKTOR_VL_BOILERMODUS = 80;  //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Boilermodus
-const int SOLL_KOLLEKTOR_VL_SOLEMODUS = 60;    //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
+const int SOLL_KOLLEKTOR_VL_SOLEMODUS = 80;    //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
 const int SOLL_SOLE_VL_SOLEMODUS = 30;         //Solltemperatur, auf die der Sole VL geregelt werden soll
 const int MIN_WAERMER_BOILER = 3;              //Mindest Temperaturunterschied zwischen Boiler VL und Boiler
 const int BOILER_UPPER_EXIT_TEMPERATURE = 70;  //Temperatur, auf diese der Boiler erwärmt werden soll
@@ -59,16 +63,20 @@ const double PID_P_SOLE = 5;
 const double PID_I_SOLE = 5;
 const double PID_D_SOLE = 0;
 
+// Ethernet Konstanten
+byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+
 //Variabeln
 byte operationMode = 0;            //Betriebsmodus: 0=aus, 1=Solemodus, 2=Boilermodus
-unsigned long now = 0;             //Jeweils aktueller millis()-Wert
+byte displayMode = 0;            //Betriebsmodus anzeige
+unsigned long now = 0;         //Jeweils aktueller millis()-Wert
 bool displayOn = false;            //true, wenn Displays eingeschaltet sein soll
 bool boilerHighTemperatur = false; //true, wenn Boiler auf höherer Temperatur ist
 bool kollektorAlarm = false;       //true, wenn kollektor zu heiss ist
 bool soleAlarm = false;            //true, wenn solepumpe zu heiss ist
 float boilerLowerExitTemperature;  //Temperatur, bei der der Boilermodus abgebrochen wird
 float boilerDirectExitTemperature; //Temperatur, bei der der Boilermodus direkt (ohne Verzögerung abgebrochen wird)
-unsigned long brightness = 1;                //gemessene Helligkeit
+long brightness = 1;      //gemessene Helligkeit
 bool initializing = false;         //Ist derzeit ein neuer Modus am Initialisieren?
 bool tooLowValue = false;          //True, wenn Sollwert das erste mal unterschritten
 
@@ -78,6 +86,11 @@ double PIDInputKollektorPumpe, PIDOutputKollektorPumpe, PIDSetpointKollektorPump
 // ==============================
 // 3. PIN-Adressen und BUS-Definitionen
 // ==============================
+
+// i2c Multiplexer
+const unsigned int MUX_OUT = 0x70;
+const unsigned int MUX_IN = 0x71;
+
 // i2c Adressen
 Adafruit_LiquidCrystal LCD_00(0x74);
 Adafruit_LiquidCrystal LCD_01(0x77);
@@ -85,8 +98,8 @@ Adafruit_LiquidCrystal LCD_02(0x73);
 Adafruit_LiquidCrystal LCD_03(0x72);
 Adafruit_LiquidCrystal LCD_04(0x75);
 Adafruit_LiquidCrystal LCD_05(0x76);
-Adafruit_LiquidCrystal LCD_06(0x70);
-Adafruit_LiquidCrystal LCD_07(0x71);
+Adafruit_LiquidCrystal LCD_06(0x74);
+Adafruit_LiquidCrystal LCD_07(0x75);
 
 // Analog Pins
 const byte FUEHLER_KOLLEKTOR_VL_PIN = A7;   //S0
@@ -101,7 +114,11 @@ const byte FUEHLER_SOLE_PIN = A6;           //S7
 // const byte POTENTIOMETER_2_PIN = A15; //aktuell nicht gebraucht
 
 // Digital In Pins
-const byte DISPLAY_BUTTON = 47;
+const byte DISPLAY_BUTTON = 30;
+const byte UP_BUTTON = 24;
+const byte DOWN_BUTTON = 28;
+const byte LEFT_BUTTON = 26;
+const byte RIGHT_BUTTON = 22;
 const byte FLOW_METER_BOILER = 45;
 const byte FLOW_METER_SOLE = 43;
 
@@ -112,8 +129,9 @@ const byte STELLWERK_SOLE_BOILER = 27; //high = höhere Temperatur?
 const byte STELLWERK_BOILER_TEMP = 29; //high = Boiler?
 
 // PWM Pins
-const byte PWM_SOLE_PUMPE = 4;
-const byte PWM_KOLLEKTOR_PUMPE = 13;
+//const byte PWM_SOLE_PUMPE = 4;
+const byte PWM_KOLLEKTOR_PUMPE = 9;
+
 
 // ====================
 // 4. INITIALISIERUNGEN
@@ -152,20 +170,35 @@ Timer timer7d(7, 'd'); //7d Timer
 
 //Timer für bestimmte Funktionen
 Timer initialOperationModeTimeout(3, 'm'); //Zeit bevor ein Modus EXIT-Kriterien berücksichtigt
-Timer exitTimeout(2, 'm');                  //Solange muss der Sollwert mindestens unterschritten sein, bevor Abbruch
-Timer flowMeterBoilerTimeout(100);          //Durchflussmeter 1 Timeout
-Timer flowMeterSoleTimeout(100);            //Durchflussmeter 2 Timeout
-Timer displayButtonTimeout(1000);           //Display-Button Timeout
-Timer displayTimeout(30, 's');              //Display-Ausschaltzeit
-Timer boilerTimeout(1, 'd');                //Boiler-Ausschaltzeit
+Timer exitTimeout(2, 'm');                 //Solange muss der Sollwert mindestens unterschritten sein, bevor Abbruch
+Timer flowMeterBoilerTimeout(500);         //Durchflussmeter 1 Timeout
+Timer flowMeterSoleTimeout(500);           //Durchflussmeter 2 Timeout
+Timer displayButtonTimeout(1000);          //Display-Button Timeout
+Timer displayTimeout(30, 's');             //Display-Ausschaltzeit
+Timer boilerTimeout(1, 'd');               //Boiler-Ausschaltzeit
 
 //PWM Setup
 PID PIDReglerKollektorPumpe(&PIDInputKollektorPumpe, &PIDOutputKollektorPumpe, &PIDSetpointKollektorPumpe, PID_P_KOLLEKTOR, PID_I_KOLLEKTOR, PID_D_KOLLEKTOR, REVERSE);
 PID PIDReglerSolePumpe(&PIDInputSolePumpe, &PIDOutputSolePumpe, &PIDSetpointSolePumpe, PID_P_SOLE, PID_I_SOLE, PID_D_SOLE, REVERSE);
 
+//MQTT Setup
+EthernetClient client;
+MqttClient mqttClient(client);
+
+const char broker[] = "storage.moser-artz.ch";
+int        port     = 1883;
+const char topic[]  = "derart";
+
 // =============
 // 5. FUNKTIONEN
 // =============
+
+void i2cSelect(int mux, uint8_t i) {
+  if (i > 7) return;
+  Wire.beginTransmission(mux);
+  Wire.write(1 << i);
+  Wire.endTransmission();
+}
 
 void boilerModusStart()
 {
@@ -190,7 +223,7 @@ void soleModusStart()
   digitalWrite(RELAIS_SOLE_PUMPE, HIGH);                   //Solepumpe einschalten
   digitalWrite(STELLWERK_SOLE_BOILER, LOW);                //Stellwerk auf Sole umschalten
   PIDReglerKollektorPumpe.SetMode(1);                      //PID-Regler Kollektorpumpe einschalten
-  PIDReglerSolePumpe.SetMode(0);                           //PID-Regler Solepumpe einschalten
+  PIDReglerSolePumpe.SetMode(1);                           //PID-Regler Solepumpe einschalten
   PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_SOLEMODUS; //Kollektor Vorlauf Sollwert setzen
   PIDSetpointSolePumpe = SOLL_SOLE_VL_SOLEMODUS;           //Sole Vorlauf Sollwert setzen
   initializing = true;                                     //Initialisierung starten
@@ -210,6 +243,67 @@ void turnOffModusStart()
   initializing = false;                      //Initialisierung stoppen
   operationMode = 0;                         //Modus auf aus schalten
   tooLowValue = false;                       //tooLowValue zurücksetzen
+}
+
+void eraseDisplays()
+{
+  
+  i2cSelect(MUX_IN,1);
+  LCD_00.clear();
+  LCD_01.clear();
+  LCD_02.clear();
+  LCD_03.clear();
+  LCD_04.clear();
+  LCD_05.clear();
+
+  i2cSelect(MUX_IN,0);
+  LCD_06.clear();
+  LCD_07.clear();
+}
+
+void writeDisplays(byte mode)
+{
+  i2cSelect(MUX_IN,1);
+  LCD_00.print("Test1");
+  LCD_01.print("Test2");
+  LCD_02.print("Test3");
+  LCD_03.print("Test4");
+  LCD_04.print("Test5");
+  LCD_05.print("Test6");
+  i2cSelect(MUX_IN,0);
+  LCD_06.print("Test7");
+  LCD_07.print("Test8");
+
+}
+
+void turnOffDisplays()
+{
+    i2cSelect(MUX_IN,1);
+  LCD_00.setBacklight(LOW);
+  LCD_01.setBacklight(LOW);
+  LCD_02.setBacklight(LOW);
+  LCD_03.setBacklight(LOW);
+  LCD_04.setBacklight(LOW);
+  LCD_05.setBacklight(LOW);
+
+  i2cSelect(MUX_IN,0);
+  LCD_06.setBacklight(LOW);
+  LCD_07.setBacklight(LOW);
+}
+
+void turnOnDisplays()
+{
+  i2cSelect(MUX_IN,1);
+  LCD_00.setBacklight(HIGH);
+  LCD_01.setBacklight(HIGH);
+  LCD_02.setBacklight(HIGH);
+  LCD_03.setBacklight(HIGH);
+  LCD_04.setBacklight(HIGH);
+  LCD_05.setBacklight(HIGH);
+
+  i2cSelect(MUX_IN,0);
+  LCD_06.setBacklight(HIGH);
+  LCD_07.setBacklight(HIGH);
 }
 
 // ================
@@ -236,25 +330,58 @@ void setup()
   pinMode(PWM_KOLLEKTOR_PUMPE, OUTPUT);
 
   //PWM Setup
-  PIDReglerKollektorPumpe.SetOutputLimits(25, 255);
+  PIDReglerKollektorPumpe.SetOutputLimits(70, 255);
   PIDReglerKollektorPumpe.SetSampleTime(800);
-  PIDReglerSolePumpe.SetOutputLimits(25, 255);
+  PIDReglerSolePumpe.SetOutputLimits(70, 255);
   PIDReglerSolePumpe.SetSampleTime(800);
-
-  //Display Setup
-  LCD_00.begin(16, 2);
-  LCD_01.begin(16, 2);
-  LCD_02.begin(16, 2);
-  LCD_03.begin(16, 2);
-  LCD_04.begin(16, 2);
-  LCD_05.begin(16, 2);
-  LCD_06.begin(16, 2);
-  LCD_07.begin(16, 2);
-
+//Display Setup
+  // i2cSelect(MUX_IN,0);
+  // LCD_06.begin(16, 2);
+  // LCD_07.begin(16, 2);
+  // i2cSelect(MUX_IN,1);
+  // LCD_00.begin(16, 2);
+  // LCD_01.begin(16, 2);
+  // LCD_02.begin(16, 2);
+  // LCD_03.begin(16, 2);
+  // LCD_04.begin(16, 2);
+  // LCD_05.begin(16, 2);
+  // eraseDisplays();
+  // turnOffDisplays();
+  
   //Luxmeter Setup
   luxMeter1.setGain(TSL2591_GAIN_LOW);
   luxMeter1.setTiming(TSL2591_INTEGRATIONTIME_200MS);
+  brightness = luxMeter1.getLuminosity(TSL2591_FULLSPECTRUM);
   delay(1000);
+
+  // Initialise Internet and MQTT
+  // attempt to connect to  network:
+  Serial.print("Attempting to connect to Internet via DHCP ");
+  while (Ethernet.begin(mac) == 0) {
+    // failed, retry
+    Serial.print(".");
+    delay(5000);
+  }
+
+  Serial.println("You're connected to the Internet. our IP: ");
+  Serial.println(Ethernet.localIP());
+  Serial.println();
+
+  mqttClient.setUsernamePassword(MQTT_USER, MQTT_PASS);
+
+  Serial.print("Attempting to connect to the MQTT broker: ");
+  Serial.println(broker);
+
+  while (!mqttClient.connect(broker, port)) {
+    Serial.print("MQTT connection failed! Error code = ");
+    Serial.println(mqttClient.connectError());
+
+    delay(5000);
+  }
+
+  Serial.println("You're connected to the MQTT broker!");
+  Serial.println();
+
   Serial.println("Setup beendet");
 }
 
@@ -263,7 +390,7 @@ void setup()
 // ===================
 void loop()
 {
-  /*   //Prüfen, ob je nach Betriebsmodus der entsprechende Durchflussmesser einen Impuls ausgibt
+/*     //Prüfen, ob je nach Betriebsmodus der entsprechende Durchflussmesser einen Impuls ausgibt
   switch (operationMode)
   {
   case 0:
@@ -314,49 +441,26 @@ void loop()
 
     if (displayOn)
     {
-
       //Displays Schreiben
-      Serial.print("Kollektor Luft Temperatur: ");
-      Serial.print(fuehlerKollektorLuft.getMeanTemperature(), 1);
-      Serial.println(" °C");
-      Serial.print("Boiler Temperatur: ");
-      Serial.print(fuehlerBoiler.getMeanTemperature(), 1);
-      Serial.println(" °C");
-      Serial.print("Boiler VL Temperatur: ");
-      Serial.print(fuehlerBoilerVL.getMeanTemperature(), 1);
-      Serial.println(" °C");
-      Serial.print("Sole VL Temperatur: ");
-      Serial.print(fuehlerSoleVL.getMeanTemperature(), 1);
-      Serial.println(" °C");
-      Serial.print("Boiler RL Temperatur: ");
-      Serial.print(fuehlerBoilerRL.getMeanTemperature(), 1);
-      Serial.println(" °C");
-      Serial.print("Sole RL Temperatur: ");
-      Serial.print(fuehlerSoleRL.getMeanTemperature(), 1);
-      Serial.println(" °C");
-      Serial.print("Sole Temperatur: ");
-      Serial.print(fuehlerSole.getMeanTemperature(), 1);
-      Serial.println(" °C");
-      Serial.print("Kollektor VL Temperatur: ");
-      Serial.print(fuehlerKollektorVL.getMeanTemperature(), 1);
-      Serial.println(" °C");
-      Serial.println(" ");
+      turnOnDisplays();
+      writeDisplays(displayMode);
     }
     //PID Regler berechnen
     if (operationMode == 1)
     {
       kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);
-      PIDReglerSolePumpe.Compute();
-      PIDReglerKollektorPumpe.Compute();
       solePumpe.setSpeed(PIDOutputSolePumpe);
       PIDInputSolePumpe = fuehlerSole.getMeanTemperature();             //Sole-Temperatur auslesen;
       PIDInputKollektorPumpe = fuehlerKollektorVL.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
+      PIDReglerSolePumpe.Compute();
+      PIDReglerKollektorPumpe.Compute();
     }
     if (operationMode == 2)
     {
       kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);
-      PIDReglerKollektorPumpe.Compute();
+      Serial.println(PIDOutputKollektorPumpe);
       PIDInputKollektorPumpe = fuehlerKollektorVL.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
+      PIDReglerKollektorPumpe.Compute();
     }
 
     //Timer zurücksetzen
@@ -380,7 +484,7 @@ void loop()
     if (soleAlarm)
     {
       //Solepumpe ausschalten
-      analogWrite(PWM_SOLE_PUMPE, 255);
+      analogWrite(PWM_SOLE_PUMPE, 0);
       digitalWrite(RELAIS_SOLE_PUMPE, LOW);
       Serial.println("SOLE ALARM!!");
     }
@@ -389,7 +493,7 @@ void loop()
     if (kollektorAlarm)
     {
       //Kollektorpumpe auf 100% und Wärme in Boiler
-      analogWrite(PWM_KOLLEKTOR_PUMPE, 0);
+      analogWrite(PWM_KOLLEKTOR_PUMPE, 255);
       digitalWrite(STELLWERK_SOLE_BOILER, HIGH);
       Serial.println("KOLLEKTOR ALARM!!");
     }
@@ -440,10 +544,6 @@ void loop()
       {
         soleModusStart();
         Serial.println("Solemodus aus ausgeschaltenem Modus gestartet");
-      }
-      else
-      {
-        Serial.println("Bleibt im ausgeschaltenen Modus");
       }
     }
     break;
@@ -520,14 +620,18 @@ void loop()
     timer5s.executed();
   }
 
-  // if (timer3m.checkTimer(now))
-  // {
-  //   brightness = luxMeter1.getLuminosity(TSL2591_FULLSPECTRUM); //
-  //   timer3m.executed();
-  //   Serial.print("Helligkeitmessung abgeschlossen. Helligkeit :");
-  //   Serial.print(brightness);
-  //   Serial.print(" lux");
-  // }
+   if (timer3m.checkTimer(now))
+   {
+     // Helligkeit auslesen
+     brightness = luxMeter1.getLuminosity(TSL2591_FULLSPECTRUM); //
+     timer3m.executed();
+     Serial.print("Helligkeitmessung abgeschlossen. Helligkeit :");
+     Serial.print(brightness);
+     Serial.println(" lux");
+
+     //Ethernet aktuell halten
+     Ethernet.maintain();
+  }
 
   // if (timer7d.checkTimer(now))
   // {
@@ -542,6 +646,8 @@ void loop()
   {
     displayOn = false;
     Serial.println("Display ausgeschaltet");
+    eraseDisplays();
+    turnOffDisplays();
   }
 
   // if (boilerHighTemperatur && boilerTimeout.checkTimer(now))
