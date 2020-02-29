@@ -159,11 +159,10 @@ Pump kollektorPumpe(RELAIS_KOLLEKTOR_PUMPE, PWM_KOLLEKTOR_PUMPE);
 
 // Setup der Timer (leer für ms, 's' für s, 'm' für min, 'd' für Tage)
 // Timer über normale Clock
-Timer timer200ms(500); //500ms Timer
-Timer timer1s(1, 's'); //1s Timer
-Timer timer5s(5, 's'); //5s Timer
+Timer timer1s(1, 's');  //1s Timer
+Timer timer5s(5, 's');  //5s Timer
 Timer timer3m(30, 's'); //3min Timer
-Timer timer7d(7, 'd'); //7d Timer
+Timer timer7d(7, 'd');  //7d Timer
 
 //Timer für bestimmte Funktionen
 Timer initialOperationModeTimeout(3, 'm'); //Zeit bevor ein Modus EXIT-Kriterien berücksichtigt
@@ -209,9 +208,15 @@ void i2cSelect(int mux, uint8_t i)
 void boilerModusStart()
 {
   Serial.println("Boilermodus gestartet");
-  digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH);                //Kollektorpumpe einschalten
-  digitalWrite(RELAIS_SOLE_PUMPE, LOW);                      //Solepumpe ausschalten
-  digitalWrite(STELLWERK_SOLE_BOILER, HIGH);                 //Stellwerk auf Boiler umschalten
+  digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH); //Kollektorpumpe einschalten
+  subtopic = "kollektorPumpe";
+  sendMQTTMessage(1);
+  digitalWrite(RELAIS_SOLE_PUMPE, LOW); //Solepumpe ausschalten
+  subtopic = "solePumpe";
+  sendMQTTMessage(0);
+  digitalWrite(STELLWERK_SOLE_BOILER, HIGH); //Stellwerk auf Boiler umschalten
+  subtopic = "stellwerkSoleBoiler";
+  sendMQTTMessage("Boiler");
   PIDReglerKollektorPumpe.SetMode(1);                        //PID-Regler Kollektorpumpe einschalten
   PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_BOILERMODUS; //Kollektor Vorlauf Sollwert setzen
   initializing = true;                                       //Initialisierung starten
@@ -225,9 +230,15 @@ void boilerModusStart()
 void soleModusStart()
 {
   Serial.println("Solemodus gestartet");
-  digitalWrite(RELAIS_KOLLEKTOR_PUMPE, LOW);               //Kollektorpumpe ausschalten
-  digitalWrite(RELAIS_SOLE_PUMPE, HIGH);                   //Solepumpe einschalten
-  digitalWrite(STELLWERK_SOLE_BOILER, LOW);                //Stellwerk auf Sole umschalten
+  digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH); //Kollektorpumpe ausschalten
+  subtopic = "kollektorPumpe";
+  sendMQTTMessage(1);
+  digitalWrite(RELAIS_SOLE_PUMPE, HIGH); //Solepumpe einschalten
+  subtopic = "solePumpe";
+  sendMQTTMessage(1);
+  digitalWrite(STELLWERK_SOLE_BOILER, LOW); //Stellwerk auf Sole umschalten
+  subtopic = "stellwerkSoleBoiler";
+  sendMQTTMessage("Sole");
   PIDReglerKollektorPumpe.SetMode(1);                      //PID-Regler Kollektorpumpe einschalten
   PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_SOLEMODUS; //Kollektor Vorlauf Sollwert setzen
   initializing = true;                                     //Initialisierung starten
@@ -242,12 +253,18 @@ void turnOffModusStart()
 {
   Serial.println("Modus Ausgeschaltet");
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, LOW); //Kollektorpumpe ausschalten
-  digitalWrite(RELAIS_SOLE_PUMPE, LOW);      //Solepumpe ausschalten
-  digitalWrite(STELLWERK_SOLE_BOILER, LOW);  //Stellwerk auf Sole umschalten
-  PIDReglerKollektorPumpe.SetMode(0);        //PID-Regler Kollektorpumpe ausschalten
-  initializing = false;                      //Initialisierung stoppen
-  operationMode = 0;                         //Modus auf aus schalten
-  tooLowValue = false;                       //tooLowValue zurücksetzen
+  subtopic = "kollektorPumpe";
+  sendMQTTMessage(0);
+  digitalWrite(RELAIS_SOLE_PUMPE, LOW); //Solepumpe ausschalten
+  subtopic = "solePumpe";
+  sendMQTTMessage(0);
+  digitalWrite(STELLWERK_SOLE_BOILER, LOW); //Stellwerk auf Sole umschalten
+  subtopic = "stellwerkSoleBoiler";
+  sendMQTTMessage("Sole");
+  PIDReglerKollektorPumpe.SetMode(0); //PID-Regler Kollektorpumpe ausschalten
+  initializing = false;               //Initialisierung stoppen
+  operationMode = 0;                  //Modus auf aus schalten
+  tooLowValue = false;                //tooLowValue zurücksetzen
   subtopic = "operationMode";
   sendMQTTMessage(operationMode);
 }
@@ -428,13 +445,6 @@ void loop()
     displayButtonTimeout.executed();
   }
 
-  if (timer200ms.checkTimer(now))
-  {
-
-    //Timer zurücksetzen
-    timer200ms.executed();
-  }
-
   if (timer1s.checkTimer(now))
   {
     //Alle Fühler auslesen
@@ -474,15 +484,19 @@ void loop()
     //PID Regler berechnen
     if (operationMode == 1)
     {
-      kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);
       PIDInputKollektorPumpe = fuehlerKollektorVL.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
       PIDReglerKollektorPumpe.Compute();
+      kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);
+      subtopic = "speedKollektorPumpe";
+      sendMQTTMessage(PIDOutputKollektorPumpe);
     }
     if (operationMode == 2)
     {
-      kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);
       PIDInputKollektorPumpe = fuehlerKollektorVL.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
       PIDReglerKollektorPumpe.Compute();
+      kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);
+      subtopic = "speedKollektorPumpe";
+      sendMQTTMessage(PIDOutputKollektorPumpe);
     }
 
     // MQTT Client am Leben halten
