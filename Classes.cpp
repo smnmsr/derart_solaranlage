@@ -168,7 +168,6 @@ void Pump::setSpeed(int speed)
     speed = 0;
   }
 
-  speed = abs(speed - 255);
   analogWrite(_PWMPin, speed);
   digitalWrite(_relaisPin, HIGH);
 }
