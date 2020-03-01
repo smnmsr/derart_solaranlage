@@ -67,7 +67,14 @@ float PT1000::getLastTemperature()
 //Berechnet Temperatur und gibt Mittelwert der letzten fünf Messungen zurück
 float PT1000::getMeanTemperature()
 {
-  return (_temperatures[0] + _temperatures[1] + _temperatures[2] + _temperatures[3] + _temperatures[4] + _temperatures[5] + _temperatures[6] + _temperatures[7] + _temperatures[8] + _temperatures[9]) / 10;
+  if (_temperatures[9] != 0)
+  {
+    return (_temperatures[0] + _temperatures[1] + _temperatures[2] + _temperatures[3] + _temperatures[4] + _temperatures[5] + _temperatures[6] + _temperatures[7] + _temperatures[8] + _temperatures[9]) / 10;
+  }
+  else
+  {
+    return _temperatures[0];
+  }
 }
 
 //____________________________________________
