@@ -183,13 +183,36 @@ MqttClient mqttClient(client);
 const char broker[] = "storage.moser-artz.ch";
 int port = 1883;
 String topic = "derart/";
-String subtopic;
 
 // =============
 // 5. FUNKTIONEN
 // =============
 
-void sendMQTTMessage(double value)
+void sendMQTT(String subtopic, double value)
+{
+  mqttClient.beginMessage(topic + subtopic);
+  mqttClient.print(value);
+  mqttClient.endMessage();
+}
+void sendMQTT(String subtopic, int value)
+{
+  mqttClient.beginMessage(topic + subtopic);
+  mqttClient.print(value);
+  mqttClient.endMessage();
+}
+void sendMQTT(String subtopic, long value)
+{
+  mqttClient.beginMessage(topic + subtopic);
+  mqttClient.print(value);
+  mqttClient.endMessage();
+}
+void sendMQTT(String subtopic, String value)
+{
+  mqttClient.beginMessage(topic + subtopic);
+  mqttClient.print(value);
+  mqttClient.endMessage();
+}
+void sendMQTT(String subtopic, boolean value)
 {
   mqttClient.beginMessage(topic + subtopic);
   mqttClient.print(value);
@@ -209,64 +232,52 @@ void boilerModusStart()
 {
   Serial.println("Boilermodus gestartet");
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH); //Kollektorpumpe einschalten
-  subtopic = "kollektorPumpe";
-  sendMQTTMessage(1);
+  sendMQTT("kollektorPumpe", true);
   digitalWrite(RELAIS_SOLE_PUMPE, LOW); //Solepumpe ausschalten
-  subtopic = "solePumpe";
-  sendMQTTMessage(0);
+  sendMQTT("solePumpe", false);
   digitalWrite(STELLWERK_SOLE_BOILER, HIGH); //Stellwerk auf Boiler umschalten
-  subtopic = "stellwerkSoleBoiler";
-  sendMQTTMessage("Boiler");
+  sendMQTT("stellwerkSoleBoiler","Boiler");
   PIDReglerKollektorPumpe.SetMode(1);                        //PID-Regler Kollektorpumpe einschalten
   PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_BOILERMODUS; //Kollektor Vorlauf Sollwert setzen
   initializing = true;                                       //Initialisierung starten
   initialOperationModeTimeout.setLastTime(now);              //Initialisierungs Timer starten
   operationMode = 2;                                         //Modus auf Boiler schalten
   tooLowValue = false;                                       //tooLowValue zurücksetzen
-  subtopic = "operationMode";
-  sendMQTTMessage(operationMode);
+  sendMQTT("operationMode", "Boilermodus");
 }
 
 void soleModusStart()
 {
   Serial.println("Solemodus gestartet");
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH); //Kollektorpumpe ausschalten
-  subtopic = "kollektorPumpe";
-  sendMQTTMessage(1);
+  sendMQTT("kollektorPumpe",true);
   digitalWrite(RELAIS_SOLE_PUMPE, HIGH); //Solepumpe einschalten
-  subtopic = "solePumpe";
-  sendMQTTMessage(1);
+  sendMQTT("solePumpe",true);
   digitalWrite(STELLWERK_SOLE_BOILER, LOW); //Stellwerk auf Sole umschalten
-  subtopic = "stellwerkSoleBoiler";
-  sendMQTTMessage("Sole");
+  sendMQTT("stellwerkSoleBoiler","Sole");
   PIDReglerKollektorPumpe.SetMode(1);                      //PID-Regler Kollektorpumpe einschalten
   PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_SOLEMODUS; //Kollektor Vorlauf Sollwert setzen
   initializing = true;                                     //Initialisierung starten
   initialOperationModeTimeout.setLastTime(now);            //Initialisierungs Timer starten
   operationMode = 1;                                       //Modus auf Sole schalten
   tooLowValue = false;                                     //tooLowValue zurücksetzen
-  subtopic = "operationMode";
-  sendMQTTMessage(operationMode);
+  sendMQTT("operationMode", "Solemodus");
 }
 
 void turnOffModusStart()
 {
   Serial.println("Modus Ausgeschaltet");
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, LOW); //Kollektorpumpe ausschalten
-  subtopic = "kollektorPumpe";
-  sendMQTTMessage(0);
+  sendMQTT("kollektorPumpe",true);
   digitalWrite(RELAIS_SOLE_PUMPE, LOW); //Solepumpe ausschalten
-  subtopic = "solePumpe";
-  sendMQTTMessage(0);
+  sendMQTT("solePumpe",true);
   digitalWrite(STELLWERK_SOLE_BOILER, LOW); //Stellwerk auf Sole umschalten
-  subtopic = "stellwerkSoleBoiler";
-  sendMQTTMessage("Sole");
+  sendMQTT("stellwerkSoleBoiler","Sole");
   PIDReglerKollektorPumpe.SetMode(0); //PID-Regler Kollektorpumpe ausschalten
   initializing = false;               //Initialisierung stoppen
   operationMode = 0;                  //Modus auf aus schalten
   tooLowValue = false;                //tooLowValue zurücksetzen
-  subtopic = "operationMode";
-  sendMQTTMessage(operationMode);
+  sendMQTT("operationMode","Ausgeschaltet");
 }
 
 void eraseDisplays()
@@ -458,22 +469,15 @@ void loop()
     fuehlerSole.calculateTemperature();
 
     //Fuehlerwerte an MQTT Senden
-    subtopic = "fuehlerKollektorVL";
-    sendMQTTMessage(fuehlerKollektorVL.getMeanTemperature());
-    subtopic = "fuehlerKollektorLuft";
-    sendMQTTMessage(fuehlerKollektorLuft.getMeanTemperature());
-    subtopic = "fuehlerBoiler";
-    sendMQTTMessage(fuehlerBoiler.getMeanTemperature());
-    subtopic = "fuehlerBoilerVL";
-    sendMQTTMessage(fuehlerBoilerVL.getMeanTemperature());
-    subtopic = "fuehlerSoleVL";
-    sendMQTTMessage(fuehlerSoleVL.getMeanTemperature());
-    subtopic = "fuehlerBoilerRL";
-    sendMQTTMessage(fuehlerBoilerRL.getMeanTemperature());
-    subtopic = "fuehlerSoleRL";
-    sendMQTTMessage(fuehlerSoleRL.getMeanTemperature());
-    subtopic = "fuehlerSole";
-    sendMQTTMessage(fuehlerSole.getMeanTemperature());
+    sendMQTT("fuehlerKollektorVL",fuehlerKollektorVL.getMeanTemperature());
+    sendMQTT("fuehlerKollektorLuft",fuehlerKollektorLuft.getMeanTemperature());
+    sendMQTT("fuehlerBoiler",fuehlerBoiler.getMeanTemperature());
+    sendMQTT("fuehlerBoilerVL",fuehlerBoilerVL.getMeanTemperature());
+    sendMQTT("fuehlerSoleVL",fuehlerSoleVL.getMeanTemperature());
+    sendMQTT("fuehlerBoilerRL",fuehlerBoilerRL.getMeanTemperature());
+    sendMQTT("fuehlerSoleRL",fuehlerSoleRL.getMeanTemperature());
+    sendMQTT("fuehlerSole",fuehlerSole.getMeanTemperature());
+
 
     if (displayOn)
     {
@@ -487,16 +491,14 @@ void loop()
       PIDInputKollektorPumpe = fuehlerKollektorVL.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
       PIDReglerKollektorPumpe.Compute();
       kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);
-      subtopic = "speedKollektorPumpe";
-      sendMQTTMessage(PIDOutputKollektorPumpe);
+      sendMQTT("speedKollektorPumpe",PIDOutputKollektorPumpe);
     }
     if (operationMode == 2)
     {
       PIDInputKollektorPumpe = fuehlerKollektorVL.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
       PIDReglerKollektorPumpe.Compute();
       kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);
-      subtopic = "speedKollektorPumpe";
-      sendMQTTMessage(PIDOutputKollektorPumpe);
+      sendMQTT("speedKollektorPumpe",PIDOutputKollektorPumpe);
     }
 
     // MQTT Client am Leben halten
@@ -665,8 +667,7 @@ void loop()
     Serial.print("Helligkeitmessung abgeschlossen. Helligkeit :");
     Serial.print(brightness);
     Serial.println(" lux");
-    subtopic = "brightness";
-    sendMQTTMessage(brightness / 1000);
+    sendMQTT("brightness", round(brightness / 1000));
 
     //Ethernet aktuell halten
     Ethernet.maintain();
