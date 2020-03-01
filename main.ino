@@ -42,8 +42,9 @@ const int ALARMTEMPERATUR_KOLLEKTOR_LUFT = 90; //Alarmtemperatur für Kollektor 
 const int ALARMTEMPERATUR_KOLLEKTOR_VL = 85;   //Alarmtemperatur für Kollektor (Vorlauftemperatur)
 const int ALARMTEMPERATUR_SOLE = 30;           //Alarmtemperatur für Sole-Pumpe
 const int MIN_DIFFERENZ_NACH_ALARM = 3;        //erst wenn die Temperatur um diesen Wert gesunken ist, geht der Alarmmodus aus
-const int SOLE_EXIT_TEMPERATURE = 14;          //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
-const int SOLE_VL_EXIT_TEMPERATURE = 18;       //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
+const int SOLE_EXIT_TEMPERATURE = 10;          //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
+const int SOLE_START_TEMPERATURE = 30;       //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus gestartet wird
+const int SOLE_VL_EXIT_TEMPERATURE = 25;       //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
 const int SOLL_KOLLEKTOR_VL_BOILERMODUS = 75;  //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Boilermodus
 const int SOLL_KOLLEKTOR_VL_SOLEMODUS = 65;    //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
 const int SOLL_SOLE_VL_SOLEMODUS = 30;         //Solltemperatur, auf die der Sole VL geregelt werden soll
@@ -250,7 +251,7 @@ void turnOffModusStart()
 {
   Serial.println("Modus Ausgeschaltet");
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, LOW); //Kollektorpumpe ausschalten
-  sendMQTT("kollektorPumpe",1);
+  sendMQTT("kollektorPumpe",0);
   digitalWrite(RELAIS_SOLE_PUMPE, LOW); //Solepumpe ausschalten
   sendMQTT("solePumpe",0);
   digitalWrite(STELLWERK_SOLE_BOILER, LOW); //Stellwerk auf Sole umschalten
@@ -559,15 +560,15 @@ void loop()
     {
     case 0: //Im Modus ausgeschaltet?
     {
-      if (fuehlerKollektorLuft.getMeanTemperature() > boilerLowerExitTemperature+10 && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE && !initializing) //Temperatur so hoch, dass Boiler geheizt werden könnte?
+      if (fuehlerKollektorLuft.getMeanTemperature() > boilerLowerExitTemperature+5 && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE && !initializing) //Temperatur so hoch, dass Boiler geheizt werden könnte?
       {
         boilerModusStart();
         Serial.println("Boilermodus aus ausgeschaltenem Modus aufgrund hoher Vorlauftemperatur gestartet");
       }
-      else if (fuehlerKollektorLuft.getMeanTemperature() > 25 && !initializing) //Temperatur so hoch, dass Boiler geheizt werden könnte?
+      else if (fuehlerKollektorLuft.getMeanTemperature() > SOLE_START_TEMPERATURE && !initializing) //Temperatur genügenr für Solemodus?
       {
-        boilerModusStart();
-        Serial.println("Boilermodus aus ausgeschaltenem Modus aufgrund hoher Vorlauftemperatur gestartet");
+        soleModusStart();
+        Serial.println("Solemodus aus ausgeschaltenem Modus aufgrund hoher Vorlauftemperatur gestartet");
       }
 /*       if (brightness > BOILER_START_BRIGHTNESS && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE) //Kriterien für Boilermodus erfüllt?
       {
@@ -601,7 +602,7 @@ void loop()
         tooLowValue = false; //Abbruch abbrechen
       }
 
-      if ((fuehlerSole.getMeanTemperature() < SOLE_EXIT_TEMPERATURE || fuehlerSoleVL.getMeanTemperature() < SOLE_VL_EXIT_TEMPERATURE) && !initializing) //zu tiefe Temperatur im Solemodus?
+      if (fuehlerSole.getMeanTemperature() < SOLE_EXIT_TEMPERATURE || fuehlerSoleVL.getMeanTemperature() < SOLE_VL_EXIT_TEMPERATURE && !initializing) //zu tiefe Temperatur im Solemodus?
       {
         if (!tooLowValue)
         {
