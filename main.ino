@@ -39,13 +39,13 @@ const float FUEHLER_SOLE_KORREKTURFAKTOR = 1.0;           //Korrekturfaktor S7
 
 //Temperaturen
 const int ALARMTEMPERATUR_KOLLEKTOR_LUFT = 90; //Alarmtemperatur für Kollektor (Lufttemperatur)
-const int ALARMTEMPERATUR_KOLLEKTOR_VL = 90;   //Alarmtemperatur für Kollektor (Vorlauftemperatur)
+const int ALARMTEMPERATUR_KOLLEKTOR_VL = 85;   //Alarmtemperatur für Kollektor (Vorlauftemperatur)
 const int ALARMTEMPERATUR_SOLE = 30;           //Alarmtemperatur für Sole-Pumpe
 const int MIN_DIFFERENZ_NACH_ALARM = 3;        //erst wenn die Temperatur um diesen Wert gesunken ist, geht der Alarmmodus aus
 const int SOLE_EXIT_TEMPERATURE = 14;          //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
 const int SOLE_VL_EXIT_TEMPERATURE = 18;       //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
-const int SOLL_KOLLEKTOR_VL_BOILERMODUS = 80;  //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Boilermodus
-const int SOLL_KOLLEKTOR_VL_SOLEMODUS = 80;    //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
+const int SOLL_KOLLEKTOR_VL_BOILERMODUS = 75;  //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Boilermodus
+const int SOLL_KOLLEKTOR_VL_SOLEMODUS = 65;    //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
 const int SOLL_SOLE_VL_SOLEMODUS = 30;         //Solltemperatur, auf die der Sole VL geregelt werden soll
 const int MIN_WAERMER_BOILER = 3;              //Mindest Temperaturunterschied zwischen Boiler VL und Boiler
 const int BOILER_UPPER_EXIT_TEMPERATURE = 70;  //Temperatur, auf diese der Boiler erwärmt werden soll
@@ -57,7 +57,7 @@ const unsigned long SOLE_START_BRIGHTNESS = 10000;   //Helligkeit, bei der zum S
 
 //PID Tuning Parameter
 const double PID_P_KOLLEKTOR = 10;
-const double PID_I_KOLLEKTOR = 10;
+const double PID_I_KOLLEKTOR = 1;
 const double PID_D_KOLLEKTOR = 0;
 const double PID_P_SOLE = 5;
 const double PID_I_SOLE = 5;
@@ -188,31 +188,13 @@ String topic = "derart/";
 // 5. FUNKTIONEN
 // =============
 
-void sendMQTT(String subtopic, double value)
+void sendMQTT(String subtopic, float value)
 {
   mqttClient.beginMessage(topic + subtopic);
   mqttClient.print(value);
   mqttClient.endMessage();
 }
 void sendMQTT(String subtopic, int value)
-{
-  mqttClient.beginMessage(topic + subtopic);
-  mqttClient.print(value);
-  mqttClient.endMessage();
-}
-void sendMQTT(String subtopic, long value)
-{
-  mqttClient.beginMessage(topic + subtopic);
-  mqttClient.print(value);
-  mqttClient.endMessage();
-}
-void sendMQTT(String subtopic, String value)
-{
-  mqttClient.beginMessage(topic + subtopic);
-  mqttClient.print(value);
-  mqttClient.endMessage();
-}
-void sendMQTT(String subtopic, boolean value)
 {
   mqttClient.beginMessage(topic + subtopic);
   mqttClient.print(value);
@@ -232,52 +214,52 @@ void boilerModusStart()
 {
   Serial.println("Boilermodus gestartet");
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH); //Kollektorpumpe einschalten
-  sendMQTT("kollektorPumpe", true);
+  sendMQTT("kollektorPumpe", 1);
   digitalWrite(RELAIS_SOLE_PUMPE, LOW); //Solepumpe ausschalten
-  sendMQTT("solePumpe", false);
+  sendMQTT("solePumpe", 0);
   digitalWrite(STELLWERK_SOLE_BOILER, HIGH); //Stellwerk auf Boiler umschalten
-  sendMQTT("stellwerkSoleBoiler","Boiler");
+  sendMQTT("stellwerkSoleBoiler",2);
   PIDReglerKollektorPumpe.SetMode(1);                        //PID-Regler Kollektorpumpe einschalten
   PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_BOILERMODUS; //Kollektor Vorlauf Sollwert setzen
   initializing = true;                                       //Initialisierung starten
   initialOperationModeTimeout.setLastTime(now);              //Initialisierungs Timer starten
   operationMode = 2;                                         //Modus auf Boiler schalten
   tooLowValue = false;                                       //tooLowValue zurücksetzen
-  sendMQTT("operationMode", "Boilermodus");
+  sendMQTT("operationMode", 2);
 }
 
 void soleModusStart()
 {
   Serial.println("Solemodus gestartet");
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH); //Kollektorpumpe ausschalten
-  sendMQTT("kollektorPumpe",true);
+  sendMQTT("kollektorPumpe",1);
   digitalWrite(RELAIS_SOLE_PUMPE, HIGH); //Solepumpe einschalten
-  sendMQTT("solePumpe",true);
+  sendMQTT("solePumpe",1);
   digitalWrite(STELLWERK_SOLE_BOILER, LOW); //Stellwerk auf Sole umschalten
-  sendMQTT("stellwerkSoleBoiler","Sole");
+  sendMQTT("stellwerkSoleBoiler",1);
   PIDReglerKollektorPumpe.SetMode(1);                      //PID-Regler Kollektorpumpe einschalten
   PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_SOLEMODUS; //Kollektor Vorlauf Sollwert setzen
   initializing = true;                                     //Initialisierung starten
   initialOperationModeTimeout.setLastTime(now);            //Initialisierungs Timer starten
   operationMode = 1;                                       //Modus auf Sole schalten
   tooLowValue = false;                                     //tooLowValue zurücksetzen
-  sendMQTT("operationMode", "Solemodus");
+  sendMQTT("operationMode", 1);
 }
 
 void turnOffModusStart()
 {
   Serial.println("Modus Ausgeschaltet");
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, LOW); //Kollektorpumpe ausschalten
-  sendMQTT("kollektorPumpe",true);
+  sendMQTT("kollektorPumpe",1);
   digitalWrite(RELAIS_SOLE_PUMPE, LOW); //Solepumpe ausschalten
-  sendMQTT("solePumpe",true);
+  sendMQTT("solePumpe",0);
   digitalWrite(STELLWERK_SOLE_BOILER, LOW); //Stellwerk auf Sole umschalten
-  sendMQTT("stellwerkSoleBoiler","Sole");
+  sendMQTT("stellwerkSoleBoiler",1);
   PIDReglerKollektorPumpe.SetMode(0); //PID-Regler Kollektorpumpe ausschalten
   initializing = false;               //Initialisierung stoppen
   operationMode = 0;                  //Modus auf aus schalten
   tooLowValue = false;                //tooLowValue zurücksetzen
-  sendMQTT("operationMode","Ausgeschaltet");
+  sendMQTT("operationMode",0);
 }
 
 void eraseDisplays()
@@ -345,6 +327,7 @@ void turnOnDisplays()
 // ================
 void setup()
 {
+  Wire.setClock(10000);
   Serial.begin(9600);
   while (!Serial)
   {
@@ -365,7 +348,7 @@ void setup()
   pinMode(STELLWERK_BOILER_TEMP, OUTPUT);
   pinMode(PWM_KOLLEKTOR_PUMPE, OUTPUT);
 
-  //PWM Setup
+  //PID Setup
   PIDReglerKollektorPumpe.SetOutputLimits(70, 255);
   PIDReglerKollektorPumpe.SetSampleTime(800);
 
@@ -417,6 +400,8 @@ void setup()
 
   Serial.println("You're connected to the MQTT broker!");
   Serial.println();
+
+  Wire.setClock(10000);
 
   Serial.println("Setup beendet");
 }
@@ -488,17 +473,17 @@ void loop()
     //PID Regler berechnen
     if (operationMode == 1)
     {
-      PIDInputKollektorPumpe = fuehlerKollektorVL.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
+      PIDInputKollektorPumpe = fuehlerKollektorLuft.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
       PIDReglerKollektorPumpe.Compute();
       kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);
-      sendMQTT("speedKollektorPumpe",PIDOutputKollektorPumpe);
+      sendMQTT("speedKollektorPumpe",(int)round(PIDOutputKollektorPumpe));
     }
     if (operationMode == 2)
     {
-      PIDInputKollektorPumpe = fuehlerKollektorVL.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
+      PIDInputKollektorPumpe = fuehlerKollektorLuft.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
       PIDReglerKollektorPumpe.Compute();
       kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);
-      sendMQTT("speedKollektorPumpe",PIDOutputKollektorPumpe);
+      sendMQTT("speedKollektorPumpe",(int)round(PIDOutputKollektorPumpe));
     }
 
     // MQTT Client am Leben halten
@@ -574,7 +559,17 @@ void loop()
     {
     case 0: //Im Modus ausgeschaltet?
     {
-      if (brightness > BOILER_START_BRIGHTNESS && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE) //Kriterien für Boilermodus erfüllt?
+      if (fuehlerKollektorLuft.getMeanTemperature() > boilerLowerExitTemperature+10 && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE && !initializing) //Temperatur so hoch, dass Boiler geheizt werden könnte?
+      {
+        boilerModusStart();
+        Serial.println("Boilermodus aus ausgeschaltenem Modus aufgrund hoher Vorlauftemperatur gestartet");
+      }
+      else if (fuehlerKollektorLuft.getMeanTemperature() > 25 && !initializing) //Temperatur so hoch, dass Boiler geheizt werden könnte?
+      {
+        boilerModusStart();
+        Serial.println("Boilermodus aus ausgeschaltenem Modus aufgrund hoher Vorlauftemperatur gestartet");
+      }
+/*       if (brightness > BOILER_START_BRIGHTNESS && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE) //Kriterien für Boilermodus erfüllt?
       {
         boilerModusStart();
         Serial.println("Boilermodus aus ausgeschaltenem Modus gestartet");
@@ -584,16 +579,16 @@ void loop()
       {
         soleModusStart();
         Serial.println("Solemodus aus ausgeschaltenem Modus gestartet");
-      }
+      } */
     }
     break;
     case 1: //Im Modus Sole?
     {
-      if (brightness > BOILER_START_BRIGHTNESS && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE && !initializing) //Kriterien für Boilermodus erfüllt?
+/*       if (brightness > BOILER_START_BRIGHTNESS && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE && !initializing) //Kriterien für Boilermodus erfüllt?
       {
         boilerModusStart();
         Serial.println("Boilermodus aus Solemodus aufgrund Helligkeit gestartet");
-      }
+      } */
 
       if (fuehlerKollektorVL.getMeanTemperature() > boilerLowerExitTemperature && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE && !initializing) //Temperatur so hoch, dass Boiler geheizt werden könnte?
       {
@@ -662,12 +657,12 @@ void loop()
 
   if (timer3m.checkTimer(now))
   {
-    // Helligkeit auslesen
+/*     // Helligkeit auslesen
     brightness = luxMeter1.getLuminosity(TSL2591_FULLSPECTRUM); //
     Serial.print("Helligkeitmessung abgeschlossen. Helligkeit :");
     Serial.print(brightness);
     Serial.println(" lux");
-    sendMQTT("brightness", round(brightness / 1000));
+    sendMQTT("brightness", (int)round(brightness / 1000)); */
 
     //Ethernet aktuell halten
     Ethernet.maintain();
