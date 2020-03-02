@@ -55,6 +55,7 @@ class Timer {
     bool checkTimer(unsigned long now);
     void executed();
     void setLastTime(unsigned long lastTime);
+    void setDelayTime(unsigned long delay, char = 'x');
   private:
     unsigned long _now;
     unsigned long _lastTime;
