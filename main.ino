@@ -42,9 +42,9 @@ const int ALARMTEMPERATUR_KOLLEKTOR_LUFT = 90; //Alarmtemperatur für Kollektor 
 const int ALARMTEMPERATUR_KOLLEKTOR_VL = 85;   //Alarmtemperatur für Kollektor (Vorlauftemperatur)
 const int ALARMTEMPERATUR_SOLE = 30;           //Alarmtemperatur für Sole-Pumpe
 const int MIN_DIFFERENZ_NACH_ALARM = 3;        //erst wenn die Temperatur um diesen Wert gesunken ist, geht der Alarmmodus aus
-const int SOLE_EXIT_TEMPERATURE = 10;          //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
-const int SOLE_START_TEMPERATURE = 30;       //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus gestartet wird
-const int SOLE_VL_EXIT_TEMPERATURE = 25;       //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
+const int SOLE_EXIT_TEMPERATURE = 5;           //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
+const int SOLE_START_TEMPERATURE = 30;         //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus gestartet wird
+const int SOLE_VL_EXIT_TEMPERATURE = 23;       //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
 const int SOLL_KOLLEKTOR_VL_BOILERMODUS = 75;  //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Boilermodus
 const int SOLL_KOLLEKTOR_VL_SOLEMODUS = 65;    //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
 const int SOLL_SOLE_VL_SOLEMODUS = 30;         //Solltemperatur, auf die der Sole VL geregelt werden soll
@@ -160,12 +160,12 @@ Pump kollektorPumpe(RELAIS_KOLLEKTOR_PUMPE, PWM_KOLLEKTOR_PUMPE);
 
 // Setup der Timer (leer für ms, 's' für s, 'm' für min, 'd' für Tage)
 // Timer über normale Clock
-Timer timer1s(1, 's');  //1s Timer
-Timer timer5s(5, 's');  //5s Timer
-Timer timer3m(30, 's'); //3min Timer
-Timer timer7d(7, 'd');  //7d Timer
+Timer timer1s(1, 's'); //1s Timer
+Timer timer5s(5, 's'); //5s Timer
+Timer timer3m(3, 'm'); //3min Timer
 
 //Timer für bestimmte Funktionen
+Timer timerLegionellenschaltung(7, 'd');   //Legio-Timer
 Timer initialOperationModeTimeout(3, 'm'); //Zeit bevor ein Modus EXIT-Kriterien berücksichtigt
 Timer exitTimeout(2, 'm');                 //Solange muss der Sollwert mindestens unterschritten sein, bevor Abbruch
 Timer flowMeterBoilerTimeout(500);         //Durchflussmeter 1 Timeout
@@ -219,16 +219,17 @@ void i2cSelect(int mux, uint8_t i)
 
 void boilerModusStart()
 {
-  sendMQTT("message","Zum Boilermodus gewechselt.");
+  sendMQTT("message", "Zum Boilermodus gewechselt.");
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH); //Kollektorpumpe einschalten
   sendMQTT("kollektorPumpe", 1);
   digitalWrite(RELAIS_SOLE_PUMPE, LOW); //Solepumpe ausschalten
   sendMQTT("solePumpe", 0);
   digitalWrite(STELLWERK_SOLE_BOILER, HIGH); //Stellwerk auf Boiler umschalten
-  sendMQTT("stellwerkSoleBoiler",2);
+  sendMQTT("stellwerkSoleBoiler", 2);
   PIDReglerKollektorPumpe.SetMode(1);                        //PID-Regler Kollektorpumpe einschalten
   PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_BOILERMODUS; //Kollektor Vorlauf Sollwert setzen
   initializing = true;                                       //Initialisierung starten
+  initialOperationModeTimeout.setDelayTime(3, 'm');          //Initialisierungszeit setzen
   initialOperationModeTimeout.setLastTime(now);              //Initialisierungs Timer starten
   operationMode = 2;                                         //Modus auf Boiler schalten
   tooLowValue = false;                                       //tooLowValue zurücksetzen
@@ -237,36 +238,50 @@ void boilerModusStart()
 
 void soleModusStart()
 {
-  sendMQTT("message","Zum Solemodus gewechselt.");
+  sendMQTT("message", "Zum Solemodus gewechselt.");
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH); //Kollektorpumpe ausschalten
-  sendMQTT("kollektorPumpe",1);
+  sendMQTT("kollektorPumpe", 1);
   digitalWrite(RELAIS_SOLE_PUMPE, HIGH); //Solepumpe einschalten
-  sendMQTT("solePumpe",1);
+  sendMQTT("solePumpe", 1);
   digitalWrite(STELLWERK_SOLE_BOILER, LOW); //Stellwerk auf Sole umschalten
-  sendMQTT("stellwerkSoleBoiler",1);
+  sendMQTT("stellwerkSoleBoiler", 1);
   PIDReglerKollektorPumpe.SetMode(1);                      //PID-Regler Kollektorpumpe einschalten
   PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_SOLEMODUS; //Kollektor Vorlauf Sollwert setzen
   initializing = true;                                     //Initialisierung starten
-  initialOperationModeTimeout.setLastTime(now);            //Initialisierungs Timer starten
-  operationMode = 1;                                       //Modus auf Sole schalten
-  tooLowValue = false;                                     //tooLowValue zurücksetzen
+  switch (operationMode)                                   //Initialisierungszeit setzen
+  {
+  case 0: //War ausgeschaltet?
+    initialOperationModeTimeout.setDelayTime(15, 'm');
+    break;
+  case 2: //War im Boilermodus??
+    initialOperationModeTimeout.setDelayTime(3, 'm');
+    break;
+
+  default:
+    break;
+  }
+  initialOperationModeTimeout.setLastTime(now); //Initialisierungs Timer starten
+  operationMode = 1;                            //Modus auf Sole schalten
+  tooLowValue = false;                          //tooLowValue zurücksetzen
   sendMQTT("operationMode", 1);
 }
 
 void turnOffModusStart()
 {
-  sendMQTT("message","In ausgeschaltenen Modus gewechselt.");
+  sendMQTT("message", "In ausgeschaltenen Modus gewechselt.");
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, LOW); //Kollektorpumpe ausschalten
-  sendMQTT("kollektorPumpe",0);
+  sendMQTT("kollektorPumpe", 0);
   digitalWrite(RELAIS_SOLE_PUMPE, LOW); //Solepumpe ausschalten
-  sendMQTT("solePumpe",0);
+  sendMQTT("solePumpe", 0);
   digitalWrite(STELLWERK_SOLE_BOILER, LOW); //Stellwerk auf Sole umschalten
-  sendMQTT("stellwerkSoleBoiler",1);
+  sendMQTT("stellwerkSoleBoiler", 1);
   PIDReglerKollektorPumpe.SetMode(0); //PID-Regler Kollektorpumpe ausschalten
-  initializing = false;               //Initialisierung stoppen
-  operationMode = 0;                  //Modus auf aus schalten
-  tooLowValue = false;                //tooLowValue zurücksetzen
-  sendMQTT("operationMode",0);
+
+  initialOperationModeTimeout.setDelayTime(3, 'm'); //Wie lange mindestens ausgeschaltet?
+  initializing = true;                              //Initialisierung starten
+  operationMode = 0;                                //Modus auf aus schalten
+  tooLowValue = false;                              //tooLowValue zurücksetzen
+  sendMQTT("operationMode", 0);
 }
 
 void eraseDisplays()
@@ -460,15 +475,14 @@ void loop()
     fuehlerSole.calculateTemperature();
 
     //Fuehlerwerte an MQTT Senden
-    sendMQTT("fuehlerKollektorVL",fuehlerKollektorVL.getMeanTemperature());
-    sendMQTT("fuehlerKollektorLuft",fuehlerKollektorLuft.getMeanTemperature());
-    sendMQTT("fuehlerBoiler",fuehlerBoiler.getMeanTemperature());
-    sendMQTT("fuehlerBoilerVL",fuehlerBoilerVL.getMeanTemperature());
-    sendMQTT("fuehlerSoleVL",fuehlerSoleVL.getMeanTemperature());
-    sendMQTT("fuehlerBoilerRL",fuehlerBoilerRL.getMeanTemperature());
-    sendMQTT("fuehlerSoleRL",fuehlerSoleRL.getMeanTemperature());
-    sendMQTT("fuehlerSole",fuehlerSole.getMeanTemperature());
-
+    sendMQTT("fuehlerKollektorVL", fuehlerKollektorVL.getMeanTemperature());
+    sendMQTT("fuehlerKollektorLuft", fuehlerKollektorLuft.getMeanTemperature());
+    sendMQTT("fuehlerBoiler", fuehlerBoiler.getMeanTemperature());
+    sendMQTT("fuehlerBoilerVL", fuehlerBoilerVL.getMeanTemperature());
+    sendMQTT("fuehlerSoleVL", fuehlerSoleVL.getMeanTemperature());
+    sendMQTT("fuehlerBoilerRL", fuehlerBoilerRL.getMeanTemperature());
+    sendMQTT("fuehlerSoleRL", fuehlerSoleRL.getMeanTemperature());
+    sendMQTT("fuehlerSole", fuehlerSole.getMeanTemperature());
 
     if (displayOn)
     {
@@ -482,17 +496,18 @@ void loop()
       PIDInputKollektorPumpe = fuehlerKollektorLuft.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
       PIDReglerKollektorPumpe.Compute();
       kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);
-      sendMQTT("speedKollektorPumpe",(int)round(PIDOutputKollektorPumpe));
+      sendMQTT("speedKollektorPumpe", (int)round(PIDOutputKollektorPumpe));
     }
     else if (operationMode == 2)
     {
       PIDInputKollektorPumpe = fuehlerKollektorLuft.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
       PIDReglerKollektorPumpe.Compute();
       kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);
-      sendMQTT("speedKollektorPumpe",(int)round(PIDOutputKollektorPumpe));
+      sendMQTT("speedKollektorPumpe", (int)round(PIDOutputKollektorPumpe));
     }
-    else {
-      sendMQTT("speedKollektorPumpe",(int)round(PIDOutputKollektorPumpe));
+    else
+    {
+      sendMQTT("speedKollektorPumpe", (int)round(PIDOutputKollektorPumpe));
     }
 
     // MQTT Client am Leben halten
@@ -520,7 +535,7 @@ void loop()
     {
       //Solepumpe ausschalten
       digitalWrite(RELAIS_SOLE_PUMPE, LOW);
-      sendMQTT("alarm","Alarm. Die Soletemperatur ist zu hoch.");
+      sendMQTT("alarm", "Alarm. Die Soletemperatur ist zu hoch.");
     }
 
     //Kollektor Alarm?
@@ -529,7 +544,7 @@ void loop()
       //Kollektorpumpe auf 100% und Wärme in Boiler
       analogWrite(PWM_KOLLEKTOR_PUMPE, 255);
       digitalWrite(STELLWERK_SOLE_BOILER, HIGH);
-      sendMQTT("alarm","Alarm. Die Kollektortemperatur ist zu hoch.");
+      sendMQTT("alarm", "Alarm. Die Kollektortemperatur ist zu hoch.");
     }
 
     while (soleAlarm || kollektorAlarm)
@@ -539,7 +554,7 @@ void loop()
       if (fuehlerSole.getLastTemperature() < ALARMTEMPERATUR_SOLE - MIN_DIFFERENZ_NACH_ALARM && soleAlarm)
       {
         soleAlarm = false;
-        sendMQTT("alarm","Die Soletemperatur ist nicht mehr zu hoch.");
+        sendMQTT("alarm", "Die Soletemperatur ist nicht mehr zu hoch.");
       }
 
       //Kollektor VL und Luft Temperatur abfragen und prüfen, ob ausreichend abgekühlt
@@ -548,7 +563,7 @@ void loop()
       if (fuehlerKollektorVL.getLastTemperature() < ALARMTEMPERATUR_KOLLEKTOR_VL - MIN_DIFFERENZ_NACH_ALARM && fuehlerKollektorLuft.getLastTemperature() < ALARMTEMPERATUR_KOLLEKTOR_LUFT - MIN_DIFFERENZ_NACH_ALARM && kollektorAlarm)
       {
         kollektorAlarm = false;
-        sendMQTT("alarm","Die Kollektortemperatue ist nicht mehr zu hoch.");
+        sendMQTT("alarm", "Die Kollektortemperatue ist nicht mehr zu hoch.");
       }
       delay(200);
     }
@@ -556,7 +571,7 @@ void loop()
     //Prüfen, ob Initialisierung abgeschlossen ist
     if (initialOperationModeTimeout.checkTimer(now) && initializing)
     {
-      sendMQTT("message","Die Initialisierung des aktuellen Betriebsmodus ist abgeschlossen.");
+      sendMQTT("message", "Die Initialisierung des aktuellen Betriebsmodus ist abgeschlossen.");
       initializing = false;
     }
 
@@ -568,17 +583,17 @@ void loop()
     {
     case 0: //Im Modus ausgeschaltet?
     {
-      if (fuehlerKollektorLuft.getMeanTemperature() > boilerLowerExitTemperature+5 && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE && !initializing) //Temperatur so hoch, dass Boiler geheizt werden könnte?
+      if (fuehlerKollektorLuft.getMeanTemperature() > boilerLowerExitTemperature + 5 && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE && !initializing) //Temperatur so hoch, dass Boiler geheizt werden könnte?
       {
         boilerModusStart();
-        sendMQTT("message","Boilermodus aus ausgeschaltenem Modus aufgrund hoher Vorlauftemperatur gestartet");
+        sendMQTT("message", "Boilermodus aus ausgeschaltenem Modus aufgrund hoher Vorlauftemperatur gestartet");
       }
       else if (fuehlerKollektorLuft.getMeanTemperature() > SOLE_START_TEMPERATURE && !initializing) //Temperatur genügenr für Solemodus?
       {
         soleModusStart();
-        sendMQTT("message","Solemodus aus ausgeschaltenem Modus aufgrund hoher Vorlauftemperatur gestartet");
+        sendMQTT("message", "Solemodus aus ausgeschaltenem Modus aufgrund hoher Vorlauftemperatur gestartet");
       }
-/*       if (brightness > BOILER_START_BRIGHTNESS && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE) //Kriterien für Boilermodus erfüllt?
+      /*       if (brightness > BOILER_START_BRIGHTNESS && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE) //Kriterien für Boilermodus erfüllt?
       {
         boilerModusStart();
         sendMQTT("message","Boilermodus aus ausgeschaltenem Modus gestartet");
@@ -592,7 +607,7 @@ void loop()
     break;
     case 1: //Im Modus Sole?
     {
-/*       if (brightness > BOILER_START_BRIGHTNESS && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE && !initializing) //Kriterien für Boilermodus erfüllt?
+      /*       if (brightness > BOILER_START_BRIGHTNESS && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE && !initializing) //Kriterien für Boilermodus erfüllt?
       {
         boilerModusStart();
         sendMQTT("message","Boilermodus aus Solemodus aufgrund Helligkeit gestartet");
@@ -601,7 +616,7 @@ void loop()
       if (fuehlerKollektorVL.getMeanTemperature() > boilerLowerExitTemperature && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE && !initializing) //Temperatur so hoch, dass Boiler geheizt werden könnte?
       {
         boilerModusStart();
-        sendMQTT("message","Boilermodus aus Solemodus aufgrund hoher Vorlauftemperatur gestartet");
+        sendMQTT("message", "Boilermodus aus Solemodus aufgrund hoher Vorlauftemperatur gestartet");
       }
 
       if ((fuehlerSole.getMeanTemperature() > SOLE_EXIT_TEMPERATURE || fuehlerSoleVL.getMeanTemperature() > SOLE_VL_EXIT_TEMPERATURE) && tooLowValue) //ausreichende Temperatur?
@@ -620,7 +635,7 @@ void loop()
         {
           turnOffModusStart();
           exitTimeout.executed();
-          sendMQTT("message","Von Solemodus zu ausgeschaltet, da zu lange zu kühl");
+          sendMQTT("message", "Von Solemodus zu ausgeschaltet, da zu lange zu kühl");
         }
       }
     }
@@ -630,7 +645,7 @@ void loop()
       if (fuehlerBoilerVL.getMeanTemperature() < boilerDirectExitTemperature && !initializing) //Vorlauftemperatur viel zu tief? --> direkter Abbruch
       {
         soleModusStart();
-        sendMQTT("message","von Boilermodus zu Solemodus da Boiler VL viel zu klühl");
+        sendMQTT("message", "von Boilermodus zu Solemodus da Boiler VL viel zu klühl");
         break;
       }
 
@@ -650,7 +665,7 @@ void loop()
         {
           soleModusStart();
           exitTimeout.executed();
-          sendMQTT("message","von Boilermodus zu Solemodus da Boiler VL zu lange zu kühl");
+          sendMQTT("message", "von Boilermodus zu Solemodus da Boiler VL zu lange zu kühl");
         }
       }
     }
@@ -665,7 +680,7 @@ void loop()
 
   if (timer3m.checkTimer(now))
   {
-/*     // Helligkeit auslesen
+    /*     // Helligkeit auslesen
     brightness = luxMeter1.getLuminosity(TSL2591_FULLSPECTRUM); //
     Serial.print("Helligkeitmessung abgeschlossen. Helligkeit :");
     Serial.print(brightness);
@@ -675,17 +690,33 @@ void loop()
     //Ethernet aktuell halten
     Ethernet.maintain();
 
+    Serial.println("I'm alive!");
+
+    //Prüfen, ob Boiler über 65 grad ist
+    if (fuehlerBoiler > 65)
+    {
+      timerLegionellenschaltung.setLastTime(now); //Legionellenschaltung hinauszögern
+      if (boilerHighTemperatur)                   //Legionellenschaltung ausschalten, falls eingeschaltet
+      {
+        boilerHighTemperatur = false;
+        digitalWrite(STELLWERK_BOILER_TEMP, LOW);
+        sendMQTT("boilerTermostat", "normal");
+        sendMQTT("message", "Boiler hohe Temperatur beendet");
+      }
+      sendMQTT("boilerLegionellenTemperatur","Temperatur erreicht")
+    }
+
     timer3m.executed();
   }
 
-  if (timer7d.checkTimer(now))
+  if (timerLegionellenschaltung.checkTimer(now))
   {
     digitalWrite(STELLWERK_BOILER_TEMP, HIGH); //Boiler auf höhere Temperatur stellen
     boilerHighTemperatur = true;
     boilerTimeout.setLastTime(now); //Timer stellen
     timer7d.executed();             //Timer zurücksetzen
-    sendMQTT("message","Boiler hohe Temperatur angefangen");
-    sendMQTT("boilerTermostat","hoch");
+    sendMQTT("message", "Boiler hohe Temperatur angefangen");
+    sendMQTT("boilerTermostat", "hoch");
   }
 
   if (displayOn && displayTimeout.checkTimer(now))
@@ -700,8 +731,8 @@ void loop()
   {
     boilerHighTemperatur = false;
     digitalWrite(STELLWERK_BOILER_TEMP, LOW);
-    sendMQTT("boilerTermostat","normal");
-    sendMQTT("message","Boiler hohe Temperatur beendet");
+    sendMQTT("boilerTermostat", "normal");
+    sendMQTT("message", "Boiler hohe Temperatur beendet");
   }
 
   now = millis();

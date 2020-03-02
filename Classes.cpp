@@ -156,6 +156,27 @@ void Timer::setLastTime(unsigned long lastTime)
   _lastTime = lastTime;
 }
 
+//Setzt die Delay-Time
+void setDelayTime(unsigned long delay, char mode) {
+  switch (mode)
+  {
+  case 's':
+    _delay = delay * 1000;
+    break;
+  case 'm':
+    _delay = delay * 60000;
+    break;
+  case 'h':
+    _delay = delay * 3600000;
+    break;
+  case 'd':
+    _delay = delay * 86400000;
+    break;
+  default:
+    _delay = delay;
+  }
+}
+
 //____________________________________________
 //Konstruktor der Pumope Klasse
 Pump::Pump(byte relaisPin, byte PWMPin)
