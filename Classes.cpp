@@ -157,7 +157,7 @@ void Timer::setLastTime(unsigned long lastTime)
 }
 
 //Setzt die Delay-Time
-void setDelayTime(unsigned long delay, char mode) {
+void Timer::setDelayTime(unsigned long delay, char mode) {
   switch (mode)
   {
   case 's':

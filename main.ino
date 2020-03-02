@@ -693,7 +693,7 @@ void loop()
     Serial.println("I'm alive!");
 
     //Prüfen, ob Boiler über 65 grad ist
-    if (fuehlerBoiler > 65)
+    if (fuehlerBoiler.getMeanTemperature() > 65)
     {
       timerLegionellenschaltung.setLastTime(now); //Legionellenschaltung hinauszögern
       if (boilerHighTemperatur)                   //Legionellenschaltung ausschalten, falls eingeschaltet
@@ -703,7 +703,7 @@ void loop()
         sendMQTT("boilerTermostat", "normal");
         sendMQTT("message", "Boiler hohe Temperatur beendet");
       }
-      sendMQTT("boilerLegionellenTemperatur","Temperatur erreicht")
+      sendMQTT("boilerLegionellenTemperatur","Temperatur erreicht");
     }
 
     timer3m.executed();
@@ -714,7 +714,7 @@ void loop()
     digitalWrite(STELLWERK_BOILER_TEMP, HIGH); //Boiler auf höhere Temperatur stellen
     boilerHighTemperatur = true;
     boilerTimeout.setLastTime(now); //Timer stellen
-    timer7d.executed();             //Timer zurücksetzen
+    timerLegionellenschaltung.executed();             //Timer zurücksetzen
     sendMQTT("message", "Boiler hohe Temperatur angefangen");
     sendMQTT("boilerTermostat", "hoch");
   }
