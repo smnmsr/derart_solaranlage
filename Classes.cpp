@@ -178,7 +178,7 @@ void Timer::setDelayTime(unsigned long delay, char mode) {
 }
 
 //____________________________________________
-//Konstruktor der Pumope Klasse
+//Konstruktor der Pumpe Klasse
 Pump::Pump(byte relaisPin, byte PWMPin)
 {
   _relaisPin = relaisPin;
