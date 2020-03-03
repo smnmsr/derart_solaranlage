@@ -441,7 +441,7 @@ void loop()
     {
       //Displays Schreiben
       turnOnDisplays();
-      writeDisplays(displayMode);
+      writeDisplays();
     }
     //PID Regler berechnen
     if (operationMode == 1) //Im Solemodus?
