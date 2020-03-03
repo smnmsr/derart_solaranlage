@@ -1,1 +1,3378 @@
-[{"id":"32a5fb5f.529444","type":"tab","label":"Flow 1","disabled":false,"info":""},{"id":"fe34524d.60e2e8","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/fuehlerKollektorVL","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":130,"y":940,"wires":[["c0391734.5c4b08","d9c3e201.c82d28","3250c491.6b004c","e32981a4.78723"]]},{"id":"c0391734.5c4b08","type":"ui_gauge","z":"32a5fb5f.529444","name":"","group":"7a3f05dd.231e9c","order":2,"width":3,"height":3,"gtype":"gage","title":"Kollektor Vorlauf","label":"°C","format":"{{value | number:0}}","min":"-20","max":"130","colors":["#0432ff","#00fa00","#ff2600"],"seg1":"25","seg2":"","x":1840,"y":940,"wires":[]},{"id":"8d83366b.6909f","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/fuehlerKollektorLuft","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":130,"y":1160,"wires":[["5d5ee20.0a83e2","a6dfc6a5.d4dd08","ca4dfa1.0ba9d08"]]},{"id":"5d5ee20.0a83e2","type":"ui_gauge","z":"32a5fb5f.529444","name":"","group":"7a3f05dd.231e9c","order":1,"width":0,"height":0,"gtype":"gage","title":"Kollektor Luft","label":"°C","format":"{{value | number:0}}","min":"-20","max":"130","colors":["#0432ff","#00fa00","#ff2600"],"seg1":"30","seg2":"","x":1840,"y":1160,"wires":[]},{"id":"c1eec7a0.acf8f","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/fuehlerBoiler","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":110,"y":1360,"wires":[["cc565321.2a3d08","1829e78b.7c7a4","72d56e1.542361"]]},{"id":"cc565321.2a3d08","type":"ui_gauge","z":"32a5fb5f.529444","name":"","group":"48898031.ea8918","order":1,"width":0,"height":0,"gtype":"gage","title":"Boilertemperatur","label":"°C","format":"{{value | number:0}}","min":"10","max":"80","colors":["#0432ff","#00fa00","#ff2600"],"seg1":"40","seg2":"","x":1850,"y":1360,"wires":[]},{"id":"f66cd84b.b71c2","type":"ui_gauge","z":"32a5fb5f.529444","name":"","group":"48898031.ea8918","order":2,"width":3,"height":3,"gtype":"gage","title":"Boiler VL","label":"°C","format":"{{value | number:0}}","min":"0","max":"100","colors":["#0056d6","#00fa00","#ff2600"],"seg1":"45","seg2":"","x":1820,"y":1580,"wires":[]},{"id":"f620460d.404f9","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/fuehlerBoilerVL","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":120,"y":1580,"wires":[["f66cd84b.b71c2","169e6672.c4db3a","be4bb2b.5884d5"]]},{"id":"2b6e4c6a.1fbec4","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/fuehlerBoilerRL","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":120,"y":1820,"wires":[["a9ee0c51.28e91","ba94f84a.baaad8","6fb9f4cb.f58e64"]]},{"id":"a9ee0c51.28e91","type":"ui_gauge","z":"32a5fb5f.529444","name":"","group":"48898031.ea8918","order":3,"width":3,"height":3,"gtype":"gage","title":"Boiler RL","label":"°C","format":"{{value | number:0}}","min":"10","max":"70","colors":["#0056d6","#00fa00","#ff2600"],"seg1":"20","seg2":"","x":1820,"y":1820,"wires":[]},{"id":"2ec03ae2.4f5746","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/fuehlerSole","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":110,"y":2060,"wires":[["fc45680a.3014b8","3211f86f.1c43f8","1fde4c46.2e9e1c"]]},{"id":"fc45680a.3014b8","type":"ui_gauge","z":"32a5fb5f.529444","name":"","group":"d1971d8a.f39e8","order":1,"width":0,"height":0,"gtype":"gage","title":"Erdsonde VL","label":"°C","format":"{{value | number:0}}","min":"5","max":"40","colors":["#0056d6","#00fa00","#ff2600"],"seg1":"10","seg2":"25","x":1830,"y":2060,"wires":[]},{"id":"bc094e93.b40ea","type":"ui_gauge","z":"32a5fb5f.529444","name":"","group":"7a3f05dd.231e9c","order":3,"width":3,"height":3,"gtype":"gage","title":"Kollektorpumpe","label":"%","format":"{{value | number:0}}","min":"0","max":"100","colors":["#929292","#00fa00","#ff2600"],"seg1":"20","seg2":"70","x":1840,"y":340,"wires":[]},{"id":"260ccc6b.023c34","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/fuehlerSoleVL","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":110,"y":2280,"wires":[["22bcb67.c2fc04a","d3c4bbaa.d4e8e","34c04fb0.0ae17"]]},{"id":"22bcb67.c2fc04a","type":"ui_gauge","z":"32a5fb5f.529444","name":"","group":"d1971d8a.f39e8","order":2,"width":3,"height":3,"gtype":"gage","title":"Wärmetauscher VL","label":"°C","format":"{{value | number:0}}","min":"10","max":"100","colors":["#0056d6","#00fa00","#ff2600"],"seg1":"25","seg2":"","x":1850,"y":2280,"wires":[]},{"id":"5a7619e9.2f112","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/fuehlerSoleRL","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":110,"y":2520,"wires":[["579d1478.ecca0c","24c0be3c.d65e3a","9be67be1.314da8"]]},{"id":"579d1478.ecca0c","type":"ui_gauge","z":"32a5fb5f.529444","name":"","group":"d1971d8a.f39e8","order":3,"width":3,"height":3,"gtype":"gage","title":"Wärmetauscher RL","label":"°C","format":"{{value | number:0}}","min":"0","max":"40","colors":["#0056d6","#00fa00","#ff2600"],"seg1":"5","seg2":"","x":1850,"y":2520,"wires":[]},{"id":"1f66308d.d5f50f","type":"ui_led","z":"32a5fb5f.529444","group":"803d01f0.e1f188","order":1,"width":0,"height":0,"label":"Onlinestatus","labelPlacement":"left","labelAlignment":"left","colorForValue":[{"color":"green","value":"true","valueType":"bool"},{"color":"red","value":"false","valueType":"bool"}],"allowColorForValueInMessage":false,"name":"Status","x":1810,"y":880,"wires":[]},{"id":"d9c3e201.c82d28","type":"trigger","z":"32a5fb5f.529444","op1":"true","op2":"false","op1type":"bool","op2type":"bool","duration":"10","extend":true,"units":"s","reset":"","bytopic":"all","name":"","x":1470,"y":880,"wires":[["1f66308d.d5f50f"]]},{"id":"5f0dfded.ba49f4","type":"ui_text","z":"32a5fb5f.529444","group":"803d01f0.e1f188","order":2,"width":0,"height":0,"name":"Betriebsmodus","label":"Betriebsmodus","format":"{{msg.payload}}","layout":"row-spread","x":1840,"y":80,"wires":[]},{"id":"abe94b9f.d7f1","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/operationMode","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":120,"y":80,"wires":[["ec4d09af.5e4"]]},{"id":"a44d7908.987c9","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/speedKollektorPumpe","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":140,"y":340,"wires":[["7fdefaaa.7ba444"]]},{"id":"7fdefaaa.7ba444","type":"function","z":"32a5fb5f.529444","name":"","func":"pwm = (msg.payload / 2.55) - 15;\nvalue = Math.round(pwm * (9/8) + 10);\nif (value > 100){\n    value = 100;\n}\nelse if (value < 0){\n    value = 0;\n}\nreturn {payload: value};","outputs":1,"noerr":0,"x":850,"y":340,"wires":[["bc094e93.b40ea","7dc7788f.d1b51","4be429b.8356358"]]},{"id":"dffea167.63e0d","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/kollektorPumpe","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":120,"y":280,"wires":[["c0bbf02.55ecb1"]]},{"id":"862c30fb.d24bf8","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/solePumpe","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":110,"y":560,"wires":[["e1a04613.cd5df8"]]},{"id":"535b0082.9fbd8","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/stellwerkSoleBoiler","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":130,"y":640,"wires":[["14c99850.f54c5"]]},{"id":"228512d2.92f106","type":"ui_led","z":"32a5fb5f.529444","group":"803d01f0.e1f188","order":3,"width":0,"height":0,"label":"Kollektorpumpe","labelPlacement":"left","labelAlignment":"left","colorForValue":[{"color":"red","value":"0","valueType":"str"},{"color":"green","value":"1","valueType":"str"}],"allowColorForValueInMessage":false,"name":"Kollektorpumpe","x":1840,"y":280,"wires":[]},{"id":"e92837f1.4632d","type":"ui_led","z":"32a5fb5f.529444","group":"803d01f0.e1f188","order":5,"width":0,"height":0,"label":"Solepumpe","labelPlacement":"left","labelAlignment":"left","colorForValue":[{"color":"red","value":"0","valueType":"str"},{"color":"green","value":"1","valueType":"str"}],"allowColorForValueInMessage":false,"name":"Solepumpe","x":1830,"y":560,"wires":[]},{"id":"9ae272d3.ee183","type":"ui_text","z":"32a5fb5f.529444","group":"803d01f0.e1f188","order":6,"width":0,"height":0,"name":"Stellwerk zeig auf","label":"Stellwerk zeigt auf","format":"{{msg.payload}}","layout":"row-spread","x":1850,"y":640,"wires":[]},{"id":"14c99850.f54c5","type":"trigger","z":"32a5fb5f.529444","op1":"","op2":"","op1type":"pay","op2type":"payl","duration":"-10","extend":false,"units":"min","reset":"","bytopic":"all","name":"","x":910,"y":640,"wires":[["ef02dc0b.3977"]]},{"id":"ec4d09af.5e4","type":"trigger","z":"32a5fb5f.529444","op1":"","op2":"","op1type":"pay","op2type":"payl","duration":"-10","extend":false,"units":"min","reset":"","bytopic":"all","name":"","x":910,"y":80,"wires":[["d1a8d51a.674848","a02520e5.44dc38","32796b43.7fff94","b17d7c16.8681a8"]]},{"id":"e1a04613.cd5df8","type":"trigger","z":"32a5fb5f.529444","op1":"","op2":"","op1type":"pay","op2type":"payl","duration":"-10","extend":false,"units":"min","reset":"","bytopic":"all","name":"","x":910,"y":560,"wires":[["e92837f1.4632d"]]},{"id":"c0bbf02.55ecb1","type":"trigger","z":"32a5fb5f.529444","op1":"","op2":"","op1type":"pay","op2type":"payl","duration":"-10","extend":false,"units":"min","reset":"","bytopic":"all","name":"","x":910,"y":280,"wires":[["228512d2.92f106"]]},{"id":"d1a8d51a.674848","type":"change","z":"32a5fb5f.529444","name":"","rules":[{"t":"change","p":"payload","pt":"msg","from":"0","fromt":"str","to":"Ausgeschaltet","tot":"str"},{"t":"change","p":"payload","pt":"msg","from":"1","fromt":"str","to":"Sole laden","tot":"str"},{"t":"change","p":"payload","pt":"msg","from":"2","fromt":"str","to":"Boiler laden","tot":"str"}],"action":"","property":"","from":"","to":"","reg":false,"x":1480,"y":80,"wires":[["5f0dfded.ba49f4"]]},{"id":"ef02dc0b.3977","type":"change","z":"32a5fb5f.529444","name":"","rules":[{"t":"change","p":"payload","pt":"msg","from":"1","fromt":"str","to":"Wärmetauscher","tot":"str"},{"t":"change","p":"payload","pt":"msg","from":"2","fromt":"str","to":"Boiler","tot":"str"}],"action":"","property":"","from":"","to":"","reg":false,"x":1480,"y":640,"wires":[["9ae272d3.ee183"]]},{"id":"3250c491.6b004c","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"2","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1500,"y":980,"wires":[["fb230f15.4dadc"]]},{"id":"6989ba4e.6e7334","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"69764fc6.522d4","order":2,"width":24,"height":6,"label":"Vorlauf Kollektor","chartType":"line","legend":"false","xformat":"HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"86400","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2180,"y":980,"wires":[[]]},{"id":"dff0d2cb.50fda8","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"69764fc6.522d4","order":1,"width":24,"height":6,"label":"Luft Kollektor","chartType":"line","legend":"false","xformat":"HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"86400","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2180,"y":1200,"wires":[[]]},{"id":"88fb819a.0229d8","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"419a499a.ba486","order":1,"width":24,"height":6,"label":"Boilertemperatur","chartType":"line","legend":"false","xformat":"HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"86400","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2190,"y":1400,"wires":[[]]},{"id":"455df715.780d68","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"419a499a.ba486","order":2,"width":24,"height":6,"label":"Boiler VL","chartType":"line","legend":"false","xformat":"HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"86400","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2160,"y":1620,"wires":[[]]},{"id":"79209df9.ca3da4","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"419a499a.ba486","order":3,"width":24,"height":6,"label":"Boiler RL","chartType":"line","legend":"false","xformat":"HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"86400","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2160,"y":1860,"wires":[[]]},{"id":"2c64d59d.4c20fa","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"d3b92f13.9aaaa8","order":1,"width":24,"height":6,"label":"Erdsonde VL","chartType":"line","legend":"false","xformat":"HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"86400","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2170,"y":2100,"wires":[[]]},{"id":"bea90d1b.45dd","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"d3b92f13.9aaaa8","order":2,"width":24,"height":6,"label":"Wärmetauscher VL","chartType":"line","legend":"false","xformat":"HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"86400","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2190,"y":2320,"wires":[[]]},{"id":"29f74d3e.868dfa","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"d3b92f13.9aaaa8","order":3,"width":24,"height":6,"label":"Wärmetauscher RL","chartType":"line","legend":"false","xformat":"HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"86400","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2190,"y":2560,"wires":[[]]},{"id":"cd634c57.6a2d6","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"ad33ef48.829d3","order":2,"width":24,"height":6,"label":"Pumpengeschwindigkeit","chartType":"line","legend":"false","xformat":"HH:mm","interpolate":"step","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":"1","removeOlderPoints":"","removeOlderUnit":"86400","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2210,"y":380,"wires":[[]]},{"id":"32796b43.7fff94","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"ad33ef48.829d3","order":1,"width":24,"height":6,"label":"Betriebsmodus","chartType":"line","legend":"false","xformat":"HH:mm","interpolate":"step","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":"1","removeOlderPoints":"","removeOlderUnit":"86400","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2180,"y":140,"wires":[[]]},{"id":"5a83e941.f6e2d","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/message","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":100,"y":2880,"wires":[["effa2206.98dc3"]]},{"id":"9b768cc9.f7e878","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/alarm","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":90,"y":2940,"wires":[["29dc9d84.c2c83a","23518014.0f6f38"]]},{"id":"effa2206.98dc3","type":"ui_toast","z":"32a5fb5f.529444","position":"top right","displayTime":"20","highlight":"","sendall":true,"outputs":0,"ok":"OK","cancel":"","raw":false,"topic":"Benachrichtigung:","name":"","x":890,"y":2880,"wires":[]},{"id":"29dc9d84.c2c83a","type":"ui_toast","z":"32a5fb5f.529444","position":"dialog","displayTime":"20","highlight":"","sendall":true,"outputs":1,"ok":"OK","cancel":"","raw":false,"topic":"ALARM!","name":"","x":870,"y":2940,"wires":[["b5e2faf1.f36a6"]]},{"id":"23518014.0f6f38","type":"trigger","z":"32a5fb5f.529444","op1":"","op2":"0","op1type":"pay","op2type":"str","duration":"-10","extend":false,"units":"s","reset":"OK","bytopic":"all","name":"","x":900,"y":3000,"wires":[["b5e2faf1.f36a6"]]},{"id":"b5e2faf1.f36a6","type":"ui_audio","z":"32a5fb5f.529444","name":"","group":"803d01f0.e1f188","voice":"de-DE","always":true,"x":1820,"y":2940,"wires":[]},{"id":"c426152.7dc9d68","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/boilerTermostat","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":120,"y":700,"wires":[["b389978b.eaf1b8"]]},{"id":"b389978b.eaf1b8","type":"ui_text","z":"32a5fb5f.529444","group":"803d01f0.e1f188","order":7,"width":0,"height":0,"name":"Boiler Solltemperatur","label":"Boiler Solltemperatur","format":"{{msg.payload}}","layout":"row-spread","x":1860,"y":700,"wires":[]},{"id":"affdd89a.91d6e8","type":"mqtt in","z":"32a5fb5f.529444","name":"","topic":"derart/boilerLegionellenTemperatur","qos":"2","datatype":"auto","broker":"c299c2a9.4f5468","x":160,"y":760,"wires":[["f9f86eb0.1f07b"]]},{"id":"f2200a5e.13935","type":"ui_text","z":"32a5fb5f.529444","group":"803d01f0.e1f188","order":8,"width":0,"height":0,"name":"","label":"Letztmals bei 65°","format":"{{msg.payload}}","layout":"row-spread","x":1850,"y":760,"wires":[]},{"id":"f9f86eb0.1f07b","type":"moment","z":"32a5fb5f.529444","name":"","topic":"","input":"","inputType":"date","inTz":"Europe/Zurich","adjAmount":0,"adjType":"days","adjDir":"add","format":"D.M.YY HH:mm","locale":"de_DE","output":"payload","outputType":"msg","outTz":"Europe/Zurich","x":900,"y":760,"wires":[["f2200a5e.13935"]]},{"id":"7faf1672.50df2","type":"comment","z":"32a5fb5f.529444","name":"Betriebsdaten","info":"","x":1830,"y":40,"wires":[]},{"id":"3b14c3a5.66e8f4","type":"comment","z":"32a5fb5f.529444","name":"24h Rückblick","info":"","x":2170,"y":40,"wires":[]},{"id":"f1098835.f360b","type":"comment","z":"32a5fb5f.529444","name":"7d Rückblick","info":"","x":2490,"y":40,"wires":[]},{"id":"cb80ac2e.59f39","type":"comment","z":"32a5fb5f.529444","name":"Speichern","info":"","x":2820,"y":40,"wires":[]},{"id":"a02520e5.44dc38","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"5d073c8b.060b84","order":1,"width":24,"height":6,"label":"Betriebsmodus","chartType":"line","legend":"false","xformat":"dd HH:mm","interpolate":"step","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":"1","removeOlderPoints":"","removeOlderUnit":"604800","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2500,"y":200,"wires":[[]]},{"id":"7dc7788f.d1b51","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"30","rateUnits":"second","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1510,"y":380,"wires":[["50fbb7a5.57cd4"]]},{"id":"38f106e5.2142ca","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"5d073c8b.060b84","order":2,"width":24,"height":6,"label":"Pumpengeschwindigkeit","chartType":"line","legend":"false","xformat":"dd HH:mm","interpolate":"step","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":"1","removeOlderPoints":"","removeOlderUnit":"604800","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2530,"y":440,"wires":[[]]},{"id":"4be429b.8356358","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"10","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1510,"y":440,"wires":[["bb0395ed.96b6e8"]]},{"id":"1257abb5.afa15c","type":"file","z":"32a5fb5f.529444","name":"","filename":"/data/raw_data/derart/operationMode.txt","appendNewline":false,"createDir":true,"overwriteFile":"false","encoding":"none","x":3060,"y":240,"wires":[[]]},{"id":"261fad3a.a935ca","type":"csv","z":"32a5fb5f.529444","name":"","sep":",","hdrin":false,"hdrout":false,"multi":"one","ret":"\\n","temp":"timestamp,data","skip":"0","strings":true,"x":2810,"y":240,"wires":[["1257abb5.afa15c"]]},{"id":"4b1b4c22.26e82c","type":"function","z":"32a5fb5f.529444","name":"","func":"time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};","outputs":1,"noerr":0,"x":2670,"y":240,"wires":[["261fad3a.a935ca"]]},{"id":"372029df.17460e","type":"file","z":"32a5fb5f.529444","name":"","filename":"/data/raw_data/derart/kollektorPumpeGeschwindigkeit.txt","appendNewline":false,"createDir":true,"overwriteFile":"false","encoding":"none","x":3110,"y":500,"wires":[[]]},{"id":"95ff83ca.905488","type":"csv","z":"32a5fb5f.529444","name":"","sep":",","hdrin":false,"hdrout":false,"multi":"one","ret":"\\n","temp":"timestamp,data","skip":"0","strings":true,"x":2810,"y":500,"wires":[["372029df.17460e"]]},{"id":"7aa88327.0cc454","type":"function","z":"32a5fb5f.529444","name":"","func":"time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};","outputs":1,"noerr":0,"x":2670,"y":500,"wires":[["95ff83ca.905488"]]},{"id":"3b726350.b5c5e4","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"37e71635.f90892","order":2,"width":24,"height":6,"label":"Vorlauf Kollektor","chartType":"line","legend":"false","xformat":"dd HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"604800","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2500,"y":1020,"wires":[[]]},{"id":"e32981a4.78723","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"10","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1510,"y":1020,"wires":[["f37ff256.8df628"]]},{"id":"f8fdaa24.1d777","type":"file","z":"32a5fb5f.529444","name":"","filename":"/data/raw_data/derart/temperaturKollektorVorlauf.txt","appendNewline":false,"createDir":true,"overwriteFile":"false","encoding":"none","x":3100,"y":1080,"wires":[[]]},{"id":"e0516bb0.b5e6d","type":"csv","z":"32a5fb5f.529444","name":"","sep":",","hdrin":false,"hdrout":false,"multi":"one","ret":"\\n","temp":"timestamp,data","skip":"0","strings":true,"x":2810,"y":1080,"wires":[["f8fdaa24.1d777"]]},{"id":"167cb824.5db0f","type":"function","z":"32a5fb5f.529444","name":"","func":"time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};","outputs":1,"noerr":0,"x":2670,"y":1080,"wires":[["e0516bb0.b5e6d"]]},{"id":"a6dfc6a5.d4dd08","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"2","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1500,"y":1200,"wires":[["9901ad8c.73cdb"]]},{"id":"1829e78b.7c7a4","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"10","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1510,"y":1400,"wires":[["fda96317.51aba"]]},{"id":"169e6672.c4db3a","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"2","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1500,"y":1620,"wires":[["d6870d6d.369528"]]},{"id":"ba94f84a.baaad8","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"2","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1500,"y":1860,"wires":[["f70a1b82.b3dd3"]]},{"id":"3211f86f.1c43f8","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"2","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1500,"y":2100,"wires":[["6c22bd9c.2448a4"]]},{"id":"d3c4bbaa.d4e8e","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"2","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1500,"y":2320,"wires":[["ba8be7e2.483678"]]},{"id":"24c0be3c.d65e3a","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"2","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1500,"y":2560,"wires":[["4990ce60.fe2f9"]]},{"id":"6d4e5a2c.4064a4","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"37e71635.f90892","order":1,"width":24,"height":6,"label":"Luft Kollektor","chartType":"line","legend":"false","xformat":"dd HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"604800","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2500,"y":1240,"wires":[[]]},{"id":"ca4dfa1.0ba9d08","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"10","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1510,"y":1240,"wires":[["a604307f.42af"]]},{"id":"5dc152b5.63d9dc","type":"file","z":"32a5fb5f.529444","name":"","filename":"/data/raw_data/derart/temperaturKollektorLuft.txt","appendNewline":false,"createDir":true,"overwriteFile":"false","encoding":"none","x":3090,"y":1300,"wires":[[]]},{"id":"8e837df6.73c5e","type":"csv","z":"32a5fb5f.529444","name":"","sep":",","hdrin":false,"hdrout":false,"multi":"one","ret":"\\n","temp":"timestamp,data","skip":"0","strings":true,"x":2810,"y":1300,"wires":[["5dc152b5.63d9dc"]]},{"id":"97c35b76.d58078","type":"function","z":"32a5fb5f.529444","name":"","func":"time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};","outputs":1,"noerr":0,"x":2670,"y":1300,"wires":[["8e837df6.73c5e"]]},{"id":"72d56e1.542361","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"1","rateUnits":"hour","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1500,"y":1440,"wires":[["58e8ecba.e58d9c"]]},{"id":"77ea4f8d.1d0c3","type":"file","z":"32a5fb5f.529444","name":"","filename":"/data/raw_data/derart/temperaturBoiler.txt","appendNewline":false,"createDir":true,"overwriteFile":"false","encoding":"none","x":3070,"y":1500,"wires":[[]]},{"id":"4b73af2a.f0c6b8","type":"csv","z":"32a5fb5f.529444","name":"","sep":",","hdrin":false,"hdrout":false,"multi":"one","ret":"\\n","temp":"timestamp,data","skip":"0","strings":true,"x":2810,"y":1500,"wires":[["77ea4f8d.1d0c3"]]},{"id":"c7d4729.2d47f1","type":"function","z":"32a5fb5f.529444","name":"","func":"time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};","outputs":1,"noerr":0,"x":2670,"y":1500,"wires":[["4b73af2a.f0c6b8"]]},{"id":"9e987e5c.68301","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"9c09e007.0f7d78","order":1,"width":24,"height":6,"label":"Boilertemperatur","chartType":"line","legend":"false","xformat":"dd HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"604800","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2510,"y":1440,"wires":[[]]},{"id":"be4bb2b.5884d5","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"10","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1510,"y":1660,"wires":[["f27478c7.572c4"]]},{"id":"fd0c2e42.1be9f8","type":"file","z":"32a5fb5f.529444","name":"","filename":"/data/raw_data/derart/temperaturBoilerVL.txt","appendNewline":false,"createDir":true,"overwriteFile":"false","encoding":"none","x":3070,"y":1720,"wires":[[]]},{"id":"db0b11a1.235778","type":"csv","z":"32a5fb5f.529444","name":"","sep":",","hdrin":false,"hdrout":false,"multi":"one","ret":"\\n","temp":"timestamp,data","skip":"0","strings":true,"x":2810,"y":1720,"wires":[["fd0c2e42.1be9f8"]]},{"id":"fce0ce09.c01ec","type":"function","z":"32a5fb5f.529444","name":"","func":"time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};","outputs":1,"noerr":0,"x":2670,"y":1720,"wires":[["db0b11a1.235778"]]},{"id":"cdde1275.7228b8","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"9c09e007.0f7d78","order":2,"width":24,"height":6,"label":"Boiler VL","chartType":"line","legend":"false","xformat":"dd HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"604800","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2480,"y":1660,"wires":[[]]},{"id":"6fb9f4cb.f58e64","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"10","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1510,"y":1900,"wires":[["1fe2074f.be8c69"]]},{"id":"2f6c280a.b76d78","type":"file","z":"32a5fb5f.529444","name":"","filename":"/data/raw_data/derart/temperaturBoilerRL.txt","appendNewline":false,"createDir":true,"overwriteFile":"false","encoding":"none","x":3070,"y":1960,"wires":[[]]},{"id":"1cb6ad5a.02d0eb","type":"csv","z":"32a5fb5f.529444","name":"","sep":",","hdrin":false,"hdrout":false,"multi":"one","ret":"\\n","temp":"timestamp,data","skip":"0","strings":true,"x":2810,"y":1960,"wires":[["2f6c280a.b76d78"]]},{"id":"b0272bc4.0d2f6","type":"function","z":"32a5fb5f.529444","name":"","func":"time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};","outputs":1,"noerr":0,"x":2670,"y":1960,"wires":[["1cb6ad5a.02d0eb"]]},{"id":"513e2a33.27b0c4","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"9c09e007.0f7d78","order":3,"width":24,"height":6,"label":"Boiler RL","chartType":"line","legend":"false","xformat":"dd HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"604800","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2480,"y":1900,"wires":[[]]},{"id":"1fde4c46.2e9e1c","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"10","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1510,"y":2140,"wires":[["2b38d77f.6f292"]]},{"id":"1507bf67.b47449","type":"file","z":"32a5fb5f.529444","name":"","filename":"/data/raw_data/derart/temperaturErdsondeVL.txt","appendNewline":false,"createDir":true,"overwriteFile":"false","encoding":"none","x":3090,"y":2200,"wires":[[]]},{"id":"53382c2e.409634","type":"csv","z":"32a5fb5f.529444","name":"","sep":",","hdrin":false,"hdrout":false,"multi":"one","ret":"\\n","temp":"timestamp,data","skip":"0","strings":true,"x":2810,"y":2200,"wires":[["1507bf67.b47449"]]},{"id":"6a33013d.89cd2","type":"function","z":"32a5fb5f.529444","name":"","func":"time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};","outputs":1,"noerr":0,"x":2670,"y":2200,"wires":[["53382c2e.409634"]]},{"id":"ecb313f5.321498","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"a00f2421.e9b4e8","order":1,"width":24,"height":6,"label":"Erdsonde VL","chartType":"line","legend":"false","xformat":"dd HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"604800","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2490,"y":2140,"wires":[[]]},{"id":"34c04fb0.0ae17","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"10","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1510,"y":2360,"wires":[["cfca4930.d1cfb"]]},{"id":"9eeae6cb.3d799","type":"file","z":"32a5fb5f.529444","name":"","filename":"/data/raw_data/derart/temperaturWaermetauscherVL.txt","appendNewline":false,"createDir":true,"overwriteFile":"false","encoding":"none","x":3110,"y":2420,"wires":[[]]},{"id":"af35bb73.efb2b","type":"csv","z":"32a5fb5f.529444","name":"","sep":",","hdrin":false,"hdrout":false,"multi":"one","ret":"\\n","temp":"timestamp,data","skip":"0","strings":true,"x":2810,"y":2420,"wires":[["9eeae6cb.3d799"]]},{"id":"e70a134c.fdb19","type":"function","z":"32a5fb5f.529444","name":"","func":"time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};","outputs":1,"noerr":0,"x":2670,"y":2420,"wires":[["af35bb73.efb2b"]]},{"id":"bcfd9690.80ddd","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"a00f2421.e9b4e8","order":2,"width":24,"height":6,"label":"Wärmetauscher VL","chartType":"line","legend":"false","xformat":"dd HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"604800","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2510,"y":2360,"wires":[[]]},{"id":"9be67be1.314da8","type":"delay","z":"32a5fb5f.529444","name":"","pauseType":"rate","timeout":"5","timeoutUnits":"seconds","rate":"1","nbRateUnits":"10","rateUnits":"minute","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":true,"x":1510,"y":2620,"wires":[["169dcab.d26a535"]]},{"id":"540c6814.eb83","type":"file","z":"32a5fb5f.529444","name":"","filename":"/data/raw_data/derart/temperaturWaermetauscherRL.txt","appendNewline":false,"createDir":true,"overwriteFile":"false","encoding":"none","x":3110,"y":2680,"wires":[[]]},{"id":"a9844d0a.928d7","type":"csv","z":"32a5fb5f.529444","name":"","sep":",","hdrin":false,"hdrout":false,"multi":"one","ret":"\\n","temp":"timestamp,data","skip":"0","strings":true,"x":2810,"y":2680,"wires":[["540c6814.eb83"]]},{"id":"205a1a7a.d7631e","type":"function","z":"32a5fb5f.529444","name":"","func":"time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};","outputs":1,"noerr":0,"x":2670,"y":2680,"wires":[["a9844d0a.928d7"]]},{"id":"13f015f6.11fc92","type":"ui_chart","z":"32a5fb5f.529444","name":"","group":"a00f2421.e9b4e8","order":3,"width":24,"height":6,"label":"Wärmetauscher RL","chartType":"line","legend":"false","xformat":"dd HH:mm","interpolate":"linear","nodata":"","dot":false,"ymin":"","ymax":"","removeOlder":1,"removeOlderPoints":"","removeOlderUnit":"604800","cutout":0,"useOneColor":false,"colors":["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5"],"useOldStyle":false,"outputs":1,"x":2510,"y":2620,"wires":[[]]},{"id":"50fbb7a5.57cd4","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":380,"wires":[["cd634c57.6a2d6"]]},{"id":"bb0395ed.96b6e8","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":440,"wires":[["38f106e5.2142ca","7aa88327.0cc454"]]},{"id":"fb230f15.4dadc","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":980,"wires":[["6989ba4e.6e7334"]]},{"id":"f37ff256.8df628","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":1020,"wires":[["3b726350.b5c5e4","167cb824.5db0f"]]},{"id":"9901ad8c.73cdb","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":1200,"wires":[["dff0d2cb.50fda8"]]},{"id":"a604307f.42af","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":1240,"wires":[["6d4e5a2c.4064a4","97c35b76.d58078"]]},{"id":"b17d7c16.8681a8","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2470,"y":240,"wires":[["4b1b4c22.26e82c"]]},{"id":"fda96317.51aba","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":1400,"wires":[["88fb819a.0229d8"]]},{"id":"58e8ecba.e58d9c","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":1440,"wires":[["9e987e5c.68301","c7d4729.2d47f1"]]},{"id":"d6870d6d.369528","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":1620,"wires":[["455df715.780d68"]]},{"id":"f27478c7.572c4","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":1660,"wires":[["cdde1275.7228b8","fce0ce09.c01ec"]]},{"id":"f70a1b82.b3dd3","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":1860,"wires":[["79209df9.ca3da4"]]},{"id":"1fe2074f.be8c69","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":1900,"wires":[["513e2a33.27b0c4","b0272bc4.0d2f6"]]},{"id":"6c22bd9c.2448a4","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":2100,"wires":[["2c64d59d.4c20fa"]]},{"id":"2b38d77f.6f292","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":2140,"wires":[["ecb313f5.321498","6a33013d.89cd2"]]},{"id":"ba8be7e2.483678","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":2320,"wires":[["bea90d1b.45dd"]]},{"id":"cfca4930.d1cfb","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":2360,"wires":[["bcfd9690.80ddd","e70a134c.fdb19"]]},{"id":"4990ce60.fe2f9","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":2560,"wires":[["29f74d3e.868dfa"]]},{"id":"169dcab.d26a535","type":"rbe","z":"32a5fb5f.529444","name":"","func":"rbe","gap":"","start":"","inout":"out","property":"payload","x":2030,"y":2620,"wires":[["13f015f6.11fc92","205a1a7a.d7631e"]]},{"id":"c299c2a9.4f5468","type":"mqtt-broker","z":"","name":"","broker":"192.168.1.14","port":"1883","clientid":"","usetls":false,"compatmode":false,"keepalive":"60","cleansession":true,"birthTopic":"","birthQos":"0","birthRetain":"false","birthPayload":"","closeTopic":"","closeQos":"0","closeRetain":"false","closePayload":"","willTopic":"","willQos":"0","willRetain":"false","willPayload":""},{"id":"7a3f05dd.231e9c","type":"ui_group","z":"","name":"Kollektor","tab":"37366d63.5b6472","order":2,"disp":true,"width":6,"collapse":true},{"id":"48898031.ea8918","type":"ui_group","z":"","name":"Boiler","tab":"37366d63.5b6472","order":3,"disp":true,"width":6,"collapse":true},{"id":"d1971d8a.f39e8","type":"ui_group","z":"","name":"Erdsonde","tab":"37366d63.5b6472","order":4,"disp":true,"width":"6","collapse":true},{"id":"803d01f0.e1f188","type":"ui_group","z":"","name":"Status","tab":"37366d63.5b6472","order":1,"disp":true,"width":"6","collapse":true},{"id":"69764fc6.522d4","type":"ui_group","z":"","name":"Temperaturen Kollektor","tab":"3d38ed10.28e242","order":2,"disp":true,"width":"24","collapse":true},{"id":"419a499a.ba486","type":"ui_group","z":"","name":"Temperaturen Boiler","tab":"3d38ed10.28e242","order":3,"disp":true,"width":"24","collapse":true},{"id":"d3b92f13.9aaaa8","type":"ui_group","z":"","name":"Temperaturen Sole","tab":"3d38ed10.28e242","order":4,"disp":true,"width":"24","collapse":true},{"id":"ad33ef48.829d3","type":"ui_group","z":"","name":"Betriebsdaten","tab":"3d38ed10.28e242","order":1,"disp":true,"width":"24","collapse":true},{"id":"5d073c8b.060b84","type":"ui_group","z":"","name":"Betriebsdaten","tab":"c99d2761.eb60a","order":1,"disp":true,"width":"24","collapse":true},{"id":"37e71635.f90892","type":"ui_group","z":"","name":"Temperaturen Kollektor","tab":"c99d2761.eb60a","order":2,"disp":true,"width":"24","collapse":true},{"id":"9c09e007.0f7d78","type":"ui_group","z":"","name":"Temperaturen Boiler","tab":"c99d2761.eb60a","order":3,"disp":true,"width":"24","collapse":true},{"id":"a00f2421.e9b4e8","type":"ui_group","z":"","name":"Temperaturen Sole","tab":"c99d2761.eb60a","order":4,"disp":true,"width":"24","collapse":true},{"id":"37366d63.5b6472","type":"ui_tab","z":"","name":"Betriebsdaten","icon":"fa-thermometer-full","order":1,"disabled":false,"hidden":false},{"id":"3d38ed10.28e242","type":"ui_tab","z":"","name":"24h Verlauf","icon":"fa-area-chart","order":2,"disabled":false,"hidden":false},{"id":"c99d2761.eb60a","type":"ui_tab","z":"","name":"7d Verlauf","icon":"dashboard","order":3,"disabled":false,"hidden":false}]
+[
+    {
+        "id": "32a5fb5f.529444",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "fe34524d.60e2e8",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/fuehlerKollektorVL",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 130,
+        "y": 940,
+        "wires": [
+            [
+                "c0391734.5c4b08",
+                "d9c3e201.c82d28",
+                "3250c491.6b004c",
+                "e32981a4.78723"
+            ]
+        ]
+    },
+    {
+        "id": "c0391734.5c4b08",
+        "type": "ui_gauge",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "7a3f05dd.231e9c",
+        "order": 2,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "Kollektor Vorlauf",
+        "label": "°C",
+        "format": "{{value | number:0}}",
+        "min": "-20",
+        "max": "130",
+        "colors": [
+            "#0432ff",
+            "#00fa00",
+            "#ff2600"
+        ],
+        "seg1": "25",
+        "seg2": "",
+        "x": 1840,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "8d83366b.6909f",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/fuehlerKollektorLuft",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 130,
+        "y": 1160,
+        "wires": [
+            [
+                "5d5ee20.0a83e2",
+                "a6dfc6a5.d4dd08",
+                "ca4dfa1.0ba9d08"
+            ]
+        ]
+    },
+    {
+        "id": "5d5ee20.0a83e2",
+        "type": "ui_gauge",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "7a3f05dd.231e9c",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Kollektor Luft",
+        "label": "°C",
+        "format": "{{value | number:0}}",
+        "min": "-20",
+        "max": "130",
+        "colors": [
+            "#0432ff",
+            "#00fa00",
+            "#ff2600"
+        ],
+        "seg1": "30",
+        "seg2": "",
+        "x": 1840,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "c1eec7a0.acf8f",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/fuehlerBoiler",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 110,
+        "y": 1360,
+        "wires": [
+            [
+                "cc565321.2a3d08",
+                "1829e78b.7c7a4",
+                "72d56e1.542361"
+            ]
+        ]
+    },
+    {
+        "id": "cc565321.2a3d08",
+        "type": "ui_gauge",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "48898031.ea8918",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Boilertemperatur",
+        "label": "°C",
+        "format": "{{value | number:0}}",
+        "min": "10",
+        "max": "80",
+        "colors": [
+            "#0432ff",
+            "#00fa00",
+            "#ff2600"
+        ],
+        "seg1": "40",
+        "seg2": "",
+        "x": 1850,
+        "y": 1360,
+        "wires": []
+    },
+    {
+        "id": "f66cd84b.b71c2",
+        "type": "ui_gauge",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "48898031.ea8918",
+        "order": 2,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "Boiler VL",
+        "label": "°C",
+        "format": "{{value | number:0}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#0056d6",
+            "#00fa00",
+            "#ff2600"
+        ],
+        "seg1": "45",
+        "seg2": "",
+        "x": 1820,
+        "y": 1580,
+        "wires": []
+    },
+    {
+        "id": "f620460d.404f9",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/fuehlerBoilerVL",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 120,
+        "y": 1580,
+        "wires": [
+            [
+                "f66cd84b.b71c2",
+                "169e6672.c4db3a",
+                "be4bb2b.5884d5"
+            ]
+        ]
+    },
+    {
+        "id": "2b6e4c6a.1fbec4",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/fuehlerBoilerRL",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 120,
+        "y": 1820,
+        "wires": [
+            [
+                "a9ee0c51.28e91",
+                "ba94f84a.baaad8",
+                "6fb9f4cb.f58e64"
+            ]
+        ]
+    },
+    {
+        "id": "a9ee0c51.28e91",
+        "type": "ui_gauge",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "48898031.ea8918",
+        "order": 3,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "Boiler RL",
+        "label": "°C",
+        "format": "{{value | number:0}}",
+        "min": "10",
+        "max": "70",
+        "colors": [
+            "#0056d6",
+            "#00fa00",
+            "#ff2600"
+        ],
+        "seg1": "20",
+        "seg2": "",
+        "x": 1820,
+        "y": 1820,
+        "wires": []
+    },
+    {
+        "id": "2ec03ae2.4f5746",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/fuehlerSole",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 110,
+        "y": 2060,
+        "wires": [
+            [
+                "fc45680a.3014b8",
+                "3211f86f.1c43f8",
+                "1fde4c46.2e9e1c"
+            ]
+        ]
+    },
+    {
+        "id": "fc45680a.3014b8",
+        "type": "ui_gauge",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "d1971d8a.f39e8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Erdsonde VL",
+        "label": "°C",
+        "format": "{{value | number:0}}",
+        "min": "5",
+        "max": "40",
+        "colors": [
+            "#0056d6",
+            "#00fa00",
+            "#ff2600"
+        ],
+        "seg1": "10",
+        "seg2": "25",
+        "x": 1830,
+        "y": 2060,
+        "wires": []
+    },
+    {
+        "id": "bc094e93.b40ea",
+        "type": "ui_gauge",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "7a3f05dd.231e9c",
+        "order": 3,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "Kollektorpumpe",
+        "label": "%",
+        "format": "{{value | number:0}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#929292",
+            "#00fa00",
+            "#ff2600"
+        ],
+        "seg1": "20",
+        "seg2": "70",
+        "x": 1840,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "260ccc6b.023c34",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/fuehlerSoleVL",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 110,
+        "y": 2280,
+        "wires": [
+            [
+                "22bcb67.c2fc04a",
+                "d3c4bbaa.d4e8e",
+                "34c04fb0.0ae17"
+            ]
+        ]
+    },
+    {
+        "id": "22bcb67.c2fc04a",
+        "type": "ui_gauge",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "d1971d8a.f39e8",
+        "order": 2,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "Wärmetauscher VL",
+        "label": "°C",
+        "format": "{{value | number:0}}",
+        "min": "10",
+        "max": "100",
+        "colors": [
+            "#0056d6",
+            "#00fa00",
+            "#ff2600"
+        ],
+        "seg1": "25",
+        "seg2": "",
+        "x": 1850,
+        "y": 2280,
+        "wires": []
+    },
+    {
+        "id": "5a7619e9.2f112",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/fuehlerSoleRL",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 110,
+        "y": 2520,
+        "wires": [
+            [
+                "579d1478.ecca0c",
+                "24c0be3c.d65e3a",
+                "9be67be1.314da8"
+            ]
+        ]
+    },
+    {
+        "id": "579d1478.ecca0c",
+        "type": "ui_gauge",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "d1971d8a.f39e8",
+        "order": 3,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "Wärmetauscher RL",
+        "label": "°C",
+        "format": "{{value | number:0}}",
+        "min": "0",
+        "max": "40",
+        "colors": [
+            "#0056d6",
+            "#00fa00",
+            "#ff2600"
+        ],
+        "seg1": "5",
+        "seg2": "",
+        "x": 1850,
+        "y": 2520,
+        "wires": []
+    },
+    {
+        "id": "1f66308d.d5f50f",
+        "type": "ui_led",
+        "z": "32a5fb5f.529444",
+        "group": "803d01f0.e1f188",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "label": "Onlinestatus",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "green",
+                "value": "true",
+                "valueType": "bool"
+            },
+            {
+                "color": "red",
+                "value": "false",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "name": "Status",
+        "x": 1810,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "d9c3e201.c82d28",
+        "type": "trigger",
+        "z": "32a5fb5f.529444",
+        "op1": "true",
+        "op2": "false",
+        "op1type": "bool",
+        "op2type": "bool",
+        "duration": "10",
+        "extend": true,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "name": "",
+        "x": 1470,
+        "y": 880,
+        "wires": [
+            [
+                "1f66308d.d5f50f"
+            ]
+        ]
+    },
+    {
+        "id": "5f0dfded.ba49f4",
+        "type": "ui_text",
+        "z": "32a5fb5f.529444",
+        "group": "803d01f0.e1f188",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Betriebsmodus",
+        "label": "Betriebsmodus",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 1840,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "abe94b9f.d7f1",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/operationMode",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 120,
+        "y": 80,
+        "wires": [
+            [
+                "ec4d09af.5e4"
+            ]
+        ]
+    },
+    {
+        "id": "a44d7908.987c9",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/speedKollektorPumpe",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 140,
+        "y": 340,
+        "wires": [
+            [
+                "7fdefaaa.7ba444"
+            ]
+        ]
+    },
+    {
+        "id": "7fdefaaa.7ba444",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "pwm = (msg.payload / 2.55) - 15;\nvalue = Math.round(pwm * (9/8) + 10);\nif (value > 100){\n    value = 100;\n}\nelse if (value < 0){\n    value = 0;\n}\nreturn {payload: value};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 850,
+        "y": 340,
+        "wires": [
+            [
+                "bc094e93.b40ea",
+                "7dc7788f.d1b51",
+                "4be429b.8356358"
+            ]
+        ]
+    },
+    {
+        "id": "dffea167.63e0d",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/kollektorPumpe",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 120,
+        "y": 280,
+        "wires": [
+            [
+                "c0bbf02.55ecb1"
+            ]
+        ]
+    },
+    {
+        "id": "862c30fb.d24bf8",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/solePumpe",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 110,
+        "y": 560,
+        "wires": [
+            [
+                "e1a04613.cd5df8"
+            ]
+        ]
+    },
+    {
+        "id": "535b0082.9fbd8",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/stellwerkSoleBoiler",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 130,
+        "y": 640,
+        "wires": [
+            [
+                "14c99850.f54c5"
+            ]
+        ]
+    },
+    {
+        "id": "228512d2.92f106",
+        "type": "ui_led",
+        "z": "32a5fb5f.529444",
+        "group": "803d01f0.e1f188",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "label": "Kollektorpumpe",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "red",
+                "value": "0",
+                "valueType": "str"
+            },
+            {
+                "color": "green",
+                "value": "1",
+                "valueType": "str"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "name": "Kollektorpumpe",
+        "x": 1840,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "e92837f1.4632d",
+        "type": "ui_led",
+        "z": "32a5fb5f.529444",
+        "group": "803d01f0.e1f188",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "label": "Solepumpe",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "red",
+                "value": "0",
+                "valueType": "str"
+            },
+            {
+                "color": "green",
+                "value": "1",
+                "valueType": "str"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "name": "Solepumpe",
+        "x": 1830,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "9ae272d3.ee183",
+        "type": "ui_text",
+        "z": "32a5fb5f.529444",
+        "group": "803d01f0.e1f188",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "Stellwerk zeig auf",
+        "label": "Stellwerk zeigt auf",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 1850,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "14c99850.f54c5",
+        "type": "trigger",
+        "z": "32a5fb5f.529444",
+        "op1": "",
+        "op2": "",
+        "op1type": "pay",
+        "op2type": "payl",
+        "duration": "-10",
+        "extend": false,
+        "units": "min",
+        "reset": "",
+        "bytopic": "all",
+        "name": "",
+        "x": 910,
+        "y": 640,
+        "wires": [
+            [
+                "ef02dc0b.3977"
+            ]
+        ]
+    },
+    {
+        "id": "ec4d09af.5e4",
+        "type": "trigger",
+        "z": "32a5fb5f.529444",
+        "op1": "",
+        "op2": "",
+        "op1type": "pay",
+        "op2type": "payl",
+        "duration": "-10",
+        "extend": false,
+        "units": "min",
+        "reset": "",
+        "bytopic": "all",
+        "name": "",
+        "x": 910,
+        "y": 80,
+        "wires": [
+            [
+                "d1a8d51a.674848",
+                "a02520e5.44dc38",
+                "32796b43.7fff94",
+                "b17d7c16.8681a8"
+            ]
+        ]
+    },
+    {
+        "id": "e1a04613.cd5df8",
+        "type": "trigger",
+        "z": "32a5fb5f.529444",
+        "op1": "",
+        "op2": "",
+        "op1type": "pay",
+        "op2type": "payl",
+        "duration": "-10",
+        "extend": false,
+        "units": "min",
+        "reset": "",
+        "bytopic": "all",
+        "name": "",
+        "x": 910,
+        "y": 560,
+        "wires": [
+            [
+                "e92837f1.4632d"
+            ]
+        ]
+    },
+    {
+        "id": "c0bbf02.55ecb1",
+        "type": "trigger",
+        "z": "32a5fb5f.529444",
+        "op1": "",
+        "op2": "",
+        "op1type": "pay",
+        "op2type": "payl",
+        "duration": "-10",
+        "extend": false,
+        "units": "min",
+        "reset": "",
+        "bytopic": "all",
+        "name": "",
+        "x": 910,
+        "y": 280,
+        "wires": [
+            [
+                "228512d2.92f106"
+            ]
+        ]
+    },
+    {
+        "id": "d1a8d51a.674848",
+        "type": "change",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "0",
+                "fromt": "str",
+                "to": "Ausgeschaltet",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "1",
+                "fromt": "str",
+                "to": "Sole laden",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "2",
+                "fromt": "str",
+                "to": "Boiler laden",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1480,
+        "y": 80,
+        "wires": [
+            [
+                "5f0dfded.ba49f4"
+            ]
+        ]
+    },
+    {
+        "id": "ef02dc0b.3977",
+        "type": "change",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "1",
+                "fromt": "str",
+                "to": "Wärmetauscher",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "2",
+                "fromt": "str",
+                "to": "Boiler",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1480,
+        "y": 640,
+        "wires": [
+            [
+                "9ae272d3.ee183"
+            ]
+        ]
+    },
+    {
+        "id": "3250c491.6b004c",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "2",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1500,
+        "y": 980,
+        "wires": [
+            [
+                "fb230f15.4dadc"
+            ]
+        ]
+    },
+    {
+        "id": "6989ba4e.6e7334",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "69764fc6.522d4",
+        "order": 2,
+        "width": 24,
+        "height": 6,
+        "label": "Vorlauf Kollektor",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2180,
+        "y": 980,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dff0d2cb.50fda8",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "69764fc6.522d4",
+        "order": 1,
+        "width": 24,
+        "height": 6,
+        "label": "Luft Kollektor",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2180,
+        "y": 1200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "88fb819a.0229d8",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "419a499a.ba486",
+        "order": 1,
+        "width": 24,
+        "height": 6,
+        "label": "Boilertemperatur",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2190,
+        "y": 1400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "455df715.780d68",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "419a499a.ba486",
+        "order": 2,
+        "width": 24,
+        "height": 6,
+        "label": "Boiler VL",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2160,
+        "y": 1620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "79209df9.ca3da4",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "419a499a.ba486",
+        "order": 3,
+        "width": 24,
+        "height": 6,
+        "label": "Boiler RL",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2160,
+        "y": 1860,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2c64d59d.4c20fa",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "d3b92f13.9aaaa8",
+        "order": 1,
+        "width": 24,
+        "height": 6,
+        "label": "Erdsonde VL",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2170,
+        "y": 2100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bea90d1b.45dd",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "d3b92f13.9aaaa8",
+        "order": 2,
+        "width": 24,
+        "height": 6,
+        "label": "Wärmetauscher VL",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2190,
+        "y": 2320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "29f74d3e.868dfa",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "d3b92f13.9aaaa8",
+        "order": 3,
+        "width": 24,
+        "height": 6,
+        "label": "Wärmetauscher RL",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2190,
+        "y": 2560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cd634c57.6a2d6",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "ad33ef48.829d3",
+        "order": 2,
+        "width": 24,
+        "height": 6,
+        "label": "Pumpengeschwindigkeit",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "1",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2210,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "32796b43.7fff94",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "ad33ef48.829d3",
+        "order": 1,
+        "width": 24,
+        "height": 6,
+        "label": "Betriebsmodus",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "1",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2180,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5a83e941.f6e2d",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/message",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 100,
+        "y": 2880,
+        "wires": [
+            [
+                "effa2206.98dc3"
+            ]
+        ]
+    },
+    {
+        "id": "9b768cc9.f7e878",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/alarm",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 90,
+        "y": 2940,
+        "wires": [
+            [
+                "29dc9d84.c2c83a",
+                "23518014.0f6f38"
+            ]
+        ]
+    },
+    {
+        "id": "effa2206.98dc3",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "top right",
+        "displayTime": "20",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "topic": "Benachrichtigung:",
+        "name": "",
+        "x": 890,
+        "y": 2880,
+        "wires": []
+    },
+    {
+        "id": "29dc9d84.c2c83a",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "dialog",
+        "displayTime": "20",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "topic": "ALARM!",
+        "name": "",
+        "x": 870,
+        "y": 2940,
+        "wires": [
+            [
+                "b5e2faf1.f36a6"
+            ]
+        ]
+    },
+    {
+        "id": "23518014.0f6f38",
+        "type": "trigger",
+        "z": "32a5fb5f.529444",
+        "op1": "",
+        "op2": "0",
+        "op1type": "pay",
+        "op2type": "str",
+        "duration": "-10",
+        "extend": false,
+        "units": "s",
+        "reset": "OK",
+        "bytopic": "all",
+        "name": "",
+        "x": 900,
+        "y": 3000,
+        "wires": [
+            [
+                "b5e2faf1.f36a6"
+            ]
+        ]
+    },
+    {
+        "id": "b5e2faf1.f36a6",
+        "type": "ui_audio",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "803d01f0.e1f188",
+        "voice": "de-DE",
+        "always": true,
+        "x": 1820,
+        "y": 2940,
+        "wires": []
+    },
+    {
+        "id": "c426152.7dc9d68",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/boilerTermostat",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 120,
+        "y": 700,
+        "wires": [
+            [
+                "b389978b.eaf1b8"
+            ]
+        ]
+    },
+    {
+        "id": "b389978b.eaf1b8",
+        "type": "ui_text",
+        "z": "32a5fb5f.529444",
+        "group": "803d01f0.e1f188",
+        "order": 7,
+        "width": 0,
+        "height": 0,
+        "name": "Boiler Solltemperatur",
+        "label": "Boiler Solltemperatur",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 1860,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "affdd89a.91d6e8",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/boilerLegionellenTemperatur",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 160,
+        "y": 760,
+        "wires": [
+            [
+                "f9f86eb0.1f07b"
+            ]
+        ]
+    },
+    {
+        "id": "f2200a5e.13935",
+        "type": "ui_text",
+        "z": "32a5fb5f.529444",
+        "group": "803d01f0.e1f188",
+        "order": 8,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Letztmals bei 65°",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 1850,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "f9f86eb0.1f07b",
+        "type": "moment",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "",
+        "input": "",
+        "inputType": "date",
+        "inTz": "Europe/Zurich",
+        "adjAmount": 0,
+        "adjType": "days",
+        "adjDir": "add",
+        "format": "D.M.YY HH:mm",
+        "locale": "de_DE",
+        "output": "payload",
+        "outputType": "msg",
+        "outTz": "Europe/Zurich",
+        "x": 900,
+        "y": 760,
+        "wires": [
+            [
+                "f2200a5e.13935"
+            ]
+        ]
+    },
+    {
+        "id": "7faf1672.50df2",
+        "type": "comment",
+        "z": "32a5fb5f.529444",
+        "name": "Betriebsdaten",
+        "info": "",
+        "x": 1830,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "3b14c3a5.66e8f4",
+        "type": "comment",
+        "z": "32a5fb5f.529444",
+        "name": "24h Rückblick",
+        "info": "",
+        "x": 2170,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "f1098835.f360b",
+        "type": "comment",
+        "z": "32a5fb5f.529444",
+        "name": "7d Rückblick",
+        "info": "",
+        "x": 2490,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "cb80ac2e.59f39",
+        "type": "comment",
+        "z": "32a5fb5f.529444",
+        "name": "Speichern",
+        "info": "",
+        "x": 2820,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "a02520e5.44dc38",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "5d073c8b.060b84",
+        "order": 1,
+        "width": 24,
+        "height": 6,
+        "label": "Betriebsmodus",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "1",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2500,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7dc7788f.d1b51",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "30",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1510,
+        "y": 380,
+        "wires": [
+            [
+                "50fbb7a5.57cd4"
+            ]
+        ]
+    },
+    {
+        "id": "38f106e5.2142ca",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "5d073c8b.060b84",
+        "order": 2,
+        "width": 24,
+        "height": 6,
+        "label": "Pumpengeschwindigkeit",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "1",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2530,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4be429b.8356358",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "10",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1510,
+        "y": 440,
+        "wires": [
+            [
+                "bb0395ed.96b6e8"
+            ]
+        ]
+    },
+    {
+        "id": "1257abb5.afa15c",
+        "type": "file",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "filename": "/data/raw_data/derart/operationMode.txt",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 3060,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "261fad3a.a935ca",
+        "type": "csv",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "sep": ",",
+        "hdrin": false,
+        "hdrout": false,
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,data",
+        "skip": "0",
+        "strings": true,
+        "x": 2810,
+        "y": 240,
+        "wires": [
+            [
+                "1257abb5.afa15c"
+            ]
+        ]
+    },
+    {
+        "id": "4b1b4c22.26e82c",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2670,
+        "y": 240,
+        "wires": [
+            [
+                "261fad3a.a935ca"
+            ]
+        ]
+    },
+    {
+        "id": "372029df.17460e",
+        "type": "file",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "filename": "/data/raw_data/derart/kollektorPumpeGeschwindigkeit.txt",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 3110,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "95ff83ca.905488",
+        "type": "csv",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "sep": ",",
+        "hdrin": false,
+        "hdrout": false,
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,data",
+        "skip": "0",
+        "strings": true,
+        "x": 2810,
+        "y": 500,
+        "wires": [
+            [
+                "372029df.17460e"
+            ]
+        ]
+    },
+    {
+        "id": "7aa88327.0cc454",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2670,
+        "y": 500,
+        "wires": [
+            [
+                "95ff83ca.905488"
+            ]
+        ]
+    },
+    {
+        "id": "3b726350.b5c5e4",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "37e71635.f90892",
+        "order": 2,
+        "width": 24,
+        "height": 6,
+        "label": "Vorlauf Kollektor",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2500,
+        "y": 1020,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e32981a4.78723",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "10",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1510,
+        "y": 1020,
+        "wires": [
+            [
+                "f37ff256.8df628"
+            ]
+        ]
+    },
+    {
+        "id": "f8fdaa24.1d777",
+        "type": "file",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "filename": "/data/raw_data/derart/temperaturKollektorVorlauf.txt",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 3100,
+        "y": 1080,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e0516bb0.b5e6d",
+        "type": "csv",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "sep": ",",
+        "hdrin": false,
+        "hdrout": false,
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,data",
+        "skip": "0",
+        "strings": true,
+        "x": 2810,
+        "y": 1080,
+        "wires": [
+            [
+                "f8fdaa24.1d777"
+            ]
+        ]
+    },
+    {
+        "id": "167cb824.5db0f",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2670,
+        "y": 1080,
+        "wires": [
+            [
+                "e0516bb0.b5e6d"
+            ]
+        ]
+    },
+    {
+        "id": "a6dfc6a5.d4dd08",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "2",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1500,
+        "y": 1200,
+        "wires": [
+            [
+                "9901ad8c.73cdb"
+            ]
+        ]
+    },
+    {
+        "id": "1829e78b.7c7a4",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "10",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1510,
+        "y": 1400,
+        "wires": [
+            [
+                "fda96317.51aba"
+            ]
+        ]
+    },
+    {
+        "id": "169e6672.c4db3a",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "2",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1500,
+        "y": 1620,
+        "wires": [
+            [
+                "d6870d6d.369528"
+            ]
+        ]
+    },
+    {
+        "id": "ba94f84a.baaad8",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "2",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1500,
+        "y": 1860,
+        "wires": [
+            [
+                "f70a1b82.b3dd3"
+            ]
+        ]
+    },
+    {
+        "id": "3211f86f.1c43f8",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "2",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1500,
+        "y": 2100,
+        "wires": [
+            [
+                "6c22bd9c.2448a4"
+            ]
+        ]
+    },
+    {
+        "id": "d3c4bbaa.d4e8e",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "2",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1500,
+        "y": 2320,
+        "wires": [
+            [
+                "ba8be7e2.483678"
+            ]
+        ]
+    },
+    {
+        "id": "24c0be3c.d65e3a",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "2",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1500,
+        "y": 2560,
+        "wires": [
+            [
+                "4990ce60.fe2f9"
+            ]
+        ]
+    },
+    {
+        "id": "6d4e5a2c.4064a4",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "37e71635.f90892",
+        "order": 1,
+        "width": 24,
+        "height": 6,
+        "label": "Luft Kollektor",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2500,
+        "y": 1240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ca4dfa1.0ba9d08",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "10",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1510,
+        "y": 1240,
+        "wires": [
+            [
+                "a604307f.42af"
+            ]
+        ]
+    },
+    {
+        "id": "5dc152b5.63d9dc",
+        "type": "file",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "filename": "/data/raw_data/derart/temperaturKollektorLuft.txt",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 3090,
+        "y": 1300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8e837df6.73c5e",
+        "type": "csv",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "sep": ",",
+        "hdrin": false,
+        "hdrout": false,
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,data",
+        "skip": "0",
+        "strings": true,
+        "x": 2810,
+        "y": 1300,
+        "wires": [
+            [
+                "5dc152b5.63d9dc"
+            ]
+        ]
+    },
+    {
+        "id": "97c35b76.d58078",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2670,
+        "y": 1300,
+        "wires": [
+            [
+                "8e837df6.73c5e"
+            ]
+        ]
+    },
+    {
+        "id": "72d56e1.542361",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "hour",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1500,
+        "y": 1440,
+        "wires": [
+            [
+                "58e8ecba.e58d9c"
+            ]
+        ]
+    },
+    {
+        "id": "77ea4f8d.1d0c3",
+        "type": "file",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "filename": "/data/raw_data/derart/temperaturBoiler.txt",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 3070,
+        "y": 1500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4b73af2a.f0c6b8",
+        "type": "csv",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "sep": ",",
+        "hdrin": false,
+        "hdrout": false,
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,data",
+        "skip": "0",
+        "strings": true,
+        "x": 2810,
+        "y": 1500,
+        "wires": [
+            [
+                "77ea4f8d.1d0c3"
+            ]
+        ]
+    },
+    {
+        "id": "c7d4729.2d47f1",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2670,
+        "y": 1500,
+        "wires": [
+            [
+                "4b73af2a.f0c6b8"
+            ]
+        ]
+    },
+    {
+        "id": "9e987e5c.68301",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "9c09e007.0f7d78",
+        "order": 1,
+        "width": 24,
+        "height": 6,
+        "label": "Boilertemperatur",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2510,
+        "y": 1440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "be4bb2b.5884d5",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "10",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1510,
+        "y": 1660,
+        "wires": [
+            [
+                "f27478c7.572c4"
+            ]
+        ]
+    },
+    {
+        "id": "fd0c2e42.1be9f8",
+        "type": "file",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "filename": "/data/raw_data/derart/temperaturBoilerVL.txt",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 3070,
+        "y": 1720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "db0b11a1.235778",
+        "type": "csv",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "sep": ",",
+        "hdrin": false,
+        "hdrout": false,
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,data",
+        "skip": "0",
+        "strings": true,
+        "x": 2810,
+        "y": 1720,
+        "wires": [
+            [
+                "fd0c2e42.1be9f8"
+            ]
+        ]
+    },
+    {
+        "id": "fce0ce09.c01ec",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2670,
+        "y": 1720,
+        "wires": [
+            [
+                "db0b11a1.235778"
+            ]
+        ]
+    },
+    {
+        "id": "cdde1275.7228b8",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "9c09e007.0f7d78",
+        "order": 2,
+        "width": 24,
+        "height": 6,
+        "label": "Boiler VL",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2480,
+        "y": 1660,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6fb9f4cb.f58e64",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "10",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1510,
+        "y": 1900,
+        "wires": [
+            [
+                "1fe2074f.be8c69"
+            ]
+        ]
+    },
+    {
+        "id": "2f6c280a.b76d78",
+        "type": "file",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "filename": "/data/raw_data/derart/temperaturBoilerRL.txt",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 3070,
+        "y": 1960,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1cb6ad5a.02d0eb",
+        "type": "csv",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "sep": ",",
+        "hdrin": false,
+        "hdrout": false,
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,data",
+        "skip": "0",
+        "strings": true,
+        "x": 2810,
+        "y": 1960,
+        "wires": [
+            [
+                "2f6c280a.b76d78"
+            ]
+        ]
+    },
+    {
+        "id": "b0272bc4.0d2f6",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2670,
+        "y": 1960,
+        "wires": [
+            [
+                "1cb6ad5a.02d0eb"
+            ]
+        ]
+    },
+    {
+        "id": "513e2a33.27b0c4",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "9c09e007.0f7d78",
+        "order": 3,
+        "width": 24,
+        "height": 6,
+        "label": "Boiler RL",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2480,
+        "y": 1900,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1fde4c46.2e9e1c",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "10",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1510,
+        "y": 2140,
+        "wires": [
+            [
+                "2b38d77f.6f292"
+            ]
+        ]
+    },
+    {
+        "id": "1507bf67.b47449",
+        "type": "file",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "filename": "/data/raw_data/derart/temperaturErdsondeVL.txt",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 3090,
+        "y": 2200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "53382c2e.409634",
+        "type": "csv",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "sep": ",",
+        "hdrin": false,
+        "hdrout": false,
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,data",
+        "skip": "0",
+        "strings": true,
+        "x": 2810,
+        "y": 2200,
+        "wires": [
+            [
+                "1507bf67.b47449"
+            ]
+        ]
+    },
+    {
+        "id": "6a33013d.89cd2",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2670,
+        "y": 2200,
+        "wires": [
+            [
+                "53382c2e.409634"
+            ]
+        ]
+    },
+    {
+        "id": "ecb313f5.321498",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "a00f2421.e9b4e8",
+        "order": 1,
+        "width": 24,
+        "height": 6,
+        "label": "Erdsonde VL",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2490,
+        "y": 2140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "34c04fb0.0ae17",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "10",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1510,
+        "y": 2360,
+        "wires": [
+            [
+                "cfca4930.d1cfb"
+            ]
+        ]
+    },
+    {
+        "id": "9eeae6cb.3d799",
+        "type": "file",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "filename": "/data/raw_data/derart/temperaturWaermetauscherVL.txt",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 3110,
+        "y": 2420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "af35bb73.efb2b",
+        "type": "csv",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "sep": ",",
+        "hdrin": false,
+        "hdrout": false,
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,data",
+        "skip": "0",
+        "strings": true,
+        "x": 2810,
+        "y": 2420,
+        "wires": [
+            [
+                "9eeae6cb.3d799"
+            ]
+        ]
+    },
+    {
+        "id": "e70a134c.fdb19",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2670,
+        "y": 2420,
+        "wires": [
+            [
+                "af35bb73.efb2b"
+            ]
+        ]
+    },
+    {
+        "id": "bcfd9690.80ddd",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "a00f2421.e9b4e8",
+        "order": 2,
+        "width": 24,
+        "height": 6,
+        "label": "Wärmetauscher VL",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2510,
+        "y": 2360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9be67be1.314da8",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "10",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1510,
+        "y": 2620,
+        "wires": [
+            [
+                "169dcab.d26a535"
+            ]
+        ]
+    },
+    {
+        "id": "540c6814.eb83",
+        "type": "file",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "filename": "/data/raw_data/derart/temperaturWaermetauscherRL.txt",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 3110,
+        "y": 2680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a9844d0a.928d7",
+        "type": "csv",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "sep": ",",
+        "hdrin": false,
+        "hdrout": false,
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,data",
+        "skip": "0",
+        "strings": true,
+        "x": 2810,
+        "y": 2680,
+        "wires": [
+            [
+                "540c6814.eb83"
+            ]
+        ]
+    },
+    {
+        "id": "205a1a7a.d7631e",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2670,
+        "y": 2680,
+        "wires": [
+            [
+                "a9844d0a.928d7"
+            ]
+        ]
+    },
+    {
+        "id": "13f015f6.11fc92",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "a00f2421.e9b4e8",
+        "order": 3,
+        "width": 24,
+        "height": 6,
+        "label": "Wärmetauscher RL",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2510,
+        "y": 2620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "50fbb7a5.57cd4",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 380,
+        "wires": [
+            [
+                "cd634c57.6a2d6"
+            ]
+        ]
+    },
+    {
+        "id": "bb0395ed.96b6e8",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 440,
+        "wires": [
+            [
+                "38f106e5.2142ca",
+                "7aa88327.0cc454"
+            ]
+        ]
+    },
+    {
+        "id": "fb230f15.4dadc",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 980,
+        "wires": [
+            [
+                "6989ba4e.6e7334"
+            ]
+        ]
+    },
+    {
+        "id": "f37ff256.8df628",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 1020,
+        "wires": [
+            [
+                "3b726350.b5c5e4",
+                "167cb824.5db0f"
+            ]
+        ]
+    },
+    {
+        "id": "9901ad8c.73cdb",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 1200,
+        "wires": [
+            [
+                "dff0d2cb.50fda8"
+            ]
+        ]
+    },
+    {
+        "id": "a604307f.42af",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 1240,
+        "wires": [
+            [
+                "6d4e5a2c.4064a4",
+                "97c35b76.d58078"
+            ]
+        ]
+    },
+    {
+        "id": "b17d7c16.8681a8",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2470,
+        "y": 240,
+        "wires": [
+            [
+                "4b1b4c22.26e82c"
+            ]
+        ]
+    },
+    {
+        "id": "fda96317.51aba",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 1400,
+        "wires": [
+            [
+                "88fb819a.0229d8"
+            ]
+        ]
+    },
+    {
+        "id": "58e8ecba.e58d9c",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 1440,
+        "wires": [
+            [
+                "9e987e5c.68301",
+                "c7d4729.2d47f1"
+            ]
+        ]
+    },
+    {
+        "id": "d6870d6d.369528",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 1620,
+        "wires": [
+            [
+                "455df715.780d68"
+            ]
+        ]
+    },
+    {
+        "id": "f27478c7.572c4",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 1660,
+        "wires": [
+            [
+                "cdde1275.7228b8",
+                "fce0ce09.c01ec"
+            ]
+        ]
+    },
+    {
+        "id": "f70a1b82.b3dd3",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 1860,
+        "wires": [
+            [
+                "79209df9.ca3da4"
+            ]
+        ]
+    },
+    {
+        "id": "1fe2074f.be8c69",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 1900,
+        "wires": [
+            [
+                "513e2a33.27b0c4",
+                "b0272bc4.0d2f6"
+            ]
+        ]
+    },
+    {
+        "id": "6c22bd9c.2448a4",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 2100,
+        "wires": [
+            [
+                "2c64d59d.4c20fa"
+            ]
+        ]
+    },
+    {
+        "id": "2b38d77f.6f292",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 2140,
+        "wires": [
+            [
+                "ecb313f5.321498",
+                "6a33013d.89cd2"
+            ]
+        ]
+    },
+    {
+        "id": "ba8be7e2.483678",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 2320,
+        "wires": [
+            [
+                "bea90d1b.45dd"
+            ]
+        ]
+    },
+    {
+        "id": "cfca4930.d1cfb",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 2360,
+        "wires": [
+            [
+                "bcfd9690.80ddd",
+                "e70a134c.fdb19"
+            ]
+        ]
+    },
+    {
+        "id": "4990ce60.fe2f9",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 2560,
+        "wires": [
+            [
+                "29f74d3e.868dfa"
+            ]
+        ]
+    },
+    {
+        "id": "169dcab.d26a535",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2030,
+        "y": 2620,
+        "wires": [
+            [
+                "13f015f6.11fc92",
+                "205a1a7a.d7631e"
+            ]
+        ]
+    },
+    {
+        "id": "c299c2a9.4f5468",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "",
+        "broker": "192.168.1.14",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": ""
+    },
+    {
+        "id": "7a3f05dd.231e9c",
+        "type": "ui_group",
+        "z": "",
+        "name": "Kollektor",
+        "tab": "37366d63.5b6472",
+        "order": 2,
+        "disp": true,
+        "width": 6,
+        "collapse": true
+    },
+    {
+        "id": "48898031.ea8918",
+        "type": "ui_group",
+        "z": "",
+        "name": "Boiler",
+        "tab": "37366d63.5b6472",
+        "order": 3,
+        "disp": true,
+        "width": 6,
+        "collapse": true
+    },
+    {
+        "id": "d1971d8a.f39e8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Erdsonde",
+        "tab": "37366d63.5b6472",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": true
+    },
+    {
+        "id": "803d01f0.e1f188",
+        "type": "ui_group",
+        "z": "",
+        "name": "Status",
+        "tab": "37366d63.5b6472",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": true
+    },
+    {
+        "id": "69764fc6.522d4",
+        "type": "ui_group",
+        "z": "",
+        "name": "Temperaturen Kollektor",
+        "tab": "3d38ed10.28e242",
+        "order": 2,
+        "disp": true,
+        "width": "24",
+        "collapse": true
+    },
+    {
+        "id": "419a499a.ba486",
+        "type": "ui_group",
+        "z": "",
+        "name": "Temperaturen Boiler",
+        "tab": "3d38ed10.28e242",
+        "order": 3,
+        "disp": true,
+        "width": "24",
+        "collapse": true
+    },
+    {
+        "id": "d3b92f13.9aaaa8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Temperaturen Sole",
+        "tab": "3d38ed10.28e242",
+        "order": 4,
+        "disp": true,
+        "width": "24",
+        "collapse": true
+    },
+    {
+        "id": "ad33ef48.829d3",
+        "type": "ui_group",
+        "z": "",
+        "name": "Betriebsdaten",
+        "tab": "3d38ed10.28e242",
+        "order": 1,
+        "disp": true,
+        "width": "24",
+        "collapse": true
+    },
+    {
+        "id": "5d073c8b.060b84",
+        "type": "ui_group",
+        "z": "",
+        "name": "Betriebsdaten",
+        "tab": "c99d2761.eb60a",
+        "order": 1,
+        "disp": true,
+        "width": "24",
+        "collapse": true
+    },
+    {
+        "id": "37e71635.f90892",
+        "type": "ui_group",
+        "z": "",
+        "name": "Temperaturen Kollektor",
+        "tab": "c99d2761.eb60a",
+        "order": 2,
+        "disp": true,
+        "width": "24",
+        "collapse": true
+    },
+    {
+        "id": "9c09e007.0f7d78",
+        "type": "ui_group",
+        "z": "",
+        "name": "Temperaturen Boiler",
+        "tab": "c99d2761.eb60a",
+        "order": 3,
+        "disp": true,
+        "width": "24",
+        "collapse": true
+    },
+    {
+        "id": "a00f2421.e9b4e8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Temperaturen Sole",
+        "tab": "c99d2761.eb60a",
+        "order": 4,
+        "disp": true,
+        "width": "24",
+        "collapse": true
+    },
+    {
+        "id": "37366d63.5b6472",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Betriebsdaten",
+        "icon": "fa-thermometer-full",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "3d38ed10.28e242",
+        "type": "ui_tab",
+        "z": "",
+        "name": "24h Verlauf",
+        "icon": "fa-area-chart",
+        "order": 2,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "c99d2761.eb60a",
+        "type": "ui_tab",
+        "z": "",
+        "name": "7d Verlauf",
+        "icon": "dashboard",
+        "order": 3,
+        "disabled": false,
+        "hidden": false
+    }
+]]
