@@ -19,7 +19,7 @@
 #include <SPI.h>                    //Ethernet
 #include <Ethernet.h>               //Ethernet
 #include <ArduinoMqttClient.h>      //MQTT
-#include "secrets.h"                //MQTT Passwords
+#include "secrets.h"                //MQTT Passwörter
 
 // ===========================
 // 2. Variabeln und Konstanten
