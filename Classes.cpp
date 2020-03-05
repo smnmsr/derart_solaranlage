@@ -157,7 +157,8 @@ void Timer::setLastTime(unsigned long lastTime)
 }
 
 //Setzt die Delay-Time
-void Timer::setDelayTime(unsigned long delay, char mode) {
+void Timer::setDelayTime(unsigned long delay, char mode)
+{
   switch (mode)
   {
   case 's':
@@ -197,11 +198,14 @@ void Pump::setSpeed(int speed)
   }
 
   analogWrite(_PWMPin, speed);
-  digitalWrite(_relaisPin, HIGH);
+  if (speed > 0)
+  {
+    digitalWrite(_relaisPin, HIGH);
+  }
 }
 
 void Pump::stop()
 {
-  analogWrite(_PWMPin, 255);
+  analogWrite(_PWMPin, 0);
   digitalWrite(_relaisPin, LOW);
 }

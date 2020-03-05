@@ -113,8 +113,8 @@ const byte FLOW_METER_SOLE = 43;   //Anschluss PIN Durchflussmesser Solekreis
 // Digital Out Pins
 const byte RELAIS_SOLE_PUMPE = 23;      //Relais-Ausgang Solepumpe
 const byte RELAIS_KOLLEKTOR_PUMPE = 25; //Relais-Ausgang Kollektorpumpe
-const byte STELLWERK_SOLE_BOILER = 27;  //Relais-Ausgang Stellwerk-Legionellen, high = höhere Temperatur
-const byte STELLWERK_BOILER_TEMP = 29;  //Relais-Ausgang SStellwerk Sole/Boiler, high = Boiler
+const byte STELLWERK_SOLE_BOILER = 32;  //Relais-Ausgang Stellwerk-Legionellen, high = höhere Temperatur
+const byte STELLWERK_BOILER_TEMP = 34;  //Relais-Ausgang SStellwerk Sole/Boiler, high = Boiler
 
 // PWM Pins
 const byte PWM_KOLLEKTOR_PUMPE = 9; //PWM-Ausgang Kollektorpumpe
@@ -147,8 +147,8 @@ Timer timer3m(3, 'm'); //3min Timer
 Timer timerLegionellenschaltung(7, 'd');   //Legio-Timer (Zeit. nach der elektrisch auf hohe Boilertemperatur geheizt wird, falls diese nie erreicht wurde)
 Timer initialOperationModeTimeout(3, 'm'); //Zeit bevor ein Modus EXIT-Kriterien berücksichtigt (Achtung, Variabel)
 Timer exitTimeout(2, 'm');                 //Solange muss der Sollwert mindestens unterschritten sein, bevor Abbruch
-Timer flowMeterBoilerTimeout(500);         //Durchflussmeter 1 Timeout
-Timer flowMeterSoleTimeout(500);           //Durchflussmeter 2 Timeout
+Timer flowMeterBoilerTimeout(5, 's');      //Durchflussmeter 1 Timeout
+Timer flowMeterSoleTimeout(20, '2');       //Durchflussmeter 2 Timeout
 Timer displayButtonTimeout(1000);          //Display-Button Timeout
 Timer displayTimeout(30, 's');             //Display-Ausschaltzeit
 Timer boilerTimeout(1, 'd');               //Boiler-Ausschaltzeit
@@ -252,7 +252,7 @@ void turnOffModusStart()
   sendMQTT("stellwerkSoleBoiler", 1);                          //Info an Dashboard, Stellwerk zeit auf Sole
   PIDReglerKollektorPumpe.SetMode(0);                          //PID-Regler Kollektorpumpe ausschalten
   PIDOutputKollektorPumpe = 0;                                 //Speed auf Null setzen
-  kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);            //neuen Speed Kollektorpumpe setzen
+  kollektorPumpe.stop();                                       //kollektorpumpe stoppen
   initialOperationModeTimeout.setDelayTime(3, 'm');            //Wie lange mindestens ausgeschaltet?
   initializing = true;                                         //Initialisierung starten
   operationMode = 0;                                           //Modus auf aus schalten
@@ -339,7 +339,7 @@ void setup()
   pinMode(PWM_KOLLEKTOR_PUMPE, OUTPUT);
 
   //PID Setup
-  PIDReglerKollektorPumpe.SetOutputLimits(70, 255);
+  PIDReglerKollektorPumpe.SetOutputLimits(PID_KOLLEKTOR_MIN_SPEED, 255);
   PIDReglerKollektorPumpe.SetSampleTime(800);
 
   //Display Setup
@@ -396,7 +396,7 @@ void setup()
 void loop()
 {
   //Dieser Programmteil wird in jeder Schleife durchgefuehrt
-  /*     //Prüfen, ob je nach Betriebsmodus der entsprechende Durchflussmesser einen Impuls ausgibt
+  //Prüfen, ob je nach Betriebsmodus der entsprechende Durchflussmesser einen Impuls ausgibt
   switch (operationMode)
   {
   case 0:
@@ -415,7 +415,7 @@ void loop()
       flowMeterBoilerTimeout.executed();
     }
     break;
-  } */
+  }
 
   //Prüfen, ob der Display Button gedrückt wird
   if (digitalRead(DISPLAY_BUTTON) == HIGH && displayButtonTimeout.checkTimer(now))
@@ -642,13 +642,21 @@ void loop()
     Serial.println(Ethernet.localIP());
 
     //Prüfen ob MQTT noch verbunden ist, allenfalls neu-verbinden
-    if(!mqttClient.connected()){ // if the client has been disconnected, 
+    if (!mqttClient.connected())
+    { // wurde die Verbindung unterbrochen?
       Serial.println("MQTT-Verbindung unterbrochen, versuche Neuverbindung");
       Serial.println();
-    
-      if(!attemptReconnect()){ // try reconnecting
-        Serial.print("MQTT-Verbindung wieder hergestellt");
-        Serial.println();
+      uint8_t i = 0;
+
+      while (!mqttClient.connect(broker, port) && i < 5) //starte 5 Verbindungsversuche
+      {
+        Serial.print("MQTT Verbindung fehlgeschlagen! Fehlercode = ");
+        Serial.println(mqttClient.connectError());
+        Serial.println("Neuer Verbindungsversuch ...");
+        delay(2000);
+        i++;
+      }
+    }
 
     //Prüfen, ob Boiler über 65 Grad ist
     if (fuehlerBoiler.getMeanTemperature() > 65)
