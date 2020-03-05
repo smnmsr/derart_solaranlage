@@ -45,8 +45,8 @@ const int SOLE_START_TEMPERATURE = 30;            //Temperatur im Kollektor (Luf
 const int SOLE_VL_EXIT_TEMPERATURE = 23;          //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
 const int SOLL_KOLLEKTOR_VL_BOILERMODUS = 75;     //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Boilermodus
 const int SOLL_KOLLEKTOR_VL_SOLEMODUS = 75;       //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
-const int MIN_WAERMER_BOILER = 3;                 //Mindest Temperaturunterschied zwischen Boiler VL und Boiler, ansonsten Abbruch
-const int MIN_WAERMER_KOLLEKTOR_VL_BOILER = 5;    //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
+const int MIN_WAERMER_BOILER = 0;                 //Mindest Temperaturunterschied zwischen Boiler VL und Boiler, ansonsten Abbruch
+const int MIN_WAERMER_KOLLEKTOR_VL_BOILER = 0;    //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
 const int MIN_WAERMER_KOLLEKTOR_LUFT_BOILER = 10; //mindest Temperaturunterschied zwischen Boiler und Kollektor LUFT, bei dem der Boilermodus gestartet wird
 const int BOILER_UPPER_EXIT_TEMPERATURE = 70;     //Temperatur, auf diese der Boiler erwärmt werden soll
 const int BOILER_MAX_START_TEMPERATURE = 65;      //Wenn der Boiler wärmer ist als diese Temperatur, wird er nicht mehr beheizt
@@ -251,6 +251,8 @@ void turnOffModusStart()
   digitalWrite(STELLWERK_SOLE_BOILER, LOW);                    //Stellwerk auf Sole umschalten
   sendMQTT("stellwerkSoleBoiler", 1);                          //Info an Dashboard, Stellwerk zeit auf Sole
   PIDReglerKollektorPumpe.SetMode(0);                          //PID-Regler Kollektorpumpe ausschalten
+  PIDOutputKollektorPumpe = 0;                                 //Speed auf Null setzen
+  kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);            //neuen Speed Kollektorpumpe setzen
   initialOperationModeTimeout.setDelayTime(3, 'm');            //Wie lange mindestens ausgeschaltet?
   initializing = true;                                         //Initialisierung starten
   operationMode = 0;                                           //Modus auf aus schalten
@@ -444,18 +446,9 @@ void loop()
       writeDisplays();
     }
     //PID Regler berechnen
-    if (operationMode == 1) //Im Solemodus?
-    {
-      PIDInputKollektorPumpe = fuehlerKollektorLuft.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
-      PIDReglerKollektorPumpe.Compute();                                  //PID-Regler berechnen
-      kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);                   //neuen Speed Kollektorpumpe setzen
-    }
-    else if (operationMode == 2) //Im Boilermodus?
-    {
-      PIDInputKollektorPumpe = fuehlerKollektorLuft.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
-      PIDReglerKollektorPumpe.Compute();                                  //PID Regler berechnen
-      kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);                   //neuen Speed Kollektorpumpe setzen
-    }
+    PIDInputKollektorPumpe = fuehlerKollektorLuft.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
+    PIDReglerKollektorPumpe.Compute();                                  //PID Regler berechnen
+    kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);                   //neuen Speed Kollektorpumpe setzen
 
     //Wenn die Pumpe die Temperatur herunterregelt, die Geschwindigkeit oefter senden
     if (PIDOutputKollektorPumpe > PID_KOLLEKTOR_MIN_SPEED)
@@ -465,7 +458,7 @@ void loop()
 
     //Ethernet aktuell halten
     Ethernet.maintain();
-    
+
     // MQTT Client am Leben halten
     mqttClient.poll();
 
@@ -576,7 +569,7 @@ void loop()
     break;
     case 1: //Im Modus Sole?
     {
-      if (fuehlerKollektorVL.getMeanTemperature() > fuehlerBoiler.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE && !initializing) //Temperatur so hoch, dass Boiler geheizt werden könnte?
+      if (fuehlerKollektorLuft.getMeanTemperature() > boilerDirectStartTemperature || fuehlerKollektorVL.getMeanTemperature() > fuehlerBoiler.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE && !initializing) //Temperatur so hoch, dass Boiler geheizt werden könnte?
       {
         boilerModusStart();
         sendMQTT("message", "Boilermodus aus Solemodus aufgrund hoher Kollektor-Vorlauftemperatur gestartet");
@@ -621,12 +614,12 @@ void loop()
       {
         if (!tooLowValue)
         {
-          tooLowValue = true; //Abbruchvariable setzen
+          tooLowValue = true;           //Abbruchvariable setzen
           exitTimeout.setLastTime(now); //Abbruchtimer setzen
         }
         else if (tooLowValue && exitTimeout.checkTimer(now))
         {
-          soleModusStart(); //In Solemodus wechseln
+          soleModusStart();       //In Solemodus wechseln
           exitTimeout.executed(); //Abbrucht imer zurücksetzen
           sendMQTT("message", "Vom Boiler laden zum Solemodus gewechselt, da der Boiler Vorlauf zu lange zu kühl war. Sole-Initialisierung beginnt.");
         }
@@ -647,6 +640,15 @@ void loop()
     Serial.println("Ich lebe noch!");
     Serial.println("IP-Adresse: ");
     Serial.println(Ethernet.localIP());
+
+    //Prüfen ob MQTT noch verbunden ist, allenfalls neu-verbinden
+    if(!mqttClient.connected()){ // if the client has been disconnected, 
+      Serial.println("MQTT-Verbindung unterbrochen, versuche Neuverbindung");
+      Serial.println();
+    
+      if(!attemptReconnect()){ // try reconnecting
+        Serial.print("MQTT-Verbindung wieder hergestellt");
+        Serial.println();
 
     //Prüfen, ob Boiler über 65 Grad ist
     if (fuehlerBoiler.getMeanTemperature() > 65)
