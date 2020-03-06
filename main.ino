@@ -46,7 +46,7 @@ const int SOLE_VL_EXIT_TEMPERATURE = 23;          //Temperatur im Sole Wärmetau
 const int SOLL_KOLLEKTOR_VL_BOILERMODUS = 75;     //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Boilermodus
 const int SOLL_KOLLEKTOR_VL_SOLEMODUS = 75;       //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
 const int MIN_WAERMER_BOILER = 0;                 //Mindest Temperaturunterschied zwischen Boiler VL und Boiler, ansonsten Abbruch
-const int MIN_WAERMER_KOLLEKTOR_VL_BOILER = 0;    //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
+const int MIN_WAERMER_KOLLEKTOR_VL_BOILER = 6;    //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
 const int MIN_WAERMER_KOLLEKTOR_LUFT_BOILER = 10; //mindest Temperaturunterschied zwischen Boiler und Kollektor LUFT, bei dem der Boilermodus gestartet wird
 const int BOILER_UPPER_EXIT_TEMPERATURE = 70;     //Temperatur, auf diese der Boiler erwärmt werden soll
 const int BOILER_MAX_START_TEMPERATURE = 65;      //Wenn der Boiler wärmer ist als diese Temperatur, wird er nicht mehr beheizt
@@ -107,14 +107,14 @@ const byte UP_BUTTON = 24;         //Anschluss PIN UP-Button
 const byte DOWN_BUTTON = 28;       //Anschluss PIN DOWN-Button
 const byte LEFT_BUTTON = 26;       //Anschluss PIN LEFT-Button
 const byte RIGHT_BUTTON = 22;      //Anschluss PIN RIGHT-Button
-const byte FLOW_METER_BOILER = 45; //Anschluss PIN Durchflussmesser Boilerkreis
-const byte FLOW_METER_SOLE = 43;   //Anschluss PIN Durchflussmesser Solekreis
+const byte FLOW_METER_BOILER = 32; //Anschluss PIN Durchflussmesser Boilerkreis
+const byte FLOW_METER_SOLE = 34;   //Anschluss PIN Durchflussmesser Solekreis
 
 // Digital Out Pins
 const byte RELAIS_SOLE_PUMPE = 23;      //Relais-Ausgang Solepumpe
 const byte RELAIS_KOLLEKTOR_PUMPE = 25; //Relais-Ausgang Kollektorpumpe
-const byte STELLWERK_SOLE_BOILER = 32;  //Relais-Ausgang Stellwerk-Legionellen, high = höhere Temperatur
-const byte STELLWERK_BOILER_TEMP = 34;  //Relais-Ausgang SStellwerk Sole/Boiler, high = Boiler
+const byte STELLWERK_SOLE_BOILER = 27;  //Relais-Ausgang Stellwerk-Legionellen, high = höhere Temperatur
+const byte STELLWERK_BOILER_TEMP = 29;  //Relais-Ausgang Stellwerk Sole/Boiler, high = Boiler
 
 // PWM Pins
 const byte PWM_KOLLEKTOR_PUMPE = 9; //PWM-Ausgang Kollektorpumpe
@@ -401,13 +401,13 @@ void loop()
   {
   case 0:
     break;
-  case 1:
-    if (digitalRead(FLOW_METER_SOLE) == HIGH && flowMeterSoleTimeout.checkTimer(now) == true)
-    {
-      Serial.println("Flow Meter Sole gibt an");
-      flowMeterSoleTimeout.executed();
-    }
-    break;
+  // case 1:
+  //   if (digitalRead(FLOW_METER_SOLE) == HIGH && flowMeterSoleTimeout.checkTimer(now) == true)
+  //   {
+  //     Serial.println("Flow Meter Sole gibt an");
+  //     flowMeterSoleTimeout.executed();
+  //   }
+  //   break;
   case 2:
     if (digitalRead(FLOW_METER_BOILER) == HIGH && flowMeterBoilerTimeout.checkTimer(now) == true)
     {
@@ -636,10 +636,10 @@ void loop()
 
   if (timer3m.checkTimer(now))
   {
-    //Regelmässig mit Serieller Schnittstelle kommunizieren und Modus durchgeben
+/*     //DEBUG: Regelmässig mit Serieller Schnittstelle kommunizieren und Modus durchgeben
     Serial.println("Ich lebe noch!");
     Serial.println("IP-Adresse: ");
-    Serial.println(Ethernet.localIP());
+    Serial.println(Ethernet.localIP()); */
 
     //Prüfen ob MQTT noch verbunden ist, allenfalls neu-verbinden
     if (!mqttClient.connected())
