@@ -150,7 +150,7 @@ Timer exitTimeout(2, 'm');                 //Solange muss der Sollwert mindesten
 Timer flowMeterBoilerTimeout(5, 's');      //Durchflussmeter 1 Timeout
 Timer flowMeterSoleTimeout(20, '2');       //Durchflussmeter 2 Timeout
 Timer displayButtonTimeout(1000);          //Display-Button Timeout
-Timer displayTimeout(30, 's');             //Display-Ausschaltzeit
+Timer displayTimeout(2, 'm');             //Display-Ausschaltzeit
 Timer boilerTimeout(1, 'd');               //Boiler-Ausschaltzeit
 
 //PWM Setup
