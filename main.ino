@@ -1,17 +1,17 @@
 //Software für die Funktionen gemäss README-Datei
 //
 //STRUKTUR:
-// 1. HEADER-Dateien und Libaries
+// 1. HEADER-Dateien, Definitionen und Libaries
 // 2. Variabeln und Konstanten
-// 3. PIN-Adressen und BUS-Definitionen
+// 3. PIN-Adressen und BUS-Adressierung
 // 4. Initialisierungen
 // 5. Funktionen
 // 6. Setup Sequenz
 // 7. Programmschleife
 
-// ==============================
-// 1. HEADER-Dateien und Libaries
-// ==============================
+// ============================================
+// 1. HEADER-Dateien, Definitionen und Libaries
+// ============================================
 #include "Wire.h"                   //Für I2C Bus
 #include "PID_v1.h"                 //Für PID-Regelung
 #include "Adafruit_LiquidCrystal.h" //Für Displays
@@ -41,15 +41,13 @@ const int ALARMTEMPERATUR_KOLLEKTOR_VL = 85;      //Alarmtemperatur für Kollekt
 const int ALARMTEMPERATUR_SOLE = 30;              //Alarmtemperatur für Sole-Pumpe
 const int MIN_DIFFERENZ_NACH_ALARM = 3;           //erst wenn die Temperatur um diesen Wert gesunken ist, geht der Alarmmodus aus
 const int SOLE_EXIT_TEMPERATURE = 6;              //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
-const int SOLE_START_TEMPERATURE = 30;            //Temperatur im Kollektor (Luft), bei der der Solemodus gestartet wird
+const int SOLE_START_TEMPERATURE = 25;            //Temperatur im Kollektor (Luft), bei der der Solemodus gestartet wird
 const int SOLE_VL_EXIT_TEMPERATURE = 23;          //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
 const int SOLL_KOLLEKTOR_VL_BOILERMODUS = 75;     //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Boilermodus
 const int SOLL_KOLLEKTOR_VL_SOLEMODUS = 75;       //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
-const int MIN_WAERMER_BOILER = 0;                 //Mindest Temperaturunterschied zwischen Boiler VL und Boiler, ansonsten Abbruch
+const int BOILER_DIRECT_EXIT_DIFF = -3;           //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
 const int MIN_WAERMER_KOLLEKTOR_VL_BOILER = 6;    //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
 const int MIN_WAERMER_KOLLEKTOR_LUFT_BOILER = 10; //mindest Temperaturunterschied zwischen Boiler und Kollektor LUFT, bei dem der Boilermodus gestartet wird
-const int BOILER_UPPER_EXIT_TEMPERATURE = 70;     //Temperatur, auf diese der Boiler erwärmt werden soll
-const int BOILER_MAX_START_TEMPERATURE = 65;      //Wenn der Boiler wärmer ist als diese Temperatur, wird er nicht mehr beheizt
 
 //PID Tuning Parameter
 const double PID_P_KOLLEKTOR = 10;        //Verstärkung des Proportionalen Anteils des PID-Reglers der Kollektorpumpe
@@ -62,24 +60,21 @@ const byte PID_KOLLEKTOR_MAX_SPEED = 255; //Maximale Kollektorpumpen-Geschwindig
 byte mac[] = {0xA8, 0x61, 0x0A, 0xAE, 0x3D, 0xB7}; //Hardware-Adresse des Ethernet-Boards (Kleber auf Board)
 
 //Variabeln
-byte operationMode = 0;             //Betriebsmodus: 0=aus, 1=Solemodus, 2=Boilermodus
-unsigned long now = 0;              //Jeweils aktueller millis()-Wert
-bool displayOn = false;             //true, wenn Displays eingeschaltet sein soll
-bool boilerHighTemperatur = false;  //true, wenn Boiler auf höherer Temperatur ist
-bool kollektorAlarm = false;        //true, wenn kollektor zu heiss ist
-bool soleAlarm = false;             //true, wenn solepumpe zu heiss ist
-float boilerLowerExitTemperature;   //Temperatur, bei der der Boilermodus abgebrochen wird
-float boilerDirectExitTemperature;  //Temperatur, bei der der Boilermodus direkt (ohne Verzögerung abgebrochen wird)
-float boilerDirectStartTemperature; //Temperatur der Kollektorluft, bei der der Boilermodus eingeschaltet wird
-bool initializing = false;          //Ist derzeit ein neuer Modus am Initialisieren?
-bool tooLowValue = false;           //True, wenn Sollwert das erste mal unterschritten
+byte operationMode = 0;            //Betriebsmodus: 0=aus, 1=Solemodus, 2=Boilermodus
+unsigned long now = 0;             //Jeweils aktueller millis()-Wert
+bool displayOn = false;            //true, wenn Displays eingeschaltet sein soll
+bool boilerHighTemperatur = false; //true, wenn Boiler auf höherer Temperatur ist
+bool kollektorAlarm = false;       //true, wenn kollektor zu heiss ist
+bool soleAlarm = false;            //true, wenn solepumpe zu heiss ist
+bool initializing = false;         //Ist derzeit ein neuer Modus am Initialisieren?
+bool tooLowValue = false;          //True, wenn Sollwert das erste mal unterschritten
 
 //PID Variabeln
 double PIDInputKollektorPumpe, PIDOutputKollektorPumpe, PIDSetpointKollektorPumpe; //Variabeln für PID-Regler der Kollektorpumpe
 
-// ==============================
-// 3. PIN-Adressen und BUS-Definitionen
-// ==============================
+// ====================================
+// 3. PIN-Adressen und BUS-Adressierung
+// ====================================
 
 // i2c Adressen der Displays
 Adafruit_LiquidCrystal LCD_00(0x74);
@@ -150,7 +145,7 @@ Timer exitTimeout(2, 'm');                 //Solange muss der Sollwert mindesten
 Timer flowMeterBoilerTimeout(5, 's');      //Durchflussmeter 1 Timeout
 Timer flowMeterSoleTimeout(20, '2');       //Durchflussmeter 2 Timeout
 Timer displayButtonTimeout(1000);          //Display-Button Timeout
-Timer displayTimeout(2, 'm');             //Display-Ausschaltzeit
+Timer displayTimeout(2, 'm');              //Display-Ausschaltzeit
 Timer boilerTimeout(1, 'd');               //Boiler-Ausschaltzeit
 
 //PWM Setup
@@ -195,33 +190,24 @@ void sendMQTT(String subtopic, const char value[])
 //Startet den Boilermodus
 void boilerModusStart()
 {
-  sendMQTT("message", "Zum Modus Boiler Laden gewechselt."); //Dashboard Pop-Up
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH);                //Kollektorpumpe einschalten
-  sendMQTT("kollektorPumpe", 1);                             //Info an Dashboard: Kollektorpumpe ein
   digitalWrite(RELAIS_SOLE_PUMPE, LOW);                      //Solepumpe ausschalten
-  sendMQTT("solePumpe", 0);                                  // Info an Dashboard, Solepumpe aus
   digitalWrite(STELLWERK_SOLE_BOILER, HIGH);                 //Stellwerk auf Boiler umschalten
-  sendMQTT("stellwerkSoleBoiler", 2);                        //Info an Dashboard, Stellwerk zeigt auf Boiler
   PIDReglerKollektorPumpe.SetMode(1);                        //PID-Regler Kollektorpumpe einschalten
   PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_BOILERMODUS; //Kollektor Vorlauf Sollwert setzen
   initializing = true;                                       //Initialisierung starten
-  initialOperationModeTimeout.setDelayTime(3, 'm');          //Initialisierungszeit setzen
+  initialOperationModeTimeout.setDelayTime(5, 'm');          //Initialisierungszeit setzen
   initialOperationModeTimeout.setLastTime(now);              //Initialisierungs Timer starten
   operationMode = 2;                                         //Modus auf Boiler schalten
   tooLowValue = false;                                       //tooLowValue zurücksetzen
-  sendMQTT("operationMode", 2);                              //Info an Dashboard, Boilermodus
 }
 
 //Startet den Solemodus
 void soleModusStart()
 {
-  sendMQTT("message", "Zum Modus Sole laden gewechselt."); //Dashboard Pop-Up
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH);              //Kollektorpumpe ausschalten
-  sendMQTT("kollektorPumpe", 1);                           //Info an Dashboard, Kollektorpumpe ein
   digitalWrite(RELAIS_SOLE_PUMPE, HIGH);                   //Solepumpe einschalten
-  sendMQTT("solePumpe", 1);                                //Info an Dashboard, Solepumpe ein
   digitalWrite(STELLWERK_SOLE_BOILER, LOW);                //Stellwerk auf Sole umschalten
-  sendMQTT("stellwerkSoleBoiler", 1);                      //Info an Dashboard, Stellwerk zeigt auf Sole
   PIDReglerKollektorPumpe.SetMode(1);                      //PID-Regler Kollektorpumpe einschalten
   PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_SOLEMODUS; //Kollektor Vorlauf Sollwert setzen
   initializing = true;                                     //Initialisierung starten
@@ -237,27 +223,21 @@ void soleModusStart()
   initialOperationModeTimeout.setLastTime(now); //Initialisierungs Timer starten
   operationMode = 1;                            //Modus auf Sole schalten
   tooLowValue = false;                          //tooLowValue zurücksetzen
-  sendMQTT("operationMode", 1);                 //Info an Dashboard, Solemodus
 }
 
 //Schaltet die Anlage aus
 void turnOffModusStart()
 {
-  sendMQTT("message", "In ausgeschaltenen Modus gewechselt."); //Dashboard Pop-Up
-  digitalWrite(RELAIS_KOLLEKTOR_PUMPE, LOW);                   //Kollektorpumpe ausschalten
-  sendMQTT("kollektorPumpe", 0);                               //info an Dashboard, Kollektorpumpe aus
-  digitalWrite(RELAIS_SOLE_PUMPE, LOW);                        //Solepumpe ausschalten
-  sendMQTT("solePumpe", 0);                                    //Info an Dashboard, Solepumpe aus
-  digitalWrite(STELLWERK_SOLE_BOILER, LOW);                    //Stellwerk auf Sole umschalten
-  sendMQTT("stellwerkSoleBoiler", 1);                          //Info an Dashboard, Stellwerk zeit auf Sole
-  PIDReglerKollektorPumpe.SetMode(0);                          //PID-Regler Kollektorpumpe ausschalten
-  PIDOutputKollektorPumpe = 0;                                 //Speed auf Null setzen
-  kollektorPumpe.stop();                                       //kollektorpumpe stoppen
-  initialOperationModeTimeout.setDelayTime(3, 'm');            //Wie lange mindestens ausgeschaltet?
-  initializing = true;                                         //Initialisierung starten
-  operationMode = 0;                                           //Modus auf aus schalten
-  tooLowValue = false;                                         //tooLowValue zurücksetzen
-  sendMQTT("operationMode", 0);                                //Info an Dashboard, Ausgeschaltener Modus
+  digitalWrite(RELAIS_KOLLEKTOR_PUMPE, LOW);        //Kollektorpumpe ausschalten
+  digitalWrite(RELAIS_SOLE_PUMPE, LOW);             //Solepumpe ausschalten
+  digitalWrite(STELLWERK_SOLE_BOILER, LOW);         //Stellwerk auf Sole umschalten
+  PIDReglerKollektorPumpe.SetMode(0);               //PID-Regler Kollektorpumpe ausschalten
+  PIDOutputKollektorPumpe = 0;                      //Speed auf Null setzen
+  kollektorPumpe.stop();                            //kollektorpumpe stoppen
+  initialOperationModeTimeout.setDelayTime(3, 'm'); //Wie lange mindestens ausgeschaltet?
+  initializing = true;                              //Initialisierung starten
+  operationMode = 0;                                //Modus auf aus schalten
+  tooLowValue = false;                              //tooLowValue zurücksetzen
 }
 
 //Alle Displays löschen
@@ -384,8 +364,9 @@ void setup()
   Serial.println("Du bist mit dem MQTT Broker verbunden!");
   Serial.println();
 
-  //erster Betriebsmodus nach dem Starten
+  //erster Betriebsmodus nach dem Starten (Ohne Initialisierungszeit)
   turnOffModusStart();
+  initializing = false;
 
   Serial.println("Setup beendet");
 }
@@ -545,83 +526,117 @@ void loop()
       initializing = false;
     }
 
-    //Dynamische Grenztemperaturen
-    boilerDirectExitTemperature = fuehlerBoiler.getMeanTemperature();                                      //Boilertemperatur für direkten Abbruch
-    boilerLowerExitTemperature = fuehlerBoiler.getMeanTemperature() + MIN_WAERMER_BOILER;                  //Mindest Boilertemperatur
-    boilerDirectStartTemperature = fuehlerBoiler.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_LUFT_BOILER; //Mindest-Kollektorluft-Temperatur für Boilermodus
-
     //Entscheidung Betriebsmodus
     switch (operationMode)
     {
     case 0: //Im Modus ausgeschaltet?
     {
-      if (fuehlerKollektorLuft.getMeanTemperature() > boilerDirectStartTemperature && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE && !initializing) //Temperatur so hoch, dass Boiler geheizt werden könnte?
+      if (!initializing)
+      //Nicht am Initialisieren
       {
-        boilerModusStart();
-        sendMQTT("message", "Boilermodus aus ausgeschaltenem Modus aufgrund hoher Kollektur-Luft-Temperatur gestartet. Initialisierung beginnt.");
-      }
-      else if (fuehlerKollektorLuft.getMeanTemperature() > SOLE_START_TEMPERATURE && !initializing) //Temperatur genügenr für Solemodus?
-      {
-        soleModusStart();
-        sendMQTT("message", "Solemodus aus ausgeschaltenem Modus aufgrund hoher Kollektor-Luft-Temperatur gestartet. Initialisierung beginnt.");
+        if (fuehlerKollektorLuft.getMeanTemperature() > fuehlerBoiler.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_LUFT_BOILER)
+        //Kollektor Luft ist heiss genug für Boilermodus
+        {
+          boilerModusStart();
+          sendMQTT("message", "Boilermodus aus ausgeschaltenem Modus aufgrund hoher Kollektur-Luft-Temperatur gestartet. Initialisierung beginnt.");
+        }
+        else if (fuehlerKollektorLuft.getMeanTemperature() > SOLE_START_TEMPERATURE)
+        //Kollektor-Luft ist heiss genug für Solemodus
+        {
+          soleModusStart();
+          sendMQTT("message", "Solemodus aus ausgeschaltenem Modus aufgrund hoher Kollektor-Luft-Temperatur gestartet. Initialisierung beginnt.");
+        }
       }
     }
     break;
     case 1: //Im Modus Sole?
     {
-      if (fuehlerKollektorLuft.getMeanTemperature() > boilerDirectStartTemperature || fuehlerKollektorVL.getMeanTemperature() > fuehlerBoiler.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER && fuehlerBoiler.getMeanTemperature() < BOILER_MAX_START_TEMPERATURE && !initializing) //Temperatur so hoch, dass Boiler geheizt werden könnte?
+      if (tooLowValue)
+      //Sollwert bereits unterschritten
       {
-        boilerModusStart();
-        sendMQTT("message", "Boilermodus aus Solemodus aufgrund hoher Kollektor-Vorlauftemperatur gestartet");
-      }
-
-      else if (fuehlerSole.getMeanTemperature() > SOLE_EXIT_TEMPERATURE && fuehlerSoleVL.getMeanTemperature() > SOLE_VL_EXIT_TEMPERATURE && tooLowValue) //ausreichende Temperatur?
-      {
-        tooLowValue = false; //Abbruch abbrechen
-        sendMQTT("message", "Solltemperatur für Solemodus wurde wieder erreicht, Modus wird nicht abgebrochen.");
-      }
-
-      if (fuehlerSole.getMeanTemperature() < SOLE_EXIT_TEMPERATURE || fuehlerSoleVL.getMeanTemperature() < SOLE_VL_EXIT_TEMPERATURE && !initializing) //zu tiefe Temperatur im Solemodus?
-      {
-        if (!tooLowValue)
+        if ((fuehlerSoleVL.getMeanTemperature() > SOLE_VL_EXIT_TEMPERATURE) && (fuehlerSole.getMeanTemperature() > SOLE_EXIT_TEMPERATURE))
+        //Sollwerte fur Solemodus alle wieder erreicht?
         {
-          tooLowValue = true;           //Abbruchvariable setzen
-          exitTimeout.setLastTime(now); //Abbruchtimer setzen
-          sendMQTT("message", "Solltemperatur für Solemodus wurde unterschritten, Modus wird demnächst abgebrochen.");
+          tooLowValue = false; //Abbruch abbrechen
+          sendMQTT("message", "Solltemperatur für Solemodus wurde wieder erreicht, Modus wird nicht abgebrochen.");
         }
-        else if (tooLowValue && exitTimeout.checkTimer(now))
+      }
+
+      if (initializing)
+      //Am Initialisieren
+      {
+        if ((fuehlerKollektorVL.getMeanTemperature() > fuehlerBoiler.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER) && (fuehlerSoleVL.getMeanTemperature() > fuehlerBoiler.getMeanTemperature()))
+        //Kollektor und Sole VL so heiss, dass Boiler geladen werden kann? --> Direkt zu Boiler umschalten.
         {
-          turnOffModusStart();    //Anlage ausschalten
-          exitTimeout.executed(); //Abbruchtimer zurücksetzen
-          sendMQTT("message", "Der Solemodus wurde abgebrochen, da die Solltemperatur zu lange unterschritten wurde. Die Anlage ist jetzt ausgeschaltet.");
+          boilerModusStart();
+          sendMQTT("message", "Boilermodus direkt aus Sole-Modus aufgrund hoher Vorlauf Temperaturen gestartet. Initialisierung beginnt.");
+        }
+      }
+      else
+      //Nicht am Initialisieren
+      {
+        if (fuehlerKollektorVL.getMeanTemperature() > fuehlerBoiler.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER)
+        //Kollektor VL genug heiss fuer Boilermodus
+        {
+          boilerModusStart();
+          sendMQTT("message", "Boilermodus aus Sole-Modus aufgrund hoher Kollektor-Vorlauf Temperaturen gestartet. Initialisierung beginnt.");
+        }
+        else if ((fuehlerSoleVL.getMeanTemperature() < SOLE_VL_EXIT_TEMPERATURE) || (fuehlerSole.getMeanTemperature() < SOLE_EXIT_TEMPERATURE))
+        //Wurde einer der Sollwerte Unterschritten?
+        {
+          if (!tooLowValue)
+          {
+            tooLowValue = true;           //Abbruchvariable setzen
+            exitTimeout.setLastTime(now); //Abbruchtimer setzen
+            sendMQTT("message", "Solltemperatur für Solemodus wurde unterschritten, Modus wird demnächst abgebrochen.");
+          }
+          else if (tooLowValue && exitTimeout.checkTimer(now))
+          {
+            turnOffModusStart();    //Anlage ausschalten
+            exitTimeout.executed(); //Abbruchtimer zurücksetzen
+            sendMQTT("message", "Der Solemodus wurde abgebrochen, da die Solltemperatur zu lange unterschritten wurde. Die Anlage ist jetzt ausgeschaltet.");
+          }
         }
       }
     }
     break;
     case 2: //Im Modus Boiler?
     {
-      if (fuehlerBoilerVL.getMeanTemperature() < boilerDirectExitTemperature && !initializing) //Vorlauftemperatur viel zu tief? --> direkter Abbruch
+      if (tooLowValue)
+      //Sollwert bereits unterschritten
       {
-        soleModusStart(); //Solemodus starten
-        sendMQTT("message", "Vom Boiler laden zum Solemodus gewechselt, da der Boiler Vorlauf viel zu kühl war. Sole-Initialisierung beginnt.");
-      }
-      else if (fuehlerBoilerVL.getMeanTemperature() > boilerLowerExitTemperature && tooLowValue) //ausreichende Temperatur?
-      {
-        tooLowValue = false; //Abbruch abbrechen
+        if (fuehlerBoilerVL.getMeanTemperature() > fuehlerBoiler.getMeanTemperature())
+        //Sollwerte fur Boilermodus alle wieder erreicht?
+        {
+          tooLowValue = false; //Abbruch abbrechen
+          sendMQTT("message", "Solltemperatur für Boilermodus wurde wieder erreicht, Modus wird nicht abgebrochen.");
+        }
       }
 
-      if (fuehlerBoilerVL.getMeanTemperature() < boilerLowerExitTemperature && !initializing) //zu Tiefe Temperatur im Boilermodus
+      if (!initializing)
+      //Nicht mehr am Initialisieren?
       {
-        if (!tooLowValue)
+        if (fuehlerBoilerVL.getMeanTemperature() < fuehlerBoiler.getMeanTemperature() + BOILER_DIRECT_EXIT_DIFF)
+        //Boiler VL so kalt, dass direkt abgebrochen werden muss?
         {
-          tooLowValue = true;           //Abbruchvariable setzen
-          exitTimeout.setLastTime(now); //Abbruchtimer setzen
+          soleModusStart(); //Solemodus starten
+          sendMQTT("message", "Vom Boiler-Laden zum Solemodus gewechselt, da der Boiler Vorlauf viel zu kalt war. Sole-Initialisierung beginnt.");
         }
-        else if (tooLowValue && exitTimeout.checkTimer(now))
+        else if (fuehlerBoilerVL.getMeanTemperature() < fuehlerBoiler.getMeanTemperature())
+        //Boiler VL hat Sollwert unterschritten?
         {
-          soleModusStart();       //In Solemodus wechseln
-          exitTimeout.executed(); //Abbrucht imer zurücksetzen
-          sendMQTT("message", "Vom Boiler laden zum Solemodus gewechselt, da der Boiler Vorlauf zu lange zu kühl war. Sole-Initialisierung beginnt.");
+          if (!tooLowValue)
+          {
+            tooLowValue = true;           //Abbruchvariable setzen
+            exitTimeout.setLastTime(now); //Abbruchtimer setzen
+            sendMQTT("message", "Solltemperatur für Boilermodus wurde unterschritten, Modus wird demnächst abgebrochen.");
+          }
+          else if (tooLowValue && exitTimeout.checkTimer(now))
+          {
+            soleModusStart();       //In Solemodus wechseln
+            exitTimeout.executed(); //Abbrucht imer zurücksetzen
+            sendMQTT("message", "Vom Boiler laden zum Solemodus gewechselt, da der Boiler Vorlauf zu lange zu kühl war. Sole-Initialisierung beginnt.");
+          }
         }
       }
     }
@@ -631,12 +646,19 @@ void loop()
       turnOffModusStart(); //Standardmässig ausschalten
     }
     }
+
+    //Informationen an Dashboard
+    sendMQTT("kollektorPumpe", digitalRead(RELAIS_KOLLEKTOR_PUMPE));         //Info an Dashboard: Kollektorpumpe ein
+    sendMQTT("solePumpe", digitalRead(RELAIS_SOLE_PUMPE));                   // Info an Dashboard, Solepumpe aus
+    sendMQTT("stellwerkSoleBoiler", digitalRead(STELLWERK_SOLE_BOILER) + 1); //Info an Dashboard, Stellwerk zeigt auf Boiler
+    sendMQTT("operationMode", operationMode);                                //Info an Dashboard, Boilermodus
+
     timer5s.executed();
   }
 
   if (timer3m.checkTimer(now))
   {
-/*     //DEBUG: Regelmässig mit Serieller Schnittstelle kommunizieren und Modus durchgeben
+    /*     //DEBUG: Regelmässig mit Serieller Schnittstelle kommunizieren und Modus durchgeben
     Serial.println("Ich lebe noch!");
     Serial.println("IP-Adresse: ");
     Serial.println(Ethernet.localIP()); */
