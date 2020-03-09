@@ -378,10 +378,10 @@ void loop()
 {
   //Dieser Programmteil wird in jeder Schleife durchgefuehrt
   //Prüfen, ob je nach Betriebsmodus der entsprechende Durchflussmesser einen Impuls ausgibt
-  switch (operationMode)
-  {
-  case 0:
-    break;
+  //switch (operationMode)
+  //{
+  //case 0:
+  //  break;
   // case 1:
   //   if (digitalRead(FLOW_METER_SOLE) == HIGH && flowMeterSoleTimeout.checkTimer(now) == true)
   //   {
@@ -389,14 +389,14 @@ void loop()
   //     flowMeterSoleTimeout.executed();
   //   }
   //   break;
-  case 2:
-    if (digitalRead(FLOW_METER_BOILER) == HIGH && flowMeterBoilerTimeout.checkTimer(now) == true)
-    {
-      Serial.println("Flow Meter Boiler gibt an");
-      flowMeterBoilerTimeout.executed();
-    }
-    break;
-  }
+  //case 2:
+  //if (digitalRead(FLOW_METER_BOILER) == HIGH && flowMeterBoilerTimeout.checkTimer(now) == true)
+  //    {
+  //    Serial.println("Flow Meter Boiler gibt an");
+  //   flowMeterBoilerTimeout.executed();
+  //}
+  //break;
+  //}
 
   //Prüfen, ob der Display Button gedrückt wird
   if (digitalRead(DISPLAY_BUTTON) == HIGH && displayButtonTimeout.checkTimer(now))
