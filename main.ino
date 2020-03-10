@@ -36,8 +36,8 @@ const float FUEHLER_SOLE_RL_KORREKTURFAKTOR = 1.0;        //Korrekturfaktor S6S
 const float FUEHLER_SOLE_KORREKTURFAKTOR = 1.0;           //Korrekturfaktor S7
 
 //Temperaturen
-const int ALARMTEMPERATUR_KOLLEKTOR_LUFT = 90;    //Alarmtemperatur für Kollektor (Lufttemperatur)
-const int ALARMTEMPERATUR_KOLLEKTOR_VL = 85;      //Alarmtemperatur für Kollektor (Vorlauftemperatur)
+const int ALARMTEMPERATUR_KOLLEKTOR_LUFT = 85;    //Alarmtemperatur für Kollektor (Lufttemperatur)
+const int ALARMTEMPERATUR_KOLLEKTOR_VL = 90;      //Alarmtemperatur für Kollektor (Vorlauftemperatur)
 const int ALARMTEMPERATUR_SOLE = 30;              //Alarmtemperatur für Sole-Pumpe
 const int MIN_DIFFERENZ_NACH_ALARM = 3;           //erst wenn die Temperatur um diesen Wert gesunken ist, geht der Alarmmodus aus
 const int SOLE_EXIT_TEMPERATURE = 6;              //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
