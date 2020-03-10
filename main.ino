@@ -670,13 +670,16 @@ void loop()
       Serial.println();
       uint8_t i = 0;
 
-      while (!mqttClient.connect(broker, port) && i < 5) //starte 5 Verbindungsversuche
+      while (!mqttClient.connected() && !mqttClient.connect(broker, port) && i < 5) //starte 5 Verbindungsversuche
       {
         Serial.print("MQTT Verbindung fehlgeschlagen! Fehlercode = ");
         Serial.println(mqttClient.connectError());
         Serial.println("Neuer Verbindungsversuch ...");
         delay(2000);
         i++;
+      }
+      if (mqttClient.connected()) {
+        Serial.println("MQTT-Verbindung wiederhergestellt.");
       }
     }
 
