@@ -147,6 +147,7 @@ Timer flowMeterSoleTimeout(20, '2');       //Durchflussmeter 2 Timeout
 Timer displayButtonTimeout(1000);          //Display-Button Timeout
 Timer displayTimeout(2, 'm');              //Display-Ausschaltzeit
 Timer boilerTimeout(1, 'd');               //Boiler-Ausschaltzeit
+Timer MQTTSendTimer(5, 's');               //Sendeinterval Daten an Dashboard (Achtung, Variabel)
 
 //PWM Setup
 PID PIDReglerKollektorPumpe(&PIDInputKollektorPumpe, &PIDOutputKollektorPumpe, &PIDSetpointKollektorPumpe, PID_P_KOLLEKTOR, PID_I_KOLLEKTOR, PID_D_KOLLEKTOR, REVERSE);
@@ -450,19 +451,6 @@ void loop()
   //Dieser Programmteil wird alle 5s ausgeführt
   if (timer5s.checkTimer(now))
   {
-    //Fuehlerwerte an MQTT Senden
-    sendMQTT("fuehlerKollektorVL", fuehlerKollektorVL.getMeanTemperature());
-    sendMQTT("fuehlerKollektorLuft", fuehlerKollektorLuft.getMeanTemperature());
-    sendMQTT("fuehlerBoiler", fuehlerBoiler.getMeanTemperature());
-    sendMQTT("fuehlerBoilerVL", fuehlerBoilerVL.getMeanTemperature());
-    sendMQTT("fuehlerSoleVL", fuehlerSoleVL.getMeanTemperature());
-    sendMQTT("fuehlerBoilerRL", fuehlerBoilerRL.getMeanTemperature());
-    sendMQTT("fuehlerSoleRL", fuehlerSoleRL.getMeanTemperature());
-    sendMQTT("fuehlerSole", fuehlerSole.getMeanTemperature());
-
-    //Speed der Kollektorpumpe an Dashboard senden
-    sendMQTT("speedKollektorPumpe", (int)round(PIDOutputKollektorPumpe));
-
     //Überprüfen, ob Alarmwerte überschritten wurden
     if (fuehlerSole.getLastTemperature() > ALARMTEMPERATUR_SOLE)
     {
@@ -647,13 +635,32 @@ void loop()
     }
     }
 
-    //Informationen an Dashboard
-    sendMQTT("kollektorPumpe", digitalRead(RELAIS_KOLLEKTOR_PUMPE));         //Info an Dashboard: Kollektorpumpe ein
-    sendMQTT("solePumpe", digitalRead(RELAIS_SOLE_PUMPE));                   // Info an Dashboard, Solepumpe aus
-    sendMQTT("stellwerkSoleBoiler", digitalRead(STELLWERK_SOLE_BOILER) + 1); //Info an Dashboard, Stellwerk zeigt auf Boiler
-    sendMQTT("operationMode", operationMode);                                //Info an Dashboard, Boilermodus
+    //Dashbord sagen, dass online
+    sendMQTT("alive", 1);
 
     timer5s.executed();
+  }
+
+  if (MQTTSendTimer.checkTimer(now)) //Daten an Dashboard senden
+  {
+    //Fuehlerwerte an MQTT Senden
+    sendMQTT("fuehlerKollektorVL", fuehlerKollektorVL.getMeanTemperature());
+    sendMQTT("fuehlerKollektorLuft", fuehlerKollektorLuft.getMeanTemperature());
+    sendMQTT("fuehlerBoiler", fuehlerBoiler.getMeanTemperature());
+    sendMQTT("fuehlerBoilerVL", fuehlerBoilerVL.getMeanTemperature());
+    sendMQTT("fuehlerSoleVL", fuehlerSoleVL.getMeanTemperature());
+    sendMQTT("fuehlerBoilerRL", fuehlerBoilerRL.getMeanTemperature());
+    sendMQTT("fuehlerSoleRL", fuehlerSoleRL.getMeanTemperature());
+    sendMQTT("fuehlerSole", fuehlerSole.getMeanTemperature());
+
+    //Speed der Kollektorpumpe an Dashboard senden
+    sendMQTT("speedKollektorPumpe", (int)round(PIDOutputKollektorPumpe));
+
+    //Informationen an Dashboard
+    sendMQTT("kollektorPumpe", digitalRead(RELAIS_KOLLEKTOR_PUMPE));         //Info an Dashboard: Kollektorpumpe
+    sendMQTT("solePumpe", digitalRead(RELAIS_SOLE_PUMPE));                   // Info an Dashboard, Solepumpe
+    sendMQTT("stellwerkSoleBoiler", digitalRead(STELLWERK_SOLE_BOILER) + 1); //Info an Dashboard, Stellwerk
+    sendMQTT("operationMode", operationMode);                                //Info an Dashboard, Modus
   }
 
   if (timer3m.checkTimer(now))
@@ -662,6 +669,20 @@ void loop()
     Serial.println("Ich lebe noch!");
     Serial.println("IP-Adresse: ");
     Serial.println(Ethernet.localIP()); */
+
+    //Prüfen, welcher Sendeintervall geeignet ist
+    if (operationMode) {
+      MQTTSendTimer.setDelayTime(5, 's');
+    }
+    else if(fuehlerKollektorLuft.getMeanTemperature() > SOLE_START_TEMPERATURE - 5) {
+      MQTTSendTimer.setDelayTime(5, 's');
+    }
+    else if(fuehlerKollektorLuft.getMeanTemperature() > SOLE_START_TEMPERATURE - 10) {
+      MQTTSendTimer.setDelayTime(5, 'm');
+    }
+    else {
+      MQTTSendTimer.setDelayTime(30, 'm');
+    }
 
     //Prüfen ob MQTT noch verbunden ist, allenfalls neu-verbinden
     if (!mqttClient.connected())
@@ -678,7 +699,8 @@ void loop()
         delay(2000);
         i++;
       }
-      if (mqttClient.connected()) {
+      if (mqttClient.connected())
+      {
         Serial.println("MQTT-Verbindung wiederhergestellt.");
       }
     }
