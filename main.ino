@@ -236,6 +236,7 @@ void turnOffModusStart()
   PIDOutputKollektorPumpe = 0;                      //Speed auf Null setzen
   kollektorPumpe.stop();                            //kollektorpumpe stoppen
   initialOperationModeTimeout.setDelayTime(3, 'm'); //Wie lange mindestens ausgeschaltet?
+  initialOperationModeTimeout.setLastTime(now); //Initialisierungs Timer starten
   initializing = true;                              //Initialisierung starten
   operationMode = 0;                                //Modus auf aus schalten
   tooLowValue = false;                              //tooLowValue zurücksetzen
@@ -411,33 +412,6 @@ void loop()
   //Dieser Programmteil wird alle 1s ausgeführt
   if (timer1s.checkTimer(now))
   {
-    //Alle Fühler auslesen
-    fuehlerKollektorVL.calculateTemperature();
-    fuehlerKollektorLuft.calculateTemperature();
-    fuehlerBoiler.calculateTemperature();
-    fuehlerBoilerVL.calculateTemperature();
-    fuehlerSoleVL.calculateTemperature();
-    fuehlerBoilerRL.calculateTemperature();
-    fuehlerSoleRL.calculateTemperature();
-    fuehlerSole.calculateTemperature();
-
-    if (displayOn) //Soll das Display eingeschaltet sein?
-    {
-      //Displays Schreiben
-      turnOnDisplays();
-      writeDisplays();
-    }
-    //PID Regler berechnen
-    PIDInputKollektorPumpe = fuehlerKollektorLuft.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
-    PIDReglerKollektorPumpe.Compute();                                  //PID Regler berechnen
-    kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);                   //neuen Speed Kollektorpumpe setzen
-
-    //Wenn die Pumpe die Temperatur herunterregelt, die Geschwindigkeit oefter senden
-    if (PIDOutputKollektorPumpe > PID_KOLLEKTOR_MIN_SPEED)
-    {
-      sendMQTT("speedKollektorPumpe", (int)round(PIDOutputKollektorPumpe));
-    }
-
     //Ethernet aktuell halten
     Ethernet.maintain();
 
@@ -451,6 +425,28 @@ void loop()
   //Dieser Programmteil wird alle 5s ausgeführt
   if (timer5s.checkTimer(now))
   {
+    //Alle Fühler auslesen
+    fuehlerKollektorVL.calculateTemperature();
+    fuehlerKollektorLuft.calculateTemperature();
+    fuehlerBoiler.calculateTemperature();
+    fuehlerBoilerVL.calculateTemperature();
+    fuehlerSoleVL.calculateTemperature();
+    fuehlerBoilerRL.calculateTemperature();
+    fuehlerSoleRL.calculateTemperature();
+    fuehlerSole.calculateTemperature();
+
+    //PID Regler berechnen
+    PIDInputKollektorPumpe = fuehlerKollektorLuft.getMeanTemperature(); //Kollektor Vorlauftemperatur auslesen
+    PIDReglerKollektorPumpe.Compute();                                  //PID Regler berechnen
+    kollektorPumpe.setSpeed(PIDOutputKollektorPumpe);                   //neuen Speed Kollektorpumpe setzen
+
+    if (displayOn) //Soll das Display eingeschaltet sein?
+    {
+      //Displays Schreiben
+      turnOnDisplays();
+      writeDisplays();
+    }
+
     //Überprüfen, ob Alarmwerte überschritten wurden
     if (fuehlerSole.getLastTemperature() > ALARMTEMPERATUR_SOLE)
     {
@@ -661,6 +657,8 @@ void loop()
     sendMQTT("solePumpe", digitalRead(RELAIS_SOLE_PUMPE));                   // Info an Dashboard, Solepumpe
     sendMQTT("stellwerkSoleBoiler", digitalRead(STELLWERK_SOLE_BOILER) + 1); //Info an Dashboard, Stellwerk
     sendMQTT("operationMode", operationMode);                                //Info an Dashboard, Modus
+
+    MQTTSendTimer.executed();
   }
 
   if (timer3m.checkTimer(now))
@@ -671,16 +669,20 @@ void loop()
     Serial.println(Ethernet.localIP()); */
 
     //Prüfen, welcher Sendeintervall geeignet ist
-    if (operationMode) {
+    if (operationMode)
+    {
       MQTTSendTimer.setDelayTime(5, 's');
     }
-    else if(fuehlerKollektorLuft.getMeanTemperature() > SOLE_START_TEMPERATURE - 5) {
+    else if (fuehlerKollektorLuft.getMeanTemperature() > SOLE_START_TEMPERATURE - 5)
+    {
       MQTTSendTimer.setDelayTime(5, 's');
     }
-    else if(fuehlerKollektorLuft.getMeanTemperature() > SOLE_START_TEMPERATURE - 10) {
+    else if (fuehlerKollektorLuft.getMeanTemperature() > SOLE_START_TEMPERATURE - 10)
+    {
       MQTTSendTimer.setDelayTime(5, 'm');
     }
-    else {
+    else
+    {
       MQTTSendTimer.setDelayTime(30, 'm');
     }
 
