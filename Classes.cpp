@@ -178,6 +178,12 @@ void Timer::setDelayTime(unsigned long delay, char mode)
   }
 }
 
+//Gibt die Delay-Time zurück
+long Timer::getDelayTime()
+{
+  return _delay;
+}
+
 //____________________________________________
 //Konstruktor der Pumpe Klasse
 Pump::Pump(byte relaisPin, byte PWMPin)
