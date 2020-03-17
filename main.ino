@@ -46,8 +46,8 @@ const int SOLE_VL_EXIT_TEMPERATURE = 23;          //Temperatur im Sole Wärmetau
 const int SOLL_KOLLEKTOR_VL_BOILERMODUS = 75;     //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Boilermodus
 const int SOLL_KOLLEKTOR_VL_SOLEMODUS = 75;       //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
 const int BOILER_DIRECT_EXIT_DIFF = -3;           //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
-const int MIN_DIFFERENZ_VL_RL_BOILER = 5;         //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
-const int MIN_DIFFERENZ_VL_RL_SOLE = 5;         //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
+const int MIN_DIFFERENZ_VL_RL_BOILER = 10;        //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
+const int MIN_DIFFERENZ_VL_RL_SOLE = 5;           //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
 const int MIN_WAERMER_KOLLEKTOR_VL_BOILER = 4;    //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
 const int MIN_WAERMER_KOLLEKTOR_LUFT_BOILER = 10; //mindest Temperaturunterschied zwischen Boiler und Kollektor LUFT, bei dem der Boilermodus gestartet wird
 
@@ -62,14 +62,15 @@ const byte PID_KOLLEKTOR_MAX_SPEED = 255; //Maximale Kollektorpumpen-Geschwindig
 byte mac[] = {0xA8, 0x61, 0x0A, 0xAE, 0x3D, 0xB7}; //Hardware-Adresse des Ethernet-Boards (Kleber auf Board)
 
 //Variabeln
-byte operationMode = 0;            //Betriebsmodus: 0=aus, 1=Solemodus, 2=Boilermodus
-unsigned long now = 0;             //Jeweils aktueller millis()-Wert
-bool displayOn = false;            //true, wenn Displays eingeschaltet sein soll
-bool boilerHighTemperatur = false; //true, wenn Boiler auf höherer Temperatur ist
-bool kollektorAlarm = false;       //true, wenn kollektor zu heiss ist
-bool soleAlarm = false;            //true, wenn solepumpe zu heiss ist
-bool initializing = false;         //Ist derzeit ein neuer Modus am Initialisieren?
-bool tooLowValue = false;          //True, wenn Sollwert das erste mal unterschritten
+byte operationMode = 0;              //Betriebsmodus: 0=aus, 1=Solemodus, 2=Boilermodus
+unsigned long now = 0;               //Jeweils aktueller millis()-Wert
+bool displayOn = false;              //true, wenn Displays eingeschaltet sein soll
+bool boilerHighTemperatur = false;   //true, wenn Boiler auf höherer Temperatur ist
+bool kollektorAlarm = false;         //true, wenn kollektor zu heiss ist
+bool soleAlarm = false;              //true, wenn solepumpe zu heiss ist
+bool initializing = false;           //Ist derzeit ein neuer Modus am Initialisieren?
+bool tooLowValue = false;            //True, wenn Sollwert das erste mal unterschritten
+bool lastStateFlowMeterBoiler = LOW; //Lester Status des Flow Meter Boiler
 
 //PID Variabeln
 double PIDInputKollektorPumpe, PIDOutputKollektorPumpe, PIDSetpointKollektorPumpe; //Variabeln für PID-Regler der Kollektorpumpe
@@ -144,8 +145,8 @@ Timer timer3m(3, 'm'); //3min Timer
 Timer timerLegionellenschaltung(7, 'd');   //Legio-Timer (Zeit. nach der elektrisch auf hohe Boilertemperatur geheizt wird, falls diese nie erreicht wurde)
 Timer initialOperationModeTimeout(3, 'm'); //Zeit bevor ein Modus EXIT-Kriterien berücksichtigt (Achtung, Variabel)
 Timer exitTimeout(2, 'm');                 //Solange muss der Sollwert mindestens unterschritten sein, bevor Abbruch
-Timer flowMeterBoilerTimeout(5, 's');      //Durchflussmeter 1 Timeout
-Timer flowMeterSoleTimeout(20, '2');       //Durchflussmeter 2 Timeout
+Timer flowMeterBoilerTimeout(1, 's');      //Durchflussmeter 1 Timeout
+Timer flowMeterSoleTimeout(1, 's');        //Durchflussmeter 2 Timeout
 Timer displayButtonTimeout(1000);          //Display-Button Timeout
 Timer displayTimeout(2, 'm');              //Display-Ausschaltzeit
 Timer boilerTimeout(1, 'd');               //Boiler-Ausschaltzeit
@@ -262,14 +263,56 @@ void eraseDisplays()
 //Displays schreiben
 void writeDisplays()
 {
-  LCD_00.print("Test1");
-  LCD_01.print("Test2");
-  LCD_02.print("Test3");
-  LCD_03.print("Test4");
-  LCD_04.print("Test5");
-  LCD_05.print("Test6");
-  LCD_06.print("Test7");
-  LCD_07.print("Test8");
+  //Bildschirm oben links
+  LCD_00.setCursor(0, 0);
+  LCD_00.print("Betriebsmodus:");
+  LCD_00.setCursor(1, 0);
+  switch (operationMode)
+  {
+  case 0:
+    LCD_00.print("Ausgeschaltet");
+    break;
+  case 1:
+    LCD_00.print("Sole laden");
+    break;
+  case 2:
+    LCD_00.print("Boiler laden");
+    break;
+  }
+
+  //Bildschirm oben rechts
+  LCD_01.setCursor(0,0);
+  LCD_01.print("K-Pumpe:");
+  LCD_01.setCursor(0,11);
+  if (round(((PIDOutputKollektorPumpe/2.55)-15)*(9/8)+10) <= 2){
+    LCD_01.print("Aus");
+  }
+  else if (round(((PIDOutputKollektorPumpe/2.55)-15)*(9/8)+10) >= 100) {
+    LCD_01.print("100 %");
+  }
+  else {
+  LCD_01.print(round(((PIDOutputKollektorPumpe/2.55)-15)*(9/8)+10)); LCD_01.print(" % ");
+  }
+  LCD_01.setCursor(1,0);
+  LCD_01.print("S-Pumpe:");
+  LCD_01.setCursor(1,11);
+  if (digitalRead(RELAIS_SOLE_PUMPE)) {
+    LCD_01.print("Ein");
+  }
+  else {
+    LCD_01.print("Aus");
+  }
+
+  //Bildschirm mitteOben rechts
+  LCD_03.setCursor(0,0);
+  LCD_03.print("K-Luft:");
+  LCD_03.setCursor(0,11);
+  LCD_03.print(fuehlerKollektorLuft.getMeanTemperature(),1);
+  LCD_03.setCursor(0,0);
+  LCD_03.print("K-VL:");
+  LCD_03.setCursor(0,11);
+  LCD_03.print(fuehlerKollektorVL.getMeanTemperature(),1);
+
 }
 
 //Displays ausschalten
@@ -386,26 +429,21 @@ void setup()
 void loop()
 {
   //Dieser Programmteil wird in jeder Schleife durchgefuehrt
-  //Prüfen, ob je nach Betriebsmodus der entsprechende Durchflussmesser einen Impuls ausgibt
-  //switch (operationMode)
-  //{
-  //case 0:
-  //  break;
-  // case 1:
-  //   if (digitalRead(FLOW_METER_SOLE) == HIGH && flowMeterSoleTimeout.checkTimer(now) == true)
-  //   {
-  //     Serial.println("Flow Meter Sole gibt an");
-  //     flowMeterSoleTimeout.executed();
-  //   }
-  //   break;
-  //case 2:
-  //if (digitalRead(FLOW_METER_BOILER) == HIGH && flowMeterBoilerTimeout.checkTimer(now) == true)
-  //    {
-  //    Serial.println("Flow Meter Boiler gibt an");
-  //   flowMeterBoilerTimeout.executed();
-  //}
-  //break;
-  //}
+  //Prüfen, ob der Durchflussmesser Boiler einen Impuls abgeben
+  if (flowMeterBoilerTimeout.checkTimer(now))
+  {
+    if (digitalRead(FLOW_METER_BOILER) && !lastStateFlowMeterBoiler)
+    {
+      sendMQTT("flowMeterBoiler", 1);
+      lastStateFlowMeterBoiler = HIGH;
+    }
+    else if (!digitalRead(FLOW_METER_BOILER) && lastStateFlowMeterBoiler)
+    {
+      lastStateFlowMeterBoiler = LOW;
+    }
+
+    flowMeterBoilerTimeout.executed();
+  }
 
   //Nachrichten empfangen und verarbeiten
   int messageSize = mqttClient.parseMessage();
