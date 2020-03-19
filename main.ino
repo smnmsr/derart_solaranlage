@@ -39,12 +39,14 @@ const float FUEHLER_SOLE_KORREKTURFAKTOR = 1.0;           //Korrekturfaktor S7
 const int ALARMTEMPERATUR_KOLLEKTOR_LUFT = 90;    //Alarmtemperatur für Kollektor (Lufttemperatur)
 const int ALARMTEMPERATUR_KOLLEKTOR_VL = 95;      //Alarmtemperatur für Kollektor (Vorlauftemperatur)
 const int ALARMTEMPERATUR_SOLE = 30;              //Alarmtemperatur für Sole-Pumpe
+const int ACHTUNG_TEMPERATUR_SOLE = 25;           //Alarmtemperatur für Sole-Pumpe
 const int MIN_DIFFERENZ_NACH_ALARM = 3;           //erst wenn die Temperatur um diesen Wert gesunken ist, geht der Alarmmodus aus
 const int SOLE_EXIT_TEMPERATURE = 6;              //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
 const int SOLE_START_TEMPERATURE = 25;            //Temperatur im Kollektor (Luft), bei der der Solemodus gestartet wird
 const int SOLE_VL_EXIT_TEMPERATURE = 23;          //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
-const int SOLL_KOLLEKTOR_VL_BOILERMODUS = 75;     //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Boilermodus
+const int SOLL_KOLLEKTOR_VL_BOILERMODUS = 80;     //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Boilermodus
 const int SOLL_KOLLEKTOR_VL_SOLEMODUS = 75;       //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
+const int SOLL_KOLLEKTOR_VL_SOLEMODUS_2 = 50;       //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
 const int BOILER_DIRECT_EXIT_DIFF = -3;           //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
 const int MIN_DIFFERENZ_VL_RL_BOILER = 10;        //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
 const int MIN_DIFFERENZ_VL_RL_SOLE = 5;           //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
@@ -281,38 +283,43 @@ void writeDisplays()
   }
 
   //Bildschirm oben rechts
-  LCD_01.setCursor(0,0);
+  LCD_01.setCursor(0, 0);
   LCD_01.print("K-Pumpe:");
-  LCD_01.setCursor(0,11);
-  if (round(((PIDOutputKollektorPumpe/2.55)-15)*(9/8)+10) <= 2){
+  LCD_01.setCursor(0, 11);
+  if (round(((PIDOutputKollektorPumpe / 2.55) - 15) * (9 / 8) + 10) <= 2)
+  {
     LCD_01.print("Aus");
   }
-  else if (round(((PIDOutputKollektorPumpe/2.55)-15)*(9/8)+10) >= 100) {
+  else if (round(((PIDOutputKollektorPumpe / 2.55) - 15) * (9 / 8) + 10) >= 100)
+  {
     LCD_01.print("100 %");
   }
-  else {
-  LCD_01.print(round(((PIDOutputKollektorPumpe/2.55)-15)*(9/8)+10)); LCD_01.print(" % ");
+  else
+  {
+    LCD_01.print(round(((PIDOutputKollektorPumpe / 2.55) - 15) * (9 / 8) + 10));
+    LCD_01.print(" % ");
   }
-  LCD_01.setCursor(1,0);
+  LCD_01.setCursor(1, 0);
   LCD_01.print("S-Pumpe:");
-  LCD_01.setCursor(1,11);
-  if (digitalRead(RELAIS_SOLE_PUMPE)) {
+  LCD_01.setCursor(1, 11);
+  if (digitalRead(RELAIS_SOLE_PUMPE))
+  {
     LCD_01.print("Ein");
   }
-  else {
+  else
+  {
     LCD_01.print("Aus");
   }
 
   //Bildschirm mitteOben rechts
-  LCD_03.setCursor(0,0);
+  LCD_03.setCursor(0, 0);
   LCD_03.print("K-Luft:");
-  LCD_03.setCursor(0,11);
-  LCD_03.print(fuehlerKollektorLuft.getMeanTemperature(),1);
-  LCD_03.setCursor(0,0);
+  LCD_03.setCursor(0, 11);
+  LCD_03.print(fuehlerKollektorLuft.getMeanTemperature(), 1);
+  LCD_03.setCursor(0, 0);
   LCD_03.print("K-VL:");
-  LCD_03.setCursor(0,11);
-  LCD_03.print(fuehlerKollektorVL.getMeanTemperature(),1);
-
+  LCD_03.setCursor(0, 11);
+  LCD_03.print(fuehlerKollektorVL.getMeanTemperature(), 1);
 }
 
 //Displays ausschalten
@@ -562,8 +569,10 @@ void loop()
       sendMQTT("alarm", "Alarm. Die Soletemperatur ist zu hoch."); //Alarmnachricht an Dashboard
       digitalWrite(RELAIS_SOLE_PUMPE, LOW);                        //Solepumpe ausschalten
       sendMQTT("solePumpe", 0);                                    //Solepumpen-Status an Dashboard
-      digitalWrite(STELLWERK_SOLE_BOILER, HIGH);                   //Wärme in Boiler leiten
-      sendMQTT("stellwerkSoleBoiler", 2);                          //Info an Dashboard, Stellwerk zeigt auf Boiler
+      digitalWrite(STELLWERK_SOLE_BOILER, LOW);                    //Wärme über Wärmetauscher abkühlen
+      analogWrite(PWM_KOLLEKTOR_PUMPE, 255);                       //Kollektorpumpe auf 100%
+      sendMQTT("speedKollektorPumpe", 255);                        //Info an Dashboard, Kollektorpumpe bei 100%
+      sendMQTT("stellwerkSoleBoiler", 1);                          //Info an Dashboard, Stellwerk zeigt auf Boiler
     }
 
     //Kollektor Alarm?
@@ -586,7 +595,7 @@ void loop()
       {
         soleAlarm = false;
         sendMQTT("alarm", "Die Soletemperatur ist nicht mehr zu hoch."); //Dashboard Nachricht: Alarm beendet
-        boilerModusStart();                                              //Nach Alarm in Boilermodus starten
+        soleModusStart();                                              //Nach Alarm in Boilermodus starten
       }
 
       //Kollektor VL und Luft Temperatur abfragen und prüfen, ob ausreichend abgekühlt
@@ -682,6 +691,11 @@ void loop()
             sendMQTT("message", "Der Solemodus wurde abgebrochen, da die Solltemperatur zu lange unterschritten wurde. Die Anlage ist jetzt ausgeschaltet.");
           }
         }
+      }
+      if (fuehlerSole.getMeanTemperature() > ACHTUNG_TEMPERATUR_SOLE) {
+        PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_SOLEMODUS_2;
+      } else {
+        PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_SOLEMODUS;
       }
     }
     break;
