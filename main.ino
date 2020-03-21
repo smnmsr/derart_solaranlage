@@ -422,6 +422,7 @@ void setup()
 
   // subscribe to a topic
   mqttClient.subscribe("derart/toArduino/LegionellenModus");
+  mqttClient.subscribe("derart/toArduino/Betriebsmodus");
 
   //erster Betriebsmodus nach dem Starten (Ohne Initialisierungszeit)
   turnOffModusStart();
@@ -461,7 +462,6 @@ void loop()
 
     if (recievedTopic == "derart/toArduino/LegionellenModus")
     {
-
       if (recievedPayload == '1')
       {
         timerLegionellenschaltung.setLastTime((unsigned long)(now - timerLegionellenschaltung.getDelayTime()));
@@ -476,30 +476,41 @@ void loop()
         sendMQTT("message", "Boiler wieder bei normaler Solltemperatur für elektrisches Heizen.");
         Serial.println("Legionellenschaltung aus der Ferne ausgeschaltet");
       }
+    }
+    if (recievedTopic == "derart/toArduino/Betriebsmodus")
+    {
+      if (recievedPayload == '0')
+      {
+        turnOffModusStart();
+        sendMQTT("message", "Anlage von Hand ausgeschaltet. Nach Initialisierung wieder Automatikbetrieb.");
+      }
+      else if (recievedPayload == '1')
+      {
+        soleModusStart();
+        sendMQTT("message", "Anlage von Hand zu Sole laden umgeschaltet. Nach Initialisierung wieder Automatikbetrieb.");
+      }
       else if (recievedPayload == '2')
       {
-        PIDSetpointKollektorPumpe = 25;
-        sendMQTT("message", "Neuer Sollwert: 25 degC");
+        boilerModusStart();
+        sendMQTT("message", "Anlage von Hand zu Boiler laden umgeschaltet. Nach Initialisierung wieder Automatikbetrieb.");
       }
       else if (recievedPayload == '3')
       {
-        PIDSetpointKollektorPumpe = 30;
-        sendMQTT("message", "Neuer Sollwert: 30 degC");
+        turnOffModusStart();
+        operationMode = 3;
+        sendMQTT("message", "Handbetrieb: Ausgeschaltet. Automatikfunktion aus.");
       }
       else if (recievedPayload == '4')
       {
-        PIDSetpointKollektorPumpe = 35;
-        sendMQTT("message", "Neuer Sollwert: 35 degC");
+        soleModusStart();
+        operationMode = 3;
+        sendMQTT("message", "Handbetrieb: Sole laden. Automatikfunktion aus.");
       }
       else if (recievedPayload == '5')
       {
-        PIDSetpointKollektorPumpe = 40;
-        sendMQTT("message", "Neuer Sollwert: 40 degC");
-      }
-      else if (recievedPayload == '6')
-      {
-        PIDSetpointKollektorPumpe = 45;
-        sendMQTT("message", "Neuer Sollwert: 45 degC");
+        boilerModusStart();
+        operationMode = 3;
+        sendMQTT("message", "Handbetrieb: Boiler laden. Automatikfunktion aus.");
       }
     }
   }
@@ -739,6 +750,8 @@ void loop()
         }
       }
     }
+    break;
+    case 3: //Im Modus Manuell?
     break;
     default:
     {
