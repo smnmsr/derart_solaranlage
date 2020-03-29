@@ -46,13 +46,13 @@ const int MIN_DIFFERENZ_NACH_ALARM = 3;           //erst wenn die Temperatur um 
 const int SOLE_EXIT_TEMPERATURE = 6;              //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
 const int SOLE_START_TEMPERATURE = 25;            //Temperatur im Kollektor (Luft), bei der der Solemodus gestartet wird
 const int SOLE_VL_EXIT_TEMPERATURE = 23;          //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
-const int SOLL_KOLLEKTOR_VL_BOILERMODUS = 80;     //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Boilermodus
-const int SOLL_KOLLEKTOR_VL_SOLEMODUS = 75;       //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
+//const int SOLL_KOLLEKTOR_VL_BOILERMODUS = 80;     //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Boilermodus
+//const int SOLL_KOLLEKTOR_VL_SOLEMODUS = 75;       //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
 const int SOLL_KOLLEKTOR_VL_SOLEMODUS_2 = 50;     //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
-const int BOILER_DIRECT_EXIT_DIFF = -3;           //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
+const int BOILER_DIRECT_EXIT_DIFF = -4;           //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
 const int MIN_DIFFERENZ_VL_RL_BOILER = 10;        //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
 const int MIN_DIFFERENZ_VL_RL_SOLE = 5;           //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
-const int MIN_WAERMER_KOLLEKTOR_VL_BOILER = 4;    //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
+const int MIN_WAERMER_KOLLEKTOR_VL_BOILER = 5;    //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
 const int MIN_WAERMER_KOLLEKTOR_LUFT_BOILER = 10; //mindest Temperaturunterschied zwischen Boiler und Kollektor LUFT, bei dem der Boilermodus gestartet wird
 
 //PID Tuning Parameter
@@ -76,6 +76,7 @@ bool initializing = false;           //Ist derzeit ein neuer Modus am Initialisi
 bool tooLowValue = false;            //True, wenn Sollwert das erste mal unterschritten
 bool lastStateFlowMeterBoiler = LOW; //Lester Status des Flow Meter Boiler
 bool lastStateFlowMeterSole = LOW;   //Lester Status des Flow Meter Boiler
+int soll_kollektor_vl = 70;            //Soll VL Temperatur
 
 //PID Variabeln
 double PIDInputKollektorPumpe, PIDOutputKollektorPumpe, PIDSetpointKollektorPumpe; //Variabeln für PID-Regler der Kollektorpumpe
@@ -148,6 +149,7 @@ Pump kollektorPumpe(RELAIS_KOLLEKTOR_PUMPE, PWM_KOLLEKTOR_PUMPE);
 // Timer über normale Clock
 Timer timer1s(1, 's'); //1s Timer
 Timer timer5s(5, 's'); //5s Timer
+Timer timer1m(1, 'm'); //1m Timer
 Timer timer3m(3, 'm'); //3min Timer
 
 //Timer für bestimmte Funktionen
@@ -202,6 +204,23 @@ void sendMQTT(String subtopic, const char value[])
   mqttClient.endMessage();
 }
 
+// Gibt Soll Vorlauftemperatur am Kollektor zurücksetzen
+void calculateTargetTemperature(){
+  if (PIDSetpointKollektorPumpe < fuehlerBoiler1.getMeanTemperature()) {
+      PIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature());
+  }
+  else if (PIDSetpointKollektorPumpe > fuehlerBoiler1.getMeanTemperature() + 5)
+  {
+      PIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature());
+  }
+  if (PIDSetpointKollektorPumpe < 50) {
+    PIDSetpointKollektorPumpe = 50;
+  }
+  else if (PIDSetpointKollektorPumpe > 80) {
+    PIDSetpointKollektorPumpe = 80;
+  }
+}
+
 //Startet den Boilermodus
 void boilerModusStart()
 {
@@ -209,9 +228,9 @@ void boilerModusStart()
   digitalWrite(RELAIS_SOLE_PUMPE, LOW);                      //Solepumpe ausschalten
   digitalWrite(STELLWERK_SOLE_BOILER, HIGH);                 //Stellwerk auf Boiler umschalten
   PIDReglerKollektorPumpe.SetMode(1);                        //PID-Regler Kollektorpumpe einschalten
-  PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_BOILERMODUS; //Kollektor Vorlauf Sollwert setzen
+  //PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_BOILERMODUS; //Kollektor Vorlauf Sollwert setzen
   initializing = true;                                       //Initialisierung starten
-  initialOperationModeTimeout.setDelayTime(5, 'm');          //Initialisierungszeit setzen
+  initialOperationModeTimeout.setDelayTime(6, 'm');          //Initialisierungszeit setzen
   initialOperationModeTimeout.setLastTime(now);              //Initialisierungs Timer starten
   operationMode = 2;                                         //Modus auf Boiler schalten
   tooLowValue = false;                                       //tooLowValue zurücksetzen
@@ -225,7 +244,7 @@ void soleModusStart()
   digitalWrite(RELAIS_SOLE_PUMPE, HIGH);                   //Solepumpe einschalten
   digitalWrite(STELLWERK_SOLE_BOILER, LOW);                //Stellwerk auf Sole umschalten
   PIDReglerKollektorPumpe.SetMode(1);                      //PID-Regler Kollektorpumpe einschalten
-  PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_SOLEMODUS; //Kollektor Vorlauf Sollwert setzen
+  //PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_SOLEMODUS; //Kollektor Vorlauf Sollwert setzen
   initializing = true;                                     //Initialisierung starten
   switch (operationMode)                                   //Initialisierungszeit setzen
   {
@@ -464,22 +483,6 @@ void loop()
     flowMeterBoilerTimeout.executed();
   }
 
-  //Prüfen, ob der Durchflussmesser Sole einen Impuls abgeben
-  if (flowMeterSoleTimeout.checkTimer(now))
-  {
-    if (digitalRead(FLOW_METER_SOLE) && !lastStateFlowMeterSole)
-    {
-      sendMQTT("flowMeterSole", 1);
-      lastStateFlowMeterSole = HIGH;
-    }
-    else if (!digitalRead(FLOW_METER_SOLE) && lastStateFlowMeterSole)
-    {
-      lastStateFlowMeterSole = LOW;
-    }
-
-    flowMeterSoleTimeout.executed();
-  }
-
   //Nachrichten empfangen und verarbeiten
   int messageSize = mqttClient.parseMessage();
   if (messageSize)
@@ -632,6 +635,9 @@ void loop()
       kollektorAlarm = true;
     }
 
+    //Soll Kollektor VL temperatur berechnen
+    calculateTargetTemperature();
+
     //Alarmmodus
     //Sole AlArm?
     if (soleAlarm)
@@ -770,7 +776,7 @@ void loop()
       }
       else if (PIDSetpointKollektorPumpe == SOLL_KOLLEKTOR_VL_SOLEMODUS_2)
       {
-        PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_VL_SOLEMODUS;
+        calculateTargetTemperature();
       }
     }
     break;
@@ -855,6 +861,14 @@ void loop()
     MQTTSendTimer.executed();
   }
 
+if (timer1m.checkTimer(now))
+  {
+    //Energieberechnung Sole Volumen, dass umgesetzt wird, bei gegebener Pumpenleistung. Berechnung erfolgt online
+    if(operationMode == 1){
+      sendMQTT("flowMeterSole", (float)((-3.4015*pow(10,-7))*pow(PIDOutputKollektorPumpe,3) + (2.0240*pow(10,-4))*pow(PIDOutputKollektorPumpe,2) - 0.0095*PIDOutputKollektorPumpe + 0.1153));
+    }
+    timer1m.executed();
+  }
   if (timer3m.checkTimer(now))
   {
     /*     //DEBUG: Regelmässig mit Serieller Schnittstelle kommunizieren und Modus durchgeben
