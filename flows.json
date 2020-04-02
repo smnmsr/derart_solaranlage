@@ -1,5 +1,87 @@
 [
     {
+        "id": "98be5965.b6d478",
+        "type": "subflow",
+        "name": "Vorblock",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 120,
+                "y": 300,
+                "wires": [
+                    {
+                        "id": "649b4102.e0aac"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 780,
+                "y": 300,
+                "wires": [
+                    {
+                        "id": "55fe2b20.f4c4fc",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "color": "#DDAA99"
+    },
+    {
+        "id": "649b4102.e0aac",
+        "type": "function",
+        "z": "98be5965.b6d478",
+        "name": "",
+        "func": "number = Number(msg.payload);\nreturn {payload: number, topic: msg.topic};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 250,
+        "y": 300,
+        "wires": [
+            [
+                "569ff1d8.66bb68"
+            ]
+        ]
+    },
+    {
+        "id": "55fe2b20.f4c4fc",
+        "type": "rbe",
+        "z": "98be5965.b6d478",
+        "name": "",
+        "func": "deadbandEq",
+        "gap": "1%",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 650,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "569ff1d8.66bb68",
+        "type": "rbe",
+        "z": "98be5965.b6d478",
+        "name": "",
+        "func": "deadbandEq",
+        "gap": "0.4",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 450,
+        "y": 300,
+        "wires": [
+            [
+                "55fe2b20.f4c4fc"
+            ]
+        ]
+    },
+    {
         "id": "32a5fb5f.529444",
         "type": "tab",
         "label": "Flow 1",
@@ -19,10 +101,9 @@
         "y": 940,
         "wires": [
             [
-                "c0391734.5c4b08",
-                "d9c3e201.c82d28",
                 "3250c491.6b004c",
-                "e32981a4.78723"
+                "e32981a4.78723",
+                "ed0dcd42.893d58"
             ]
         ]
     },
@@ -38,7 +119,7 @@
         "gtype": "gage",
         "title": "Kollektor Vorlauf",
         "label": "°C",
-        "format": "{{value | number:0}}",
+        "format": "{{value | number:1}}",
         "min": "-20",
         "max": "130",
         "colors": [
@@ -65,9 +146,10 @@
         "y": 1160,
         "wires": [
             [
-                "5d5ee20.0a83e2",
                 "a6dfc6a5.d4dd08",
-                "ca4dfa1.0ba9d08"
+                "ca4dfa1.0ba9d08",
+                "fccbb3a5.9adc5",
+                "1252ed73.79a503"
             ]
         ]
     },
@@ -83,7 +165,7 @@
         "gtype": "gage",
         "title": "Kollektor Luft",
         "label": "°C",
-        "format": "{{value | number:0}}",
+        "format": "{{value | number:1}}",
         "min": "-20",
         "max": "130",
         "colors": [
@@ -102,17 +184,17 @@
         "type": "mqtt in",
         "z": "32a5fb5f.529444",
         "name": "",
-        "topic": "derart/fuehlerBoiler",
+        "topic": "derart/fuehlerBoiler/1",
         "qos": "2",
         "datatype": "auto",
         "broker": "c299c2a9.4f5468",
-        "x": 110,
+        "x": 120,
         "y": 1360,
         "wires": [
             [
-                "cc565321.2a3d08",
+                "4a4ff65b.cb00f",
                 "1829e78b.7c7a4",
-                "72d56e1.542361"
+                "aabc516b.c19bf8"
             ]
         ]
     },
@@ -128,15 +210,15 @@
         "gtype": "gage",
         "title": "Boilertemperatur",
         "label": "°C",
-        "format": "{{value | number:0}}",
-        "min": "10",
+        "format": "{{value | number:1}}",
+        "min": "45",
         "max": "80",
         "colors": [
             "#0432ff",
             "#00fa00",
             "#ff2600"
         ],
-        "seg1": "40",
+        "seg1": "50",
         "seg2": "",
         "x": 1850,
         "y": 1360,
@@ -148,24 +230,24 @@
         "z": "32a5fb5f.529444",
         "name": "",
         "group": "48898031.ea8918",
-        "order": 2,
+        "order": 5,
         "width": 3,
         "height": 3,
         "gtype": "gage",
         "title": "Boiler VL",
         "label": "°C",
-        "format": "{{value | number:0}}",
-        "min": "0",
+        "format": "{{value | number:1}}",
+        "min": "50",
         "max": "100",
         "colors": [
             "#0056d6",
             "#00fa00",
             "#ff2600"
         ],
-        "seg1": "45",
+        "seg1": "",
         "seg2": "",
         "x": 1820,
-        "y": 1580,
+        "y": 1800,
         "wires": []
     },
     {
@@ -178,12 +260,13 @@
         "datatype": "auto",
         "broker": "c299c2a9.4f5468",
         "x": 120,
-        "y": 1580,
+        "y": 1800,
         "wires": [
             [
-                "f66cd84b.b71c2",
                 "169e6672.c4db3a",
-                "be4bb2b.5884d5"
+                "be4bb2b.5884d5",
+                "77214260.e99b4c",
+                "428be860.d7de7"
             ]
         ]
     },
@@ -197,12 +280,13 @@
         "datatype": "auto",
         "broker": "c299c2a9.4f5468",
         "x": 120,
-        "y": 1820,
+        "y": 2040,
         "wires": [
             [
-                "a9ee0c51.28e91",
                 "ba94f84a.baaad8",
-                "6fb9f4cb.f58e64"
+                "6fb9f4cb.f58e64",
+                "762978b6.2dd93",
+                "3e8180c3.7cc1a"
             ]
         ]
     },
@@ -212,14 +296,14 @@
         "z": "32a5fb5f.529444",
         "name": "",
         "group": "48898031.ea8918",
-        "order": 3,
+        "order": 6,
         "width": 3,
         "height": 3,
         "gtype": "gage",
         "title": "Boiler RL",
         "label": "°C",
-        "format": "{{value | number:0}}",
-        "min": "10",
+        "format": "{{value | number:1}}",
+        "min": "20",
         "max": "70",
         "colors": [
             "#0056d6",
@@ -229,7 +313,7 @@
         "seg1": "20",
         "seg2": "",
         "x": 1820,
-        "y": 1820,
+        "y": 2040,
         "wires": []
     },
     {
@@ -242,12 +326,12 @@
         "datatype": "auto",
         "broker": "c299c2a9.4f5468",
         "x": 110,
-        "y": 2060,
+        "y": 2280,
         "wires": [
             [
-                "fc45680a.3014b8",
                 "3211f86f.1c43f8",
-                "1fde4c46.2e9e1c"
+                "1fde4c46.2e9e1c",
+                "caf768dd.2fd7a8"
             ]
         ]
     },
@@ -263,7 +347,7 @@
         "gtype": "gage",
         "title": "Erdsonde VL",
         "label": "°C",
-        "format": "{{value | number:0}}",
+        "format": "{{value | number:1}}",
         "min": "5",
         "max": "40",
         "colors": [
@@ -274,7 +358,7 @@
         "seg1": "10",
         "seg2": "25",
         "x": 1830,
-        "y": 2060,
+        "y": 2280,
         "wires": []
     },
     {
@@ -313,12 +397,13 @@
         "datatype": "auto",
         "broker": "c299c2a9.4f5468",
         "x": 110,
-        "y": 2280,
+        "y": 2500,
         "wires": [
             [
-                "22bcb67.c2fc04a",
                 "d3c4bbaa.d4e8e",
-                "34c04fb0.0ae17"
+                "34c04fb0.0ae17",
+                "eb6cb29.874ced",
+                "d3ff60cf.2ef9a"
             ]
         ]
     },
@@ -334,7 +419,7 @@
         "gtype": "gage",
         "title": "Wärmetauscher VL",
         "label": "°C",
-        "format": "{{value | number:0}}",
+        "format": "{{value | number:1}}",
         "min": "10",
         "max": "100",
         "colors": [
@@ -345,7 +430,7 @@
         "seg1": "25",
         "seg2": "",
         "x": 1850,
-        "y": 2280,
+        "y": 2500,
         "wires": []
     },
     {
@@ -358,12 +443,13 @@
         "datatype": "auto",
         "broker": "c299c2a9.4f5468",
         "x": 110,
-        "y": 2520,
+        "y": 2740,
         "wires": [
             [
-                "579d1478.ecca0c",
                 "24c0be3c.d65e3a",
-                "9be67be1.314da8"
+                "9be67be1.314da8",
+                "edf7271c.9fbe1",
+                "4ecff55c.da724c"
             ]
         ]
     },
@@ -379,7 +465,7 @@
         "gtype": "gage",
         "title": "Wärmetauscher RL",
         "label": "°C",
-        "format": "{{value | number:0}}",
+        "format": "{{value | number:1}}",
         "min": "0",
         "max": "40",
         "colors": [
@@ -390,7 +476,7 @@
         "seg1": "5",
         "seg2": "",
         "x": 1850,
-        "y": 2520,
+        "y": 2740,
         "wires": []
     },
     {
@@ -473,7 +559,9 @@
         "y": 80,
         "wires": [
             [
-                "ec4d09af.5e4"
+                "24b295df.917432",
+                "49fdaa58.7142ec",
+                "c1ac9894.f4ca78"
             ]
         ]
     },
@@ -499,7 +587,7 @@
         "type": "function",
         "z": "32a5fb5f.529444",
         "name": "",
-        "func": "pwm = (msg.payload / 2.55) - 15;\nvalue = Math.round(pwm * (9/8) + 10);\nif (value > 100){\n    value = 100;\n}\nelse if (value < 0){\n    value = 0;\n}\nreturn {payload: value};",
+        "func": "pwm = (msg.payload / 2.55) - 15;\nvalue = pwm * (9/8) + 10;\nif (value > 100){\n    value = 100;\n}\nelse if (value < 0){\n    value = 0;\n}\nreturn {payload: value, topic:msg.topic};",
         "outputs": 1,
         "noerr": 0,
         "x": 850,
@@ -508,7 +596,8 @@
             [
                 "bc094e93.b40ea",
                 "7dc7788f.d1b51",
-                "4be429b.8356358"
+                "4be429b.8356358",
+                "93924a88.d94248"
             ]
         ]
     },
@@ -568,7 +657,7 @@
         "type": "ui_led",
         "z": "32a5fb5f.529444",
         "group": "803d01f0.e1f188",
-        "order": 3,
+        "order": 4,
         "width": 0,
         "height": 0,
         "label": "Kollektorpumpe",
@@ -667,20 +756,20 @@
         "op2": "",
         "op1type": "pay",
         "op2type": "payl",
-        "duration": "-10",
+        "duration": "-30",
         "extend": false,
         "units": "min",
         "reset": "",
         "bytopic": "all",
         "name": "",
-        "x": 910,
+        "x": 930,
         "y": 80,
         "wires": [
             [
                 "d1a8d51a.674848",
-                "a02520e5.44dc38",
                 "32796b43.7fff94",
-                "b17d7c16.8681a8"
+                "b17d7c16.8681a8",
+                "9f1aafa.83248d"
             ]
         ]
     },
@@ -760,6 +849,15 @@
                 "fromt": "str",
                 "to": "Boiler laden",
                 "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "3",
+                "fromt": "str",
+                "to": "Manuell",
+                "tot": "str"
             }
         ],
         "action": "",
@@ -832,7 +930,7 @@
         "y": 980,
         "wires": [
             [
-                "fb230f15.4dadc"
+                "d84b3d5f.40cb78"
             ]
         ]
     },
@@ -852,7 +950,7 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "",
+        "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
         "removeOlderPoints": "",
@@ -891,10 +989,10 @@
         "chartType": "line",
         "legend": "false",
         "xformat": "HH:mm",
-        "interpolate": "linear",
+        "interpolate": "bezier",
         "nodata": "",
         "dot": false,
-        "ymin": "",
+        "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
         "removeOlderPoints": "",
@@ -921,48 +1019,6 @@
         ]
     },
     {
-        "id": "88fb819a.0229d8",
-        "type": "ui_chart",
-        "z": "32a5fb5f.529444",
-        "name": "",
-        "group": "419a499a.ba486",
-        "order": 1,
-        "width": 24,
-        "height": 6,
-        "label": "Boilertemperatur",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "HH:mm",
-        "interpolate": "linear",
-        "nodata": "",
-        "dot": false,
-        "ymin": "",
-        "ymax": "",
-        "removeOlder": 1,
-        "removeOlderPoints": "",
-        "removeOlderUnit": "86400",
-        "cutout": 0,
-        "useOneColor": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "useOldStyle": false,
-        "outputs": 1,
-        "x": 2190,
-        "y": 1400,
-        "wires": [
-            []
-        ]
-    },
-    {
         "id": "455df715.780d68",
         "type": "ui_chart",
         "z": "32a5fb5f.529444",
@@ -978,7 +1034,7 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "",
+        "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
         "removeOlderPoints": "",
@@ -999,7 +1055,7 @@
         "useOldStyle": false,
         "outputs": 1,
         "x": 2160,
-        "y": 1620,
+        "y": 1840,
         "wires": [
             []
         ]
@@ -1020,7 +1076,7 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "",
+        "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
         "removeOlderPoints": "",
@@ -1041,7 +1097,7 @@
         "useOldStyle": false,
         "outputs": 1,
         "x": 2160,
-        "y": 1860,
+        "y": 2080,
         "wires": [
             []
         ]
@@ -1062,7 +1118,7 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "",
+        "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
         "removeOlderPoints": "",
@@ -1083,7 +1139,7 @@
         "useOldStyle": false,
         "outputs": 1,
         "x": 2170,
-        "y": 2100,
+        "y": 2320,
         "wires": [
             []
         ]
@@ -1104,7 +1160,7 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "",
+        "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
         "removeOlderPoints": "",
@@ -1125,7 +1181,7 @@
         "useOldStyle": false,
         "outputs": 1,
         "x": 2190,
-        "y": 2320,
+        "y": 2540,
         "wires": [
             []
         ]
@@ -1146,7 +1202,7 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "",
+        "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
         "removeOlderPoints": "",
@@ -1167,49 +1223,7 @@
         "useOldStyle": false,
         "outputs": 1,
         "x": 2190,
-        "y": 2560,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "cd634c57.6a2d6",
-        "type": "ui_chart",
-        "z": "32a5fb5f.529444",
-        "name": "",
-        "group": "ad33ef48.829d3",
-        "order": 2,
-        "width": 24,
-        "height": 6,
-        "label": "Pumpengeschwindigkeit",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "HH:mm",
-        "interpolate": "step",
-        "nodata": "",
-        "dot": false,
-        "ymin": "",
-        "ymax": "",
-        "removeOlder": "1",
-        "removeOlderPoints": "",
-        "removeOlderUnit": "86400",
-        "cutout": 0,
-        "useOneColor": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "useOldStyle": false,
-        "outputs": 1,
-        "x": 2210,
-        "y": 380,
+        "y": 2780,
         "wires": [
             []
         ]
@@ -1230,8 +1244,8 @@
         "interpolate": "step",
         "nodata": "",
         "dot": false,
-        "ymin": "",
-        "ymax": "",
+        "ymin": "0",
+        "ymax": "2",
         "removeOlder": "1",
         "removeOlderPoints": "",
         "removeOlderUnit": "86400",
@@ -1266,7 +1280,7 @@
         "datatype": "auto",
         "broker": "c299c2a9.4f5468",
         "x": 100,
-        "y": 2880,
+        "y": 3100,
         "wires": [
             [
                 "effa2206.98dc3"
@@ -1283,7 +1297,7 @@
         "datatype": "auto",
         "broker": "c299c2a9.4f5468",
         "x": 90,
-        "y": 2940,
+        "y": 3160,
         "wires": [
             [
                 "29dc9d84.c2c83a",
@@ -1306,7 +1320,7 @@
         "topic": "Benachrichtigung:",
         "name": "",
         "x": 890,
-        "y": 2880,
+        "y": 3100,
         "wires": []
     },
     {
@@ -1324,32 +1338,10 @@
         "topic": "ALARM!",
         "name": "",
         "x": 870,
-        "y": 2940,
+        "y": 3160,
         "wires": [
             [
-                "b5e2faf1.f36a6"
-            ]
-        ]
-    },
-    {
-        "id": "23518014.0f6f38",
-        "type": "trigger",
-        "z": "32a5fb5f.529444",
-        "op1": "",
-        "op2": "0",
-        "op1type": "pay",
-        "op2type": "str",
-        "duration": "-10",
-        "extend": false,
-        "units": "s",
-        "reset": "OK",
-        "bytopic": "all",
-        "name": "",
-        "x": 900,
-        "y": 3000,
-        "wires": [
-            [
-                "b5e2faf1.f36a6"
+                "23518014.0f6f38"
             ]
         ]
     },
@@ -1361,8 +1353,8 @@
         "group": "803d01f0.e1f188",
         "voice": "de-DE",
         "always": true,
-        "x": 1820,
-        "y": 2940,
+        "x": 1460,
+        "y": 3200,
         "wires": []
     },
     {
@@ -1443,7 +1435,7 @@
         "adjAmount": 0,
         "adjType": "days",
         "adjDir": "add",
-        "format": "D.M.YY HH:mm",
+        "format": "DD.MM.YY",
         "locale": "de_DE",
         "output": "payload",
         "outputType": "msg",
@@ -1512,8 +1504,8 @@
         "interpolate": "step",
         "nodata": "",
         "dot": false,
-        "ymin": "",
-        "ymax": "",
+        "ymin": "0",
+        "ymax": "2",
         "removeOlder": "1",
         "removeOlderPoints": "",
         "removeOlderUnit": "604800",
@@ -1577,7 +1569,7 @@
         "interpolate": "step",
         "nodata": "",
         "dot": false,
-        "ymin": "",
+        "ymin": "0",
         "ymax": "",
         "removeOlder": "1",
         "removeOlderPoints": "",
@@ -1748,7 +1740,7 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "",
+        "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
         "removeOlderPoints": "",
@@ -1793,7 +1785,7 @@
         "y": 1020,
         "wires": [
             [
-                "f37ff256.8df628"
+                "fafe21c8.d9371"
             ]
         ]
     },
@@ -1869,7 +1861,7 @@
         "y": 1200,
         "wires": [
             [
-                "9901ad8c.73cdb"
+                "71599477.66ce0c"
             ]
         ]
     },
@@ -1888,11 +1880,11 @@
         "randomLast": "5",
         "randomUnits": "seconds",
         "drop": true,
-        "x": 1510,
-        "y": 1400,
+        "x": 1770,
+        "y": 1480,
         "wires": [
             [
-                "fda96317.51aba"
+                "e1b3b416.21f0d"
             ]
         ]
     },
@@ -1912,10 +1904,10 @@
         "randomUnits": "seconds",
         "drop": true,
         "x": 1500,
-        "y": 1620,
+        "y": 1840,
         "wires": [
             [
-                "d6870d6d.369528"
+                "ed6fb965.58f59"
             ]
         ]
     },
@@ -1935,10 +1927,10 @@
         "randomUnits": "seconds",
         "drop": true,
         "x": 1500,
-        "y": 1860,
+        "y": 2080,
         "wires": [
             [
-                "f70a1b82.b3dd3"
+                "1abd2a0b.8dd436"
             ]
         ]
     },
@@ -1958,10 +1950,10 @@
         "randomUnits": "seconds",
         "drop": true,
         "x": 1500,
-        "y": 2100,
+        "y": 2320,
         "wires": [
             [
-                "6c22bd9c.2448a4"
+                "b10dbe3f.9aa7f"
             ]
         ]
     },
@@ -1981,10 +1973,10 @@
         "randomUnits": "seconds",
         "drop": true,
         "x": 1500,
-        "y": 2320,
+        "y": 2540,
         "wires": [
             [
-                "ba8be7e2.483678"
+                "383863ba.226934"
             ]
         ]
     },
@@ -2004,10 +1996,10 @@
         "randomUnits": "seconds",
         "drop": true,
         "x": 1500,
-        "y": 2560,
+        "y": 2780,
         "wires": [
             [
-                "4990ce60.fe2f9"
+                "f7aabbf2.f14c98"
             ]
         ]
     },
@@ -2027,7 +2019,7 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "",
+        "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
         "removeOlderPoints": "",
@@ -2072,7 +2064,7 @@
         "y": 1240,
         "wires": [
             [
-                "a604307f.42af"
+                "7092634.1ab509c"
             ]
         ]
     },
@@ -2144,11 +2136,11 @@
         "randomLast": "5",
         "randomUnits": "seconds",
         "drop": true,
-        "x": 1500,
-        "y": 1440,
+        "x": 1760,
+        "y": 1640,
         "wires": [
             [
-                "58e8ecba.e58d9c"
+                "b95cc03d.bce498"
             ]
         ]
     },
@@ -2157,13 +2149,13 @@
         "type": "file",
         "z": "32a5fb5f.529444",
         "name": "",
-        "filename": "/data/raw_data/derart/temperaturBoiler.txt",
+        "filename": "/data/raw_data/derart/temperaturBoilerOben.txt",
         "appendNewline": false,
         "createDir": true,
         "overwriteFile": "false",
         "encoding": "none",
-        "x": 3070,
-        "y": 1500,
+        "x": 3080,
+        "y": 1680,
         "wires": [
             []
         ]
@@ -2182,7 +2174,7 @@
         "skip": "0",
         "strings": true,
         "x": 2810,
-        "y": 1500,
+        "y": 1680,
         "wires": [
             [
                 "77ea4f8d.1d0c3"
@@ -2198,53 +2190,11 @@
         "outputs": 1,
         "noerr": 0,
         "x": 2670,
-        "y": 1500,
+        "y": 1680,
         "wires": [
             [
                 "4b73af2a.f0c6b8"
             ]
-        ]
-    },
-    {
-        "id": "9e987e5c.68301",
-        "type": "ui_chart",
-        "z": "32a5fb5f.529444",
-        "name": "",
-        "group": "9c09e007.0f7d78",
-        "order": 1,
-        "width": 24,
-        "height": 6,
-        "label": "Boilertemperatur",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "dd HH:mm",
-        "interpolate": "linear",
-        "nodata": "",
-        "dot": false,
-        "ymin": "",
-        "ymax": "",
-        "removeOlder": 1,
-        "removeOlderPoints": "",
-        "removeOlderUnit": "604800",
-        "cutout": 0,
-        "useOneColor": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "useOldStyle": false,
-        "outputs": 1,
-        "x": 2510,
-        "y": 1440,
-        "wires": [
-            []
         ]
     },
     {
@@ -2263,10 +2213,10 @@
         "randomUnits": "seconds",
         "drop": true,
         "x": 1510,
-        "y": 1660,
+        "y": 1880,
         "wires": [
             [
-                "f27478c7.572c4"
+                "5419a1f4.3014c"
             ]
         ]
     },
@@ -2281,7 +2231,7 @@
         "overwriteFile": "false",
         "encoding": "none",
         "x": 3070,
-        "y": 1720,
+        "y": 1940,
         "wires": [
             []
         ]
@@ -2300,7 +2250,7 @@
         "skip": "0",
         "strings": true,
         "x": 2810,
-        "y": 1720,
+        "y": 1940,
         "wires": [
             [
                 "fd0c2e42.1be9f8"
@@ -2316,7 +2266,7 @@
         "outputs": 1,
         "noerr": 0,
         "x": 2670,
-        "y": 1720,
+        "y": 1940,
         "wires": [
             [
                 "db0b11a1.235778"
@@ -2339,7 +2289,7 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "",
+        "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
         "removeOlderPoints": "",
@@ -2360,7 +2310,7 @@
         "useOldStyle": false,
         "outputs": 1,
         "x": 2480,
-        "y": 1660,
+        "y": 1880,
         "wires": [
             []
         ]
@@ -2381,10 +2331,10 @@
         "randomUnits": "seconds",
         "drop": true,
         "x": 1510,
-        "y": 1900,
+        "y": 2120,
         "wires": [
             [
-                "1fe2074f.be8c69"
+                "e6283382.8977c"
             ]
         ]
     },
@@ -2399,7 +2349,7 @@
         "overwriteFile": "false",
         "encoding": "none",
         "x": 3070,
-        "y": 1960,
+        "y": 2180,
         "wires": [
             []
         ]
@@ -2418,7 +2368,7 @@
         "skip": "0",
         "strings": true,
         "x": 2810,
-        "y": 1960,
+        "y": 2180,
         "wires": [
             [
                 "2f6c280a.b76d78"
@@ -2434,7 +2384,7 @@
         "outputs": 1,
         "noerr": 0,
         "x": 2670,
-        "y": 1960,
+        "y": 2180,
         "wires": [
             [
                 "1cb6ad5a.02d0eb"
@@ -2457,7 +2407,7 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "",
+        "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
         "removeOlderPoints": "",
@@ -2478,7 +2428,7 @@
         "useOldStyle": false,
         "outputs": 1,
         "x": 2480,
-        "y": 1900,
+        "y": 2120,
         "wires": [
             []
         ]
@@ -2499,10 +2449,10 @@
         "randomUnits": "seconds",
         "drop": true,
         "x": 1510,
-        "y": 2140,
+        "y": 2360,
         "wires": [
             [
-                "2b38d77f.6f292"
+                "8a57f2d1.537bb8"
             ]
         ]
     },
@@ -2517,7 +2467,7 @@
         "overwriteFile": "false",
         "encoding": "none",
         "x": 3090,
-        "y": 2200,
+        "y": 2420,
         "wires": [
             []
         ]
@@ -2536,7 +2486,7 @@
         "skip": "0",
         "strings": true,
         "x": 2810,
-        "y": 2200,
+        "y": 2420,
         "wires": [
             [
                 "1507bf67.b47449"
@@ -2552,7 +2502,7 @@
         "outputs": 1,
         "noerr": 0,
         "x": 2670,
-        "y": 2200,
+        "y": 2420,
         "wires": [
             [
                 "53382c2e.409634"
@@ -2575,7 +2525,7 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "",
+        "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
         "removeOlderPoints": "",
@@ -2596,7 +2546,7 @@
         "useOldStyle": false,
         "outputs": 1,
         "x": 2490,
-        "y": 2140,
+        "y": 2360,
         "wires": [
             []
         ]
@@ -2617,10 +2567,10 @@
         "randomUnits": "seconds",
         "drop": true,
         "x": 1510,
-        "y": 2360,
+        "y": 2580,
         "wires": [
             [
-                "cfca4930.d1cfb"
+                "1510301b.5f5e7"
             ]
         ]
     },
@@ -2635,7 +2585,7 @@
         "overwriteFile": "false",
         "encoding": "none",
         "x": 3110,
-        "y": 2420,
+        "y": 2640,
         "wires": [
             []
         ]
@@ -2654,7 +2604,7 @@
         "skip": "0",
         "strings": true,
         "x": 2810,
-        "y": 2420,
+        "y": 2640,
         "wires": [
             [
                 "9eeae6cb.3d799"
@@ -2670,7 +2620,7 @@
         "outputs": 1,
         "noerr": 0,
         "x": 2670,
-        "y": 2420,
+        "y": 2640,
         "wires": [
             [
                 "af35bb73.efb2b"
@@ -2693,7 +2643,7 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "",
+        "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
         "removeOlderPoints": "",
@@ -2714,7 +2664,7 @@
         "useOldStyle": false,
         "outputs": 1,
         "x": 2510,
-        "y": 2360,
+        "y": 2580,
         "wires": [
             []
         ]
@@ -2735,10 +2685,10 @@
         "randomUnits": "seconds",
         "drop": true,
         "x": 1510,
-        "y": 2620,
+        "y": 2840,
         "wires": [
             [
-                "169dcab.d26a535"
+                "2bb025e3.326342"
             ]
         ]
     },
@@ -2753,7 +2703,7 @@
         "overwriteFile": "false",
         "encoding": "none",
         "x": 3110,
-        "y": 2680,
+        "y": 2900,
         "wires": [
             []
         ]
@@ -2772,7 +2722,7 @@
         "skip": "0",
         "strings": true,
         "x": 2810,
-        "y": 2680,
+        "y": 2900,
         "wires": [
             [
                 "540c6814.eb83"
@@ -2788,7 +2738,7 @@
         "outputs": 1,
         "noerr": 0,
         "x": 2670,
-        "y": 2680,
+        "y": 2900,
         "wires": [
             [
                 "a9844d0a.928d7"
@@ -2811,7 +2761,7 @@
         "interpolate": "linear",
         "nodata": "",
         "dot": false,
-        "ymin": "",
+        "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
         "removeOlderPoints": "",
@@ -2832,7 +2782,7 @@
         "useOldStyle": false,
         "outputs": 1,
         "x": 2510,
-        "y": 2620,
+        "y": 2840,
         "wires": [
             []
         ]
@@ -2842,16 +2792,16 @@
         "type": "rbe",
         "z": "32a5fb5f.529444",
         "name": "",
-        "func": "rbe",
+        "func": "rbei",
         "gap": "",
         "start": "",
         "inout": "out",
         "property": "payload",
-        "x": 2030,
+        "x": 1850,
         "y": 380,
         "wires": [
             [
-                "cd634c57.6a2d6"
+                "68ff2620.5b7638"
             ]
         ]
     },
@@ -2860,7 +2810,7 @@
         "type": "rbe",
         "z": "32a5fb5f.529444",
         "name": "",
-        "func": "rbe",
+        "func": "rbei",
         "gap": "",
         "start": "",
         "inout": "out",
@@ -2869,82 +2819,8 @@
         "y": 440,
         "wires": [
             [
-                "38f106e5.2142ca",
-                "7aa88327.0cc454"
-            ]
-        ]
-    },
-    {
-        "id": "fb230f15.4dadc",
-        "type": "rbe",
-        "z": "32a5fb5f.529444",
-        "name": "",
-        "func": "rbe",
-        "gap": "",
-        "start": "",
-        "inout": "out",
-        "property": "payload",
-        "x": 2030,
-        "y": 980,
-        "wires": [
-            [
-                "6989ba4e.6e7334"
-            ]
-        ]
-    },
-    {
-        "id": "f37ff256.8df628",
-        "type": "rbe",
-        "z": "32a5fb5f.529444",
-        "name": "",
-        "func": "rbe",
-        "gap": "",
-        "start": "",
-        "inout": "out",
-        "property": "payload",
-        "x": 2030,
-        "y": 1020,
-        "wires": [
-            [
-                "3b726350.b5c5e4",
-                "167cb824.5db0f"
-            ]
-        ]
-    },
-    {
-        "id": "9901ad8c.73cdb",
-        "type": "rbe",
-        "z": "32a5fb5f.529444",
-        "name": "",
-        "func": "rbe",
-        "gap": "",
-        "start": "",
-        "inout": "out",
-        "property": "payload",
-        "x": 2030,
-        "y": 1200,
-        "wires": [
-            [
-                "dff0d2cb.50fda8"
-            ]
-        ]
-    },
-    {
-        "id": "a604307f.42af",
-        "type": "rbe",
-        "z": "32a5fb5f.529444",
-        "name": "",
-        "func": "rbe",
-        "gap": "",
-        "start": "",
-        "inout": "out",
-        "property": "payload",
-        "x": 2030,
-        "y": 1240,
-        "wires": [
-            [
-                "6d4e5a2c.4064a4",
-                "97c35b76.d58078"
+                "7aa88327.0cc454",
+                "38f106e5.2142ca"
             ]
         ]
     },
@@ -2953,7 +2829,7 @@
         "type": "rbe",
         "z": "32a5fb5f.529444",
         "name": "",
-        "func": "rbe",
+        "func": "rbei",
         "gap": "",
         "start": "",
         "inout": "out",
@@ -2967,44 +2843,268 @@
         ]
     },
     {
-        "id": "fda96317.51aba",
-        "type": "rbe",
+        "id": "6098d7e8.bf4c2",
+        "type": "ui_chart",
         "z": "32a5fb5f.529444",
         "name": "",
-        "func": "rbe",
-        "gap": "",
-        "start": "",
-        "inout": "out",
-        "property": "payload",
-        "x": 2030,
-        "y": 1400,
+        "group": "ad33ef48.829d3",
+        "order": 2,
+        "width": 24,
+        "height": 6,
+        "label": "Pumpengeschwindigkeit",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "",
+        "removeOlder": "1",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2210,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fccbb3a5.9adc5",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "x": 1660,
+        "y": 1160,
         "wires": [
             [
-                "88fb819a.0229d8"
+                "5d5ee20.0a83e2"
             ]
         ]
     },
     {
-        "id": "58e8ecba.e58d9c",
-        "type": "rbe",
+        "id": "ed0dcd42.893d58",
+        "type": "subflow:98be5965.b6d478",
         "z": "32a5fb5f.529444",
         "name": "",
-        "func": "rbe",
-        "gap": "",
-        "start": "",
-        "inout": "out",
-        "property": "payload",
-        "x": 2030,
-        "y": 1440,
+        "env": [],
+        "x": 1660,
+        "y": 940,
         "wires": [
             [
-                "9e987e5c.68301",
-                "c7d4729.2d47f1"
+                "c0391734.5c4b08"
             ]
         ]
     },
     {
-        "id": "d6870d6d.369528",
+        "id": "b99b38eb.55a018",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "x": 1660,
+        "y": 1360,
+        "wires": [
+            [
+                "cc565321.2a3d08"
+            ]
+        ]
+    },
+    {
+        "id": "77214260.e99b4c",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "x": 1660,
+        "y": 1800,
+        "wires": [
+            [
+                "f66cd84b.b71c2"
+            ]
+        ]
+    },
+    {
+        "id": "762978b6.2dd93",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "x": 1660,
+        "y": 2040,
+        "wires": [
+            [
+                "a9ee0c51.28e91"
+            ]
+        ]
+    },
+    {
+        "id": "edf7271c.9fbe1",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "x": 1660,
+        "y": 2740,
+        "wires": [
+            [
+                "579d1478.ecca0c"
+            ]
+        ]
+    },
+    {
+        "id": "eb6cb29.874ced",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "x": 1660,
+        "y": 2500,
+        "wires": [
+            [
+                "22bcb67.c2fc04a"
+            ]
+        ]
+    },
+    {
+        "id": "caf768dd.2fd7a8",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "x": 1660,
+        "y": 2280,
+        "wires": [
+            [
+                "fc45680a.3014b8"
+            ]
+        ]
+    },
+    {
+        "id": "68ff2620.5b7638",
+        "type": "trigger",
+        "z": "32a5fb5f.529444",
+        "op1": "",
+        "op2": "",
+        "op1type": "pay",
+        "op2type": "payl",
+        "duration": "-10",
+        "extend": false,
+        "units": "min",
+        "reset": "",
+        "bytopic": "all",
+        "name": "senden alle 30'",
+        "x": 2000,
+        "y": 380,
+        "wires": [
+            [
+                "6098d7e8.bf4c2"
+            ]
+        ]
+    },
+    {
+        "id": "19af52b8.327cb5",
+        "type": "ui_audio",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "803d01f0.e1f188",
+        "voice": "de-DE",
+        "always": true,
+        "x": 680,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "53264329.995d8c",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 680,
+        "y": 200,
+        "wires": [
+            [
+                "19af52b8.327cb5"
+            ]
+        ]
+    },
+    {
+        "id": "7dd9c95c.a07d5",
+        "type": "change",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "0",
+                "fromt": "str",
+                "to": "Ausgeschaltet",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "1",
+                "fromt": "str",
+                "to": "Sole laden",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "2",
+                "fromt": "str",
+                "to": "Boiler laden",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "3",
+                "fromt": "str",
+                "to": "Manueller Modus",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 460,
+        "y": 180,
+        "wires": [
+            [
+                "53264329.995d8c",
+                "19af52b8.327cb5"
+            ]
+        ]
+    },
+    {
+        "id": "9f1aafa.83248d",
         "type": "rbe",
         "z": "32a5fb5f.529444",
         "name": "",
@@ -3013,8 +3113,142 @@
         "start": "",
         "inout": "out",
         "property": "payload",
-        "x": 2030,
-        "y": 1620,
+        "x": 2340,
+        "y": 200,
+        "wires": [
+            [
+                "a02520e5.44dc38"
+            ]
+        ]
+    },
+    {
+        "id": "d84b3d5f.40cb78",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "x": 2020,
+        "y": 980,
+        "wires": [
+            [
+                "6989ba4e.6e7334"
+            ]
+        ]
+    },
+    {
+        "id": "fafe21c8.d9371",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "x": 2020,
+        "y": 1020,
+        "wires": [
+            [
+                "3b726350.b5c5e4",
+                "167cb824.5db0f"
+            ]
+        ]
+    },
+    {
+        "id": "71599477.66ce0c",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "x": 2020,
+        "y": 1200,
+        "wires": [
+            [
+                "dff0d2cb.50fda8"
+            ]
+        ]
+    },
+    {
+        "id": "7092634.1ab509c",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "env": [],
+        "x": 2020,
+        "y": 1240,
+        "wires": [
+            [
+                "6d4e5a2c.4064a4",
+                "97c35b76.d58078"
+            ]
+        ]
+    },
+    {
+        "id": "24b295df.917432",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 300,
+        "y": 160,
+        "wires": [
+            [
+                "7dd9c95c.a07d5"
+            ]
+        ]
+    },
+    {
+        "id": "49fdaa58.7142ec",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 720,
+        "y": 80,
+        "wires": [
+            [
+                "ec4d09af.5e4"
+            ]
+        ]
+    },
+    {
+        "id": "75012414.efc67c",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "env": [],
+        "x": 2020,
+        "y": 1520,
+        "wires": [
+            [
+                "57b8745b.76a74c"
+            ]
+        ]
+    },
+    {
+        "id": "b95cc03d.bce498",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "env": [],
+        "x": 2020,
+        "y": 1640,
+        "wires": [
+            [
+                "38eb38bf.34ca68",
+                "d2704792.e747a8"
+            ]
+        ]
+    },
+    {
+        "id": "ed6fb965.58f59",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "env": [],
+        "x": 2020,
+        "y": 1840,
         "wires": [
             [
                 "455df715.780d68"
@@ -3022,17 +3256,13 @@
         ]
     },
     {
-        "id": "f27478c7.572c4",
-        "type": "rbe",
+        "id": "5419a1f4.3014c",
+        "type": "subflow:98be5965.b6d478",
         "z": "32a5fb5f.529444",
         "name": "",
-        "func": "rbe",
-        "gap": "",
-        "start": "",
-        "inout": "out",
-        "property": "payload",
-        "x": 2030,
-        "y": 1660,
+        "env": [],
+        "x": 2020,
+        "y": 1880,
         "wires": [
             [
                 "cdde1275.7228b8",
@@ -3041,17 +3271,13 @@
         ]
     },
     {
-        "id": "f70a1b82.b3dd3",
-        "type": "rbe",
+        "id": "1abd2a0b.8dd436",
+        "type": "subflow:98be5965.b6d478",
         "z": "32a5fb5f.529444",
         "name": "",
-        "func": "rbe",
-        "gap": "",
-        "start": "",
-        "inout": "out",
-        "property": "payload",
-        "x": 2030,
-        "y": 1860,
+        "env": [],
+        "x": 2020,
+        "y": 2080,
         "wires": [
             [
                 "79209df9.ca3da4"
@@ -3059,17 +3285,13 @@
         ]
     },
     {
-        "id": "1fe2074f.be8c69",
-        "type": "rbe",
+        "id": "e6283382.8977c",
+        "type": "subflow:98be5965.b6d478",
         "z": "32a5fb5f.529444",
         "name": "",
-        "func": "rbe",
-        "gap": "",
-        "start": "",
-        "inout": "out",
-        "property": "payload",
-        "x": 2030,
-        "y": 1900,
+        "env": [],
+        "x": 2020,
+        "y": 2120,
         "wires": [
             [
                 "513e2a33.27b0c4",
@@ -3078,17 +3300,13 @@
         ]
     },
     {
-        "id": "6c22bd9c.2448a4",
-        "type": "rbe",
+        "id": "b10dbe3f.9aa7f",
+        "type": "subflow:98be5965.b6d478",
         "z": "32a5fb5f.529444",
         "name": "",
-        "func": "rbe",
-        "gap": "",
-        "start": "",
-        "inout": "out",
-        "property": "payload",
-        "x": 2030,
-        "y": 2100,
+        "env": [],
+        "x": 2020,
+        "y": 2320,
         "wires": [
             [
                 "2c64d59d.4c20fa"
@@ -3096,17 +3314,13 @@
         ]
     },
     {
-        "id": "2b38d77f.6f292",
-        "type": "rbe",
+        "id": "8a57f2d1.537bb8",
+        "type": "subflow:98be5965.b6d478",
         "z": "32a5fb5f.529444",
         "name": "",
-        "func": "rbe",
-        "gap": "",
-        "start": "",
-        "inout": "out",
-        "property": "payload",
-        "x": 2030,
-        "y": 2140,
+        "env": [],
+        "x": 2020,
+        "y": 2360,
         "wires": [
             [
                 "ecb313f5.321498",
@@ -3115,17 +3329,13 @@
         ]
     },
     {
-        "id": "ba8be7e2.483678",
-        "type": "rbe",
+        "id": "383863ba.226934",
+        "type": "subflow:98be5965.b6d478",
         "z": "32a5fb5f.529444",
         "name": "",
-        "func": "rbe",
-        "gap": "",
-        "start": "",
-        "inout": "out",
-        "property": "payload",
-        "x": 2030,
-        "y": 2320,
+        "env": [],
+        "x": 2020,
+        "y": 2540,
         "wires": [
             [
                 "bea90d1b.45dd"
@@ -3133,17 +3343,13 @@
         ]
     },
     {
-        "id": "cfca4930.d1cfb",
-        "type": "rbe",
+        "id": "1510301b.5f5e7",
+        "type": "subflow:98be5965.b6d478",
         "z": "32a5fb5f.529444",
         "name": "",
-        "func": "rbe",
-        "gap": "",
-        "start": "",
-        "inout": "out",
-        "property": "payload",
-        "x": 2030,
-        "y": 2360,
+        "env": [],
+        "x": 2020,
+        "y": 2580,
         "wires": [
             [
                 "bcfd9690.80ddd",
@@ -3152,17 +3358,13 @@
         ]
     },
     {
-        "id": "4990ce60.fe2f9",
-        "type": "rbe",
+        "id": "f7aabbf2.f14c98",
+        "type": "subflow:98be5965.b6d478",
         "z": "32a5fb5f.529444",
         "name": "",
-        "func": "rbe",
-        "gap": "",
-        "start": "",
-        "inout": "out",
-        "property": "payload",
-        "x": 2030,
-        "y": 2560,
+        "env": [],
+        "x": 2020,
+        "y": 2780,
         "wires": [
             [
                 "29f74d3e.868dfa"
@@ -3170,23 +3372,2887 @@
         ]
     },
     {
-        "id": "169dcab.d26a535",
-        "type": "rbe",
+        "id": "2bb025e3.326342",
+        "type": "subflow:98be5965.b6d478",
         "z": "32a5fb5f.529444",
         "name": "",
-        "func": "rbe",
-        "gap": "",
-        "start": "",
-        "inout": "out",
-        "property": "payload",
-        "x": 2030,
-        "y": 2620,
+        "env": [],
+        "x": 2020,
+        "y": 2840,
         "wires": [
             [
                 "13f015f6.11fc92",
                 "205a1a7a.d7631e"
             ]
         ]
+    },
+    {
+        "id": "4a2e017c.8941c",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/alive",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 80,
+        "y": 880,
+        "wires": [
+            [
+                "d9c3e201.c82d28"
+            ]
+        ]
+    },
+    {
+        "id": "c7b8dc0a.fb2dc",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "f5956bfd.907b3",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "jetzt starten",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Legionellenschaltung wirklich starten?",
+        "payloadType": "str",
+        "topic": "",
+        "x": 90,
+        "y": 3340,
+        "wires": [
+            [
+                "519c1967.fbec7"
+            ]
+        ]
+    },
+    {
+        "id": "4d25082.bef7078",
+        "type": "mqtt out",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/toArduino/LegionellenModus",
+        "qos": "1",
+        "retain": "",
+        "broker": "c299c2a9.4f5468",
+        "x": 940,
+        "y": 3360,
+        "wires": []
+    },
+    {
+        "id": "2c56c82.de407b8",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "f5956bfd.907b3",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "jetzt beenden",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Legionellenschaltung wirklich beenden?",
+        "payloadType": "str",
+        "topic": "",
+        "x": 100,
+        "y": 3380,
+        "wires": [
+            [
+                "a10920c5.4ff73"
+            ]
+        ]
+    },
+    {
+        "id": "519c1967.fbec7",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "dialog",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Abbrechen",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 370,
+        "y": 3340,
+        "wires": [
+            [
+                "313315fd.498a22"
+            ]
+        ]
+    },
+    {
+        "id": "313315fd.498a22",
+        "type": "change",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "OK",
+                "fromt": "str",
+                "to": "1",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 620,
+        "y": 3340,
+        "wires": [
+            [
+                "4d25082.bef7078"
+            ]
+        ]
+    },
+    {
+        "id": "a10920c5.4ff73",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "dialog",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Abbrechen",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 370,
+        "y": 3380,
+        "wires": [
+            [
+                "c13aad50.464298"
+            ]
+        ]
+    },
+    {
+        "id": "c13aad50.464298",
+        "type": "change",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "OK",
+                "fromt": "str",
+                "to": "0",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 620,
+        "y": 3380,
+        "wires": [
+            [
+                "4d25082.bef7078"
+            ]
+        ]
+    },
+    {
+        "id": "85bb610c.e10228",
+        "type": "comment",
+        "z": "32a5fb5f.529444",
+        "name": "Legionellenschaltung",
+        "info": "",
+        "x": 120,
+        "y": 3300,
+        "wires": []
+    },
+    {
+        "id": "93924a88.d94248",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "cd63ea7b.79475",
+        "order": 2,
+        "width": 24,
+        "height": 6,
+        "label": "Pumpengeschwindigkeit [%]",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "1",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2220,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1252ed73.79a503",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "cd63ea7b.79475",
+        "order": 1,
+        "width": 24,
+        "height": 6,
+        "label": "Luft Kollektor [°C]",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "1",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2190,
+        "y": 1160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b93feaed.13531",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/flowMeterBoiler",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 100,
+        "y": 4080,
+        "wires": [
+            [
+                "2fa0758b.fdbf82"
+            ]
+        ]
+    },
+    {
+        "id": "2fa0758b.fdbf82",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "//Überprüfen ob variabeln gesetzt sind und allenfalls setzen.\nif (flow.get('boilerEnergyToday') === undefined) {\n    flow.set('boilerEnergyToday', 0);\n}\nif (flow.get('boilerEnergySinceReset') === undefined) {\n    flow.set('boilerEnergySinceReset', 0);\n}\nif (flow.get('boilerEnergyTotal') === undefined) {\n    flow.set('boilerEnergyTotal', 0);\n}\nif (flow.get('boilerVLLastTime') === undefined) {\n    flow.set('boilerVLLastTime', flow.get('derart/fuehlerBoilerVL'));\n}\nif (flow.get('boilerRLLastTime') === undefined) {\n    flow.set('boilerRLLastTime', flow.get('derart/fuehlerBoilerRL'));\n}\nif (flow.get('boilerTimeLastTime') === undefined) {\n    flow.set('boilerTimeLastTime', Date.now());\n}\nif (flow.get('boilerPowerArray') === undefined) {\n    boilerPowerArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];\n    flow.set('boilerPowerArray', boilerPowerArray);\n}\n\nvolume = 0.001; //m^3\ntimeDelay = (Date.now() - flow.get('boilerTimeLastTime')) / 1000; //s\n\n//Berechnungen Vorlauf\nmeanVLTemperature = (flow.get('boilerVLLastTime') + flow.get('derart/fuehlerBoilerVL')) / 2; //°C\nmeanVLTemperatureK = meanVLTemperature + 273.15; //K\ndensityVL = -0.0054 * meanVLTemperature ^ 2 - 0.33 * meanVLTemperature + 1045; //kg/m^3\nheatCapacityVL = 0.01944 * meanVLTemperature + 1.02778 * meanVLTemperature + 3650; //J/kg*K\nmass = densityVL * volume;\namountOfHeatVL = meanVLTemperatureK * heatCapacityVL * mass; //J\n\n//Berechnungen Rücklauf\nmeanRLTemperature = (flow.get('boilerRLLastTime') + flow.get('derart/fuehlerBoilerRL')) / 2;\nmeanRLTemperatureK = meanRLTemperature + 273.15; //K\nheatCapacityRL = 0.01944 * meanRLTemperature + 1.02778 * meanRLTemperature + 3650; //J/Kg*K\namountOfHeatRL = meanRLTemperatureK * heatCapacityRL * mass; //J\n\namountOfHeatDiff = amountOfHeatVL - amountOfHeatRL; //J\namountOfHeatDiffKWH = amountOfHeatDiff / 3600000;\npowerW = amountOfHeatDiff / timeDelay; //W\n\nboilerPowerArray = flow.get('boilerPowerArray');\nboilerPowerArray.push(powerW);\nboilerPowerArray.shift();\nflow.set('boilerPowerArray', boilerPowerArray)\n\nif (timeDelay < 20) {\n    for (i = 0; i < 9; i++) {\n        powerW += boilerPowerArray[i];\n    }\n    powerW /= 10;\n} else if (timeDelay < 60) {\n    for (i = 0; i < 4; i++) {\n        powerW += boilerPowerArray[i];\n    }\n    powerW /= 5;\n} else if (timeDelay > 60 && timeDelay < 120) {\n    powerW += boilerPowerArray[8];\n    powerW /= 2;\n}\n\nflow.set('boilerPower', powerW / 1000);\n\nflow.set('boilerEnergyToday', flow.get('boilerEnergyToday') + amountOfHeatDiffKWH);\nflow.set('boilerEnergySinceReset', flow.get('boilerEnergySinceReset') + amountOfHeatDiffKWH);\nflow.set('boilerEnergyTotal', flow.get('boilerEnergyTotal') + amountOfHeatDiffKWH);\n\nflow.set('boilerVLLastTime', flow.get('derart/fuehlerBoilerVL'));\nflow.set('boilerRLLastTime', flow.get('derart/fuehlerBoilerRL'));\nflow.set('boilerTimeLastTime', Date.now());\n\nreturn { payload: 1 }",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 410,
+        "y": 4080,
+        "wires": [
+            [
+                "e9c22a2c.da93a8",
+                "85f4075e.1bea8",
+                "743a5b5a.1d7f84",
+                "b3be93d0.b14ab"
+            ]
+        ]
+    },
+    {
+        "id": "6c934a1c.652874",
+        "type": "ui_text",
+        "z": "32a5fb5f.529444",
+        "group": "51d1642b.1da0d4",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Energie heute",
+        "format": "{{msg.payload | number:1}} kWh",
+        "layout": "row-spread",
+        "x": 1680,
+        "y": 3980,
+        "wires": []
+    },
+    {
+        "id": "6bf76edb.6e1a2",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "51d1642b.1da0d4",
+        "order": 7,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "label": "Zurücksetzen",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Energiemessung Boiler wirklich zurücksetzen?",
+        "payloadType": "str",
+        "topic": "",
+        "x": 980,
+        "y": 4120,
+        "wires": [
+            [
+                "f40f95d3.a6a38"
+            ]
+        ]
+    },
+    {
+        "id": "2989eaa8.9ea7e6",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "flow.set('boilerEnergyToday',0);\nreturn {payload: 0};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 4040,
+        "wires": [
+            [
+                "6c934a1c.652874"
+            ]
+        ]
+    },
+    {
+        "id": "23518014.0f6f38",
+        "type": "trigger",
+        "z": "32a5fb5f.529444",
+        "op1": "",
+        "op2": "0",
+        "op1type": "pay",
+        "op2type": "str",
+        "duration": "-10",
+        "extend": false,
+        "units": "s",
+        "reset": "OK",
+        "bytopic": "all",
+        "name": "",
+        "x": 1100,
+        "y": 3200,
+        "wires": [
+            [
+                "b5e2faf1.f36a6"
+            ]
+        ]
+    },
+    {
+        "id": "ee6e4f52.2705e8",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "ec5eb937.a49a98",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Ausschalten, dann Auto",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Sicher?",
+        "payloadType": "str",
+        "topic": "",
+        "x": 130,
+        "y": 3480,
+        "wires": [
+            [
+                "baf18fdb.3d2a"
+            ]
+        ]
+    },
+    {
+        "id": "756e85a4.1dbe5c",
+        "type": "mqtt out",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/toArduino/Betriebsmodus",
+        "qos": "1",
+        "retain": "",
+        "broker": "c299c2a9.4f5468",
+        "x": 930,
+        "y": 3500,
+        "wires": []
+    },
+    {
+        "id": "bff36503.74e0e8",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "ec5eb937.a49a98",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Sole laden, dann Auto",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Sicher?",
+        "payloadType": "str",
+        "topic": "",
+        "x": 120,
+        "y": 3520,
+        "wires": [
+            [
+                "6d07ebab.e62cb4"
+            ]
+        ]
+    },
+    {
+        "id": "baf18fdb.3d2a",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "dialog",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Abbrechen",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 370,
+        "y": 3480,
+        "wires": [
+            [
+                "921e7b65.83981"
+            ]
+        ]
+    },
+    {
+        "id": "921e7b65.83981",
+        "type": "change",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "OK",
+                "fromt": "str",
+                "to": "0",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 620,
+        "y": 3480,
+        "wires": [
+            [
+                "756e85a4.1dbe5c"
+            ]
+        ]
+    },
+    {
+        "id": "6d07ebab.e62cb4",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "dialog",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Abbrechen",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 370,
+        "y": 3520,
+        "wires": [
+            [
+                "11127f10.929661"
+            ]
+        ]
+    },
+    {
+        "id": "11127f10.929661",
+        "type": "change",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "OK",
+                "fromt": "str",
+                "to": "1",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 620,
+        "y": 3520,
+        "wires": [
+            [
+                "756e85a4.1dbe5c"
+            ]
+        ]
+    },
+    {
+        "id": "8e2b166f.cb2aa8",
+        "type": "comment",
+        "z": "32a5fb5f.529444",
+        "name": "Betriebsmodus umschalten",
+        "info": "",
+        "x": 140,
+        "y": 3440,
+        "wires": []
+    },
+    {
+        "id": "127db313.b5fe4d",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "ec5eb937.a49a98",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Boiler laden, dann Auto",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Sicher?",
+        "payloadType": "str",
+        "topic": "",
+        "x": 130,
+        "y": 3560,
+        "wires": [
+            [
+                "83f50ff2.93f3f8"
+            ]
+        ]
+    },
+    {
+        "id": "5d6590e5.4f395",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "ec5eb937.a49a98",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Manuell Ausschalten",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Sicher?",
+        "payloadType": "str",
+        "topic": "",
+        "x": 120,
+        "y": 3600,
+        "wires": [
+            [
+                "14e7c3d9.7a7b04"
+            ]
+        ]
+    },
+    {
+        "id": "83f50ff2.93f3f8",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "dialog",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Abbrechen",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 370,
+        "y": 3560,
+        "wires": [
+            [
+                "b2015ef8.df506"
+            ]
+        ]
+    },
+    {
+        "id": "b2015ef8.df506",
+        "type": "change",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "OK",
+                "fromt": "str",
+                "to": "2",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 620,
+        "y": 3560,
+        "wires": [
+            [
+                "756e85a4.1dbe5c"
+            ]
+        ]
+    },
+    {
+        "id": "14e7c3d9.7a7b04",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "dialog",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Abbrechen",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 370,
+        "y": 3600,
+        "wires": [
+            [
+                "80dcd802.144648"
+            ]
+        ]
+    },
+    {
+        "id": "80dcd802.144648",
+        "type": "change",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "OK",
+                "fromt": "str",
+                "to": "3",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 620,
+        "y": 3600,
+        "wires": [
+            [
+                "756e85a4.1dbe5c"
+            ]
+        ]
+    },
+    {
+        "id": "80439ce8.5755c",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "ec5eb937.a49a98",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Manuell Sole Laden",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Sicher?",
+        "payloadType": "str",
+        "topic": "",
+        "x": 120,
+        "y": 3640,
+        "wires": [
+            [
+                "ec3b5fcf.f6a37"
+            ]
+        ]
+    },
+    {
+        "id": "4699273a.a98ae8",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "ec5eb937.a49a98",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Manuell Boiler Laden",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Sicher?",
+        "payloadType": "str",
+        "topic": "",
+        "x": 120,
+        "y": 3680,
+        "wires": [
+            [
+                "2dc7c747.b41298"
+            ]
+        ]
+    },
+    {
+        "id": "ec3b5fcf.f6a37",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "dialog",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Abbrechen",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 370,
+        "y": 3640,
+        "wires": [
+            [
+                "e9699572.0c6a7"
+            ]
+        ]
+    },
+    {
+        "id": "e9699572.0c6a7",
+        "type": "change",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "OK",
+                "fromt": "str",
+                "to": "4",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 620,
+        "y": 3640,
+        "wires": [
+            [
+                "756e85a4.1dbe5c"
+            ]
+        ]
+    },
+    {
+        "id": "2dc7c747.b41298",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "dialog",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Abbrechen",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 370,
+        "y": 3680,
+        "wires": [
+            [
+                "5a0b32b4.0063dc"
+            ]
+        ]
+    },
+    {
+        "id": "5a0b32b4.0063dc",
+        "type": "change",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "OK",
+                "fromt": "str",
+                "to": "5",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 620,
+        "y": 3680,
+        "wires": [
+            [
+                "756e85a4.1dbe5c"
+            ]
+        ]
+    },
+    {
+        "id": "d48a79b9.1590d",
+        "type": "comment",
+        "z": "32a5fb5f.529444",
+        "name": "Energiemessung Boiler",
+        "info": "",
+        "x": 120,
+        "y": 3860,
+        "wires": []
+    },
+    {
+        "id": "7273f073.ffe9",
+        "type": "inject",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "",
+        "payload": "0",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "00 00 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 1210,
+        "y": 4040,
+        "wires": [
+            [
+                "2989eaa8.9ea7e6"
+            ]
+        ]
+    },
+    {
+        "id": "9faca024.f46ce8",
+        "type": "ui_text",
+        "z": "32a5fb5f.529444",
+        "group": "51d1642b.1da0d4",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Energie seit Reset",
+        "format": "{{msg.payload | number:1}} kWh",
+        "layout": "row-spread",
+        "x": 1690,
+        "y": 4100,
+        "wires": []
+    },
+    {
+        "id": "b8303ad7.da265",
+        "type": "ui_text",
+        "z": "32a5fb5f.529444",
+        "group": "51d1642b.1da0d4",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Energie total",
+        "format": "{{msg.payload | number:1}} kWh",
+        "layout": "row-spread",
+        "x": 1670,
+        "y": 4220,
+        "wires": []
+    },
+    {
+        "id": "b3725589.24836",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "if (msg.payload == \"OK\")\n{\n    flow.set('boilerEnergySinceReset',0);\n    return {payload: 0};\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 4160,
+        "wires": [
+            [
+                "9faca024.f46ce8"
+            ]
+        ]
+    },
+    {
+        "id": "e9c22a2c.da93a8",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "if (msg.topic == 'interval'){\nif (flow.get('derart/operationMode') == '2') {\n    return null;\n}\nelse if (flow.get('derart/operationMode') == '3') {\n    return null;\n}\nelse {\n    flow.set('boilerPower',0)\n    return {payload:0};\n}\n}\nelse {\n    return {payload:flow.get('boilerPower')};\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 3900,
+        "wires": [
+            [
+                "f6e707f5.94af48",
+                "2db7b77.f2aa8c8",
+                "a0362931.c47378"
+            ]
+        ]
+    },
+    {
+        "id": "47eacb40.eb7f9c",
+        "type": "ui_text",
+        "z": "32a5fb5f.529444",
+        "group": "803d01f0.e1f188",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Aktuelle Leistung",
+        "format": "{{msg.payload | number:1}} kW",
+        "layout": "row-spread",
+        "x": 2450,
+        "y": 4300,
+        "wires": []
+    },
+    {
+        "id": "85f4075e.1bea8",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "return {payload:flow.get('boilerEnergyToday')};\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 3980,
+        "wires": [
+            [
+                "6c934a1c.652874"
+            ]
+        ]
+    },
+    {
+        "id": "743a5b5a.1d7f84",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "return {payload:flow.get('boilerEnergySinceReset')};\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 4100,
+        "wires": [
+            [
+                "9faca024.f46ce8"
+            ]
+        ]
+    },
+    {
+        "id": "b3be93d0.b14ab",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "return {payload: flow.get('boilerEnergyTotal')};\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 4220,
+        "wires": [
+            [
+                "b8303ad7.da265"
+            ]
+        ]
+    },
+    {
+        "id": "f40f95d3.a6a38",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "dialog",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Abbrechen",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 1170,
+        "y": 4160,
+        "wires": [
+            [
+                "b3725589.24836",
+                "6de49a5.b1e01e4"
+            ]
+        ]
+    },
+    {
+        "id": "34567722.7b925",
+        "type": "inject",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "interval",
+        "payload": "0",
+        "payloadType": "num",
+        "repeat": "300",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 1040,
+        "y": 3900,
+        "wires": [
+            [
+                "e9c22a2c.da93a8"
+            ]
+        ]
+    },
+    {
+        "id": "c1ac9894.f4ca78",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "In Variable Speichern",
+        "func": "flow.set(msg.topic, Number(msg.payload));",
+        "outputs": 0,
+        "noerr": 0,
+        "x": 380,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "428be860.d7de7",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "In Variable Speichern",
+        "func": "flow.set(msg.topic, Number(msg.payload));",
+        "outputs": 0,
+        "noerr": 0,
+        "x": 380,
+        "y": 1740,
+        "wires": []
+    },
+    {
+        "id": "3e8180c3.7cc1a",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "In Variable Speichern",
+        "func": "flow.set(msg.topic, Number(msg.payload));",
+        "outputs": 0,
+        "noerr": 0,
+        "x": 360,
+        "y": 2000,
+        "wires": []
+    },
+    {
+        "id": "1b7a6764.bd93a1",
+        "type": "inject",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "",
+        "payload": "0",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "00 00 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 1190,
+        "y": 4340,
+        "wires": [
+            [
+                "eb6c892b.b7e6f8"
+            ]
+        ]
+    },
+    {
+        "id": "eb6c892b.b7e6f8",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "return {payload:{timestamp: Date.now(), data: Math.round(flow.get('boilerEnergyTotal'))}};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 4340,
+        "wires": [
+            [
+                "8df84b32.ffb55"
+            ]
+        ]
+    },
+    {
+        "id": "b56c8611.4c6a08",
+        "type": "file",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "filename": "/data/raw_data/derart/EnergieInBoiler.txt",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 1740,
+        "y": 4340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8df84b32.ffb55",
+        "type": "csv",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "sep": ",",
+        "hdrin": false,
+        "hdrout": false,
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,data",
+        "skip": "0",
+        "strings": true,
+        "x": 1470,
+        "y": 4340,
+        "wires": [
+            [
+                "b56c8611.4c6a08"
+            ]
+        ]
+    },
+    {
+        "id": "f6e707f5.94af48",
+        "type": "ui_text",
+        "z": "32a5fb5f.529444",
+        "group": "51d1642b.1da0d4",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Aktuelle Leistung",
+        "format": "{{msg.payload | number:1}} kW",
+        "layout": "row-spread",
+        "x": 1690,
+        "y": 3880,
+        "wires": []
+    },
+    {
+        "id": "2db7b77.f2aa8c8",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "51d1642b.1da0d4",
+        "order": 2,
+        "width": 6,
+        "height": 4,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "5",
+        "removeOlder": "3",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 1650,
+        "y": 3800,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7f9b1065.8a095",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "env": [],
+        "x": 2700,
+        "y": 4060,
+        "wires": [
+            [
+                "f2274a34.8fc56"
+            ]
+        ]
+    },
+    {
+        "id": "a1cd716c.7c69e8",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/flowMeterSole",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 100,
+        "y": 4680,
+        "wires": [
+            [
+                "a221bccd.afa748",
+                "3394dfa2.aca478"
+            ]
+        ]
+    },
+    {
+        "id": "a221bccd.afa748",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "//Überprüfen ob variabeln gesetzt sind und allenfalls setzen.\nif (flow.get('soleEnergyToday') === undefined)\n{\n    flow.set('soleEnergyToday',0);\n}\nif (flow.get('soleEnergySinceReset') === undefined)\n{\n    flow.set('soleEnergySinceReset',0);\n}\nif (flow.get('soleEnergyTotal') === undefined)\n{\n    flow.set('soleEnergyTotal',0);\n}\nif (flow.get('soleVLLastTime') === undefined)\n{\n    flow.set('soleVLLastTime',flow.get('derart/fuehlerSoleVL'));\n}\nif (flow.get('soleRLLastTime') === undefined)\n{\n    flow.set('soleRLLastTime',flow.get('derart/fuehlerSoleRL'));\n}\nif (flow.get('soleTimeLastTime') === undefined)\n{\n    flow.set('soleTimeLastTime',Date.now());\n}\n\nvolume = 0.001 * Number(msg.payload);//m3\ntimeDelay = (Date.now() - flow.get('soleTimeLastTime'))/1000; //s\n\n//Berechnungen Vorlauf\nmeanVLTemperature = (flow.get('soleVLLastTime') + flow.get('derart/fuehlerSoleVL'))/2; //°C\nmeanVLTemperatureK = meanVLTemperature + 273.15; //K\ndensityVL = -0.0054 * meanVLTemperature^2 -0.33 *  meanVLTemperature + 1045; //kg/m^3\nheatCapacityVL = 0.01944 * meanVLTemperature + 1.02778 * meanVLTemperature + 3650; //J/kg*K\nmass = densityVL * volume;\namountOfHeatVL = meanVLTemperatureK * heatCapacityVL * mass; //J\n\n//Berechnungen Rücklauf\nmeanRLTemperature = (flow.get('soleRLLastTime') + flow.get('derart/fuehlerSoleRL'))/2;\nmeanRLTemperatureK = meanRLTemperature + 273.15; //K\nheatCapacityRL = 0.01944 * meanRLTemperature + 1.02778 * meanRLTemperature + 3650; //J/Kg*K\namountOfHeatRL = meanRLTemperatureK * heatCapacityRL * mass; //J\n\namountOfHeatDiff = amountOfHeatVL - amountOfHeatRL; //J\namountOfHeatDiffKWH = amountOfHeatDiff / 3600000;\npowerW = amountOfHeatDiff / timeDelay; //W\n\nflow.set('solePower',powerW/1000);\nflow.set('soleEnergyToday',flow.get('soleEnergyToday')+amountOfHeatDiffKWH);\nflow.set('soleEnergySinceReset',flow.get('soleEnergySinceReset')+amountOfHeatDiffKWH);\nflow.set('soleEnergyTotal',flow.get('soleEnergyTotal')+amountOfHeatDiffKWH);\n\nflow.set('soleVLLastTime',flow.get('derart/fuehlerSoleVL'));\nflow.set('soleRLLastTime', flow.get('derart/fuehlerSoleRL'));\nflow.set('soleTimeLastTime', Date.now());\n\nreturn {payload: 1};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 410,
+        "y": 4680,
+        "wires": [
+            [
+                "72a51f2a.268378",
+                "9421ab61.4db1f8",
+                "edf6edb4.2e9c2",
+                "8a0d0a0d.134478"
+            ]
+        ]
+    },
+    {
+        "id": "87ab080f.eee258",
+        "type": "ui_text",
+        "z": "32a5fb5f.529444",
+        "group": "b5d7ea8c.bb5888",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Energie heute",
+        "format": "{{msg.payload | number:1}} kWh",
+        "layout": "row-spread",
+        "x": 1680,
+        "y": 4580,
+        "wires": []
+    },
+    {
+        "id": "75dfe7d9.47c828",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "b5d7ea8c.bb5888",
+        "order": 7,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "label": "Zurücksetzen",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Energiemessung Sole wirklich zurücksetzen?",
+        "payloadType": "str",
+        "topic": "",
+        "x": 980,
+        "y": 4720,
+        "wires": [
+            [
+                "76b120d8.176a3"
+            ]
+        ]
+    },
+    {
+        "id": "bf5a975a.ae6bb8",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "flow.set('soleEnergyToday',0);\nreturn {payload: 0};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 4640,
+        "wires": [
+            [
+                "87ab080f.eee258"
+            ]
+        ]
+    },
+    {
+        "id": "7b292c32.507ab4",
+        "type": "inject",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "",
+        "payload": "0",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "00 00 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 1210,
+        "y": 4640,
+        "wires": [
+            [
+                "bf5a975a.ae6bb8"
+            ]
+        ]
+    },
+    {
+        "id": "4ec27756.d634a8",
+        "type": "ui_text",
+        "z": "32a5fb5f.529444",
+        "group": "b5d7ea8c.bb5888",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Energie seit Reset",
+        "format": "{{msg.payload | number:1}} kWh",
+        "layout": "row-spread",
+        "x": 1690,
+        "y": 4700,
+        "wires": []
+    },
+    {
+        "id": "cb9e1517.fd49b",
+        "type": "ui_text",
+        "z": "32a5fb5f.529444",
+        "group": "b5d7ea8c.bb5888",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Energie total",
+        "format": "{{msg.payload | number:1}} kWh",
+        "layout": "row-spread",
+        "x": 1670,
+        "y": 4820,
+        "wires": []
+    },
+    {
+        "id": "2fc23eef.6eccaa",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "if (msg.payload == \"OK\")\n{\n    flow.set('soleEnergySinceReset',0);\n    return {payload: 0};\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 4760,
+        "wires": [
+            [
+                "4ec27756.d634a8"
+            ]
+        ]
+    },
+    {
+        "id": "72a51f2a.268378",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "if (msg.topic == 'interval'){\nif (flow.get('derart/operationMode') == '1') {\n    return null;\n}\nelse if (flow.get('derart/operationMode') == '3') {\n    return null;\n}\nelse {\n    flow.set('solePower',0);\n    return {payload:0};\n}\n}\nelse {\n    return {payload:flow.get('solePower')};\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 4500,
+        "wires": [
+            [
+                "9afd62ce.09d928",
+                "6a1737a5.2eb628",
+                "a0362931.c47378"
+            ]
+        ]
+    },
+    {
+        "id": "9afd62ce.09d928",
+        "type": "ui_text",
+        "z": "32a5fb5f.529444",
+        "group": "b5d7ea8c.bb5888",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Aktuelle Leistung",
+        "format": "{{msg.payload | number:1}} kW",
+        "layout": "row-spread",
+        "x": 1690,
+        "y": 4500,
+        "wires": []
+    },
+    {
+        "id": "9421ab61.4db1f8",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "return {payload:flow.get('soleEnergyToday')};\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 4580,
+        "wires": [
+            [
+                "87ab080f.eee258"
+            ]
+        ]
+    },
+    {
+        "id": "edf6edb4.2e9c2",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "return {payload:flow.get('soleEnergySinceReset')};\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 4700,
+        "wires": [
+            [
+                "4ec27756.d634a8"
+            ]
+        ]
+    },
+    {
+        "id": "8a0d0a0d.134478",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "return {payload: flow.get('soleEnergyTotal')};\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 4820,
+        "wires": [
+            [
+                "cb9e1517.fd49b"
+            ]
+        ]
+    },
+    {
+        "id": "76b120d8.176a3",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "dialog",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Abbrechen",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 1170,
+        "y": 4760,
+        "wires": [
+            [
+                "2fc23eef.6eccaa",
+                "a0706642.8e098"
+            ]
+        ]
+    },
+    {
+        "id": "f1eb9626.050168",
+        "type": "inject",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "interval",
+        "payload": "0",
+        "payloadType": "num",
+        "repeat": "300",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 1040,
+        "y": 4500,
+        "wires": [
+            [
+                "72a51f2a.268378"
+            ]
+        ]
+    },
+    {
+        "id": "6e16f8f7.6f0b98",
+        "type": "inject",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "",
+        "payload": "0",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "00 00 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 1190,
+        "y": 4940,
+        "wires": [
+            [
+                "9638f9b2.3e87c"
+            ]
+        ]
+    },
+    {
+        "id": "9638f9b2.3e87c",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "return {payload:{timestamp: Date.now(), data: Math.round(flow.get('soleEnergyTotal'))}};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 4940,
+        "wires": [
+            [
+                "ccc7b56c.378808"
+            ]
+        ]
+    },
+    {
+        "id": "b37e6fbd.eecf6",
+        "type": "file",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "filename": "/data/raw_data/derart/EnergieInBoden.txt",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 1740,
+        "y": 4940,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ccc7b56c.378808",
+        "type": "csv",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "sep": ",",
+        "hdrin": false,
+        "hdrout": false,
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,data",
+        "skip": "0",
+        "strings": true,
+        "x": 1470,
+        "y": 4940,
+        "wires": [
+            [
+                "b37e6fbd.eecf6"
+            ]
+        ]
+    },
+    {
+        "id": "8781960e.452bf",
+        "type": "comment",
+        "z": "32a5fb5f.529444",
+        "name": "Energiemessung Sole",
+        "info": "",
+        "x": 120,
+        "y": 4460,
+        "wires": []
+    },
+    {
+        "id": "d3ff60cf.2ef9a",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "In Variable Speichern",
+        "func": "flow.set(msg.topic, Number(msg.payload));",
+        "outputs": 0,
+        "noerr": 0,
+        "x": 320,
+        "y": 2460,
+        "wires": []
+    },
+    {
+        "id": "4ecff55c.da724c",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "In Variable Speichern",
+        "func": "flow.set(msg.topic, Number(msg.payload));",
+        "outputs": 0,
+        "noerr": 0,
+        "x": 340,
+        "y": 2700,
+        "wires": []
+    },
+    {
+        "id": "a0362931.c47378",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "if (msg.topic == 'interval'){\n    if (flow.get('derart/operationMode') == '1') {\n    return null;\n}\nelse if (flow.get('derart/operationMode') == '2') {\n    return null;\n}\nelse if (flow.get('derart/operationMode') == '3') {\n    return null;\n}\nelse {\n    return {payload:0, topic:'energy'};\n}\n}\nelse {\n    power = flow.get('boilerPower');\n    if (flow.get('solePower')>flow.get('boilerPower')) { \n        power = flow.get('solePower')\n    }\n    return {payload:power, topic:'energy'};\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2130,
+        "y": 4240,
+        "wires": [
+            [
+                "47eacb40.eb7f9c",
+                "78d750e4.e6e6d",
+                "df5361da.d54f1"
+            ]
+        ]
+    },
+    {
+        "id": "6a1737a5.2eb628",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "b5d7ea8c.bb5888",
+        "order": 2,
+        "width": 6,
+        "height": 4,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "5",
+        "removeOlder": "3",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 1650,
+        "y": 4440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f2274a34.8fc56",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "5d073c8b.060b84",
+        "order": 3,
+        "width": "24",
+        "height": "6",
+        "label": "Leistung [kW]",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "5",
+        "removeOlder": "7",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2940,
+        "y": 4060,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7309a0c.f64ebe",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "ad33ef48.829d3",
+        "order": 3,
+        "width": "24",
+        "height": "6",
+        "label": "Leistung [kW]",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "5",
+        "removeOlder": "1",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2940,
+        "y": 4120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "78d750e4.e6e6d",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "number = Number(msg.payload);\nreturn {payload: number, topic: msg.topic};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2470,
+        "y": 4120,
+        "wires": [
+            [
+                "52628b8c.617e84"
+            ]
+        ]
+    },
+    {
+        "id": "52628b8c.617e84",
+        "type": "rbe",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "deadbandEq",
+        "gap": "0.1",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 2710,
+        "y": 4120,
+        "wires": [
+            [
+                "7309a0c.f64ebe"
+            ]
+        ]
+    },
+    {
+        "id": "df5361da.d54f1",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "hour",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 2520,
+        "y": 4060,
+        "wires": [
+            [
+                "7f9b1065.8a095"
+            ]
+        ]
+    },
+    {
+        "id": "8017f79d.9e76b",
+        "type": "csv",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "sep": ",",
+        "hdrin": false,
+        "hdrout": false,
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,data",
+        "skip": "0",
+        "strings": true,
+        "x": 2810,
+        "y": 1720,
+        "wires": [
+            [
+                "eae985ac.8632f"
+            ]
+        ]
+    },
+    {
+        "id": "eae985ac.8632f",
+        "type": "file",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "filename": "/data/raw_data/derart/temperaturBoilerMitte.txt",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 3080,
+        "y": 1720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "38eb38bf.34ca68",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2670,
+        "y": 1720,
+        "wires": [
+            [
+                "8017f79d.9e76b"
+            ]
+        ]
+    },
+    {
+        "id": "9ae6f9bb.a29ad8",
+        "type": "csv",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "sep": ",",
+        "hdrin": false,
+        "hdrout": false,
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,data",
+        "skip": "0",
+        "strings": true,
+        "x": 2810,
+        "y": 1760,
+        "wires": [
+            [
+                "2da5dfec.b45fe"
+            ]
+        ]
+    },
+    {
+        "id": "2da5dfec.b45fe",
+        "type": "file",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "filename": "/data/raw_data/derart/temperaturBoilerUnten.txt",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 3090,
+        "y": 1760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "57dfff20.d9b638",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "time = Date.now();\nreturn {payload:{timestamp: time, data: msg.payload}};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2670,
+        "y": 1760,
+        "wires": [
+            [
+                "9ae6f9bb.a29ad8"
+            ]
+        ]
+    },
+    {
+        "id": "e1b3b416.21f0d",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "env": [],
+        "x": 2020,
+        "y": 1480,
+        "wires": [
+            [
+                "57b8745b.76a74c"
+            ]
+        ]
+    },
+    {
+        "id": "7ea502b1.e6be6c",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "env": [],
+        "x": 2020,
+        "y": 1560,
+        "wires": [
+            [
+                "57b8745b.76a74c"
+            ]
+        ]
+    },
+    {
+        "id": "1628c40e.d9a77c",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "10",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1770,
+        "y": 1520,
+        "wires": [
+            [
+                "75012414.efc67c"
+            ]
+        ]
+    },
+    {
+        "id": "5243a80c.e41cc8",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "10",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1770,
+        "y": 1560,
+        "wires": [
+            [
+                "7ea502b1.e6be6c"
+            ]
+        ]
+    },
+    {
+        "id": "5218125d.dad1d4",
+        "type": "ui_gauge",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "48898031.ea8918",
+        "order": 3,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "unten",
+        "label": "°C",
+        "format": "{{value | number:1}}",
+        "min": "10",
+        "max": "80",
+        "colors": [
+            "#0432ff",
+            "#00fa00",
+            "#ff2600"
+        ],
+        "seg1": "45",
+        "seg2": "",
+        "x": 1810,
+        "y": 1400,
+        "wires": []
+    },
+    {
+        "id": "cbeda519.2e1178",
+        "type": "ui_gauge",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "48898031.ea8918",
+        "order": 2,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "oben",
+        "label": "°C",
+        "format": "{{value | number:1}}",
+        "min": "45",
+        "max": "80",
+        "colors": [
+            "#0432ff",
+            "#00fa00",
+            "#ff2600"
+        ],
+        "seg1": "50",
+        "seg2": "",
+        "x": 1810,
+        "y": 1320,
+        "wires": []
+    },
+    {
+        "id": "4a4ff65b.cb00f",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "x": 1660,
+        "y": 1320,
+        "wires": [
+            [
+                "cbeda519.2e1178"
+            ]
+        ]
+    },
+    {
+        "id": "e8358607.f47898",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "x": 1660,
+        "y": 1400,
+        "wires": [
+            [
+                "5218125d.dad1d4"
+            ]
+        ]
+    },
+    {
+        "id": "d9e31c5f.64b67",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "hour",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1760,
+        "y": 1680,
+        "wires": [
+            [
+                "2a672245.747c7e"
+            ]
+        ]
+    },
+    {
+        "id": "2a672245.747c7e",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "env": [],
+        "x": 2020,
+        "y": 1680,
+        "wires": [
+            [
+                "57dfff20.d9b638",
+                "d2704792.e747a8"
+            ]
+        ]
+    },
+    {
+        "id": "aabc516b.c19bf8",
+        "type": "delay",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "hour",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 1760,
+        "y": 1600,
+        "wires": [
+            [
+                "61cfc3e3.79d924"
+            ]
+        ]
+    },
+    {
+        "id": "61cfc3e3.79d924",
+        "type": "subflow:98be5965.b6d478",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "env": [],
+        "x": 2020,
+        "y": 1600,
+        "wires": [
+            [
+                "c7d4729.2d47f1",
+                "d2704792.e747a8"
+            ]
+        ]
+    },
+    {
+        "id": "54aebc.6da3d944",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "bcdccd8e.77b9d",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Auto",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "0",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1250,
+        "y": 3340,
+        "wires": [
+            [
+                "b887aafe.35d47"
+            ]
+        ]
+    },
+    {
+        "id": "b887aafe.35d47",
+        "type": "mqtt out",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/toArduino/SpeedKollektorpumpe",
+        "qos": "1",
+        "retain": "",
+        "broker": "c299c2a9.4f5468",
+        "x": 2130,
+        "y": 3360,
+        "wires": []
+    },
+    {
+        "id": "157ed466.b40734",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "bcdccd8e.77b9d",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "sehr langsam",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "1",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1280,
+        "y": 3380,
+        "wires": [
+            [
+                "b887aafe.35d47"
+            ]
+        ]
+    },
+    {
+        "id": "656f7b42.80972c",
+        "type": "comment",
+        "z": "32a5fb5f.529444",
+        "name": "Geschwindigkeit Pumpe setzen",
+        "info": "",
+        "x": 1330,
+        "y": 3300,
+        "wires": []
+    },
+    {
+        "id": "b03f58d0.306c2",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "bcdccd8e.77b9d",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "langsam",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "2",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1260,
+        "y": 3420,
+        "wires": [
+            [
+                "b887aafe.35d47"
+            ]
+        ]
+    },
+    {
+        "id": "da45056d.8b22e8",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "bcdccd8e.77b9d",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "mittel",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "3",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1250,
+        "y": 3460,
+        "wires": [
+            [
+                "b887aafe.35d47"
+            ]
+        ]
+    },
+    {
+        "id": "8998e54.0d4c498",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "bcdccd8e.77b9d",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Schnell",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "4",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1260,
+        "y": 3500,
+        "wires": [
+            [
+                "b887aafe.35d47"
+            ]
+        ]
+    },
+    {
+        "id": "f7b7979b.5aadf",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "bcdccd8e.77b9d",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Sehr schnell",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "5",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1270,
+        "y": 3540,
+        "wires": [
+            [
+                "b887aafe.35d47"
+            ]
+        ]
+    },
+    {
+        "id": "fa2d8a07.3a48f",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/fuehlerBoiler/2",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 120,
+        "y": 1400,
+        "wires": [
+            [
+                "b99b38eb.55a018",
+                "1628c40e.d9a77c",
+                "72d56e1.542361"
+            ]
+        ]
+    },
+    {
+        "id": "47848067.1dd28",
+        "type": "mqtt in",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "topic": "derart/fuehlerBoiler/3",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "c299c2a9.4f5468",
+        "x": 120,
+        "y": 1460,
+        "wires": [
+            [
+                "e8358607.f47898",
+                "5243a80c.e41cc8",
+                "d9e31c5f.64b67"
+            ]
+        ]
+    },
+    {
+        "id": "57b8745b.76a74c",
+        "type": "change",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "topic",
+                "pt": "msg",
+                "from": "derart/fuehlerBoiler/1",
+                "fromt": "str",
+                "to": "oben",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "topic",
+                "pt": "msg",
+                "from": "derart/fuehlerBoiler/2",
+                "fromt": "str",
+                "to": "mitte",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "topic",
+                "pt": "msg",
+                "from": "derart/fuehlerBoiler/3",
+                "fromt": "str",
+                "to": "unten",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2320,
+        "y": 1520,
+        "wires": [
+            [
+                "eceafc86.d5bc08"
+            ]
+        ]
+    },
+    {
+        "id": "d2704792.e747a8",
+        "type": "change",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "topic",
+                "pt": "msg",
+                "from": "derart/fuehlerBoiler/1",
+                "fromt": "str",
+                "to": "oben",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "topic",
+                "pt": "msg",
+                "from": "derart/fuehlerBoiler/2",
+                "fromt": "str",
+                "to": "mitte",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "topic",
+                "pt": "msg",
+                "from": "derart/fuehlerBoiler/3",
+                "fromt": "str",
+                "to": "unten",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2500,
+        "y": 1640,
+        "wires": [
+            [
+                "8a15980c.953618"
+            ]
+        ]
+    },
+    {
+        "id": "eceafc86.d5bc08",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "419a499a.ba486",
+        "order": 1,
+        "width": 24,
+        "height": 6,
+        "label": "Boilertemperatur",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "85",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2510,
+        "y": 1520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8a15980c.953618",
+        "type": "ui_chart",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "9c09e007.0f7d78",
+        "order": 1,
+        "width": 24,
+        "height": 6,
+        "label": "Boilertemperatur",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "85",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 2710,
+        "y": 1640,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3394dfa2.aca478",
+        "type": "debug",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 440,
+        "y": 4580,
+        "wires": []
+    },
+    {
+        "id": "17b04932.d7337f",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "db26a2fc.0e8fd8",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "komplett Reset Sole",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Gesamt-Energiemessung Sole wirklich zurücksetzen? (Gesamtzähler) (OK eingeben)",
+        "payloadType": "str",
+        "topic": "",
+        "x": 900,
+        "y": 4860,
+        "wires": [
+            [
+                "d2ff4c9d.b6a39"
+            ]
+        ]
+    },
+    {
+        "id": "d2ff4c9d.b6a39",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "prompt",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Abbrechen",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 1090,
+        "y": 4860,
+        "wires": [
+            [
+                "7cd38d5e.24fb44",
+                "dba71264.6d7f58"
+            ]
+        ]
+    },
+    {
+        "id": "7cd38d5e.24fb44",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "if (msg.payload == \"OK\")\n{\n    flow.set('soleEnergyTotal',0);\n    return {payload: 0};\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 4860,
+        "wires": [
+            [
+                "cb9e1517.fd49b"
+            ]
+        ]
+    },
+    {
+        "id": "4ac97cc7.32def4",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "if (msg.payload == \"OK\")\n{\n    flow.set('boilerEnergyTotal',0);\n    return {payload: 0};\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1330,
+        "y": 4260,
+        "wires": [
+            [
+                "b8303ad7.da265"
+            ]
+        ]
+    },
+    {
+        "id": "eb44e54c.ed5ce",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "prompt",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Abbrechen",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 1090,
+        "y": 4260,
+        "wires": [
+            [
+                "4ac97cc7.32def4",
+                "aaeee33b.8ea0d8"
+            ]
+        ]
+    },
+    {
+        "id": "96f07c8e.e5d128",
+        "type": "ui_button",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "group": "db26a2fc.0e8fd8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "komplett Reset Boiler",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Gesamt-Energiemessung Boiler wirklich zurücksetzen? (Gesamtzähler) (OK eingeben)",
+        "payloadType": "str",
+        "topic": "",
+        "x": 900,
+        "y": 4260,
+        "wires": [
+            [
+                "eb44e54c.ed5ce"
+            ]
+        ]
+    },
+    {
+        "id": "1543774f.c5e269",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "top right",
+        "displayTime": "10",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 910,
+        "y": 4960,
+        "wires": []
+    },
+    {
+        "id": "dba71264.6d7f58",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "if (msg.payload == 'OK') {\n    return {payload: \"Erfolgreich zurückgesetzt\"};\n}\nelse {\n    return {payload: \"nicht zurückgesetzt.\"};\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 750,
+        "y": 4960,
+        "wires": [
+            [
+                "1543774f.c5e269"
+            ]
+        ]
+    },
+    {
+        "id": "a0706642.8e098",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "if (msg.payload == 'OK') {\n    return {payload: \"Erfolgreich zurückgesetzt\"};\n}\nelse {\n    return {payload: \"nicht zurückgesetzt.\"};\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 790,
+        "y": 4780,
+        "wires": [
+            [
+                "d007a7f8.cb152"
+            ]
+        ]
+    },
+    {
+        "id": "d007a7f8.cb152",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "top right",
+        "displayTime": "10",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 950,
+        "y": 4780,
+        "wires": []
+    },
+    {
+        "id": "aaeee33b.8ea0d8",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "if (msg.payload == 'OK') {\n    return {payload: \"Erfolgreich zurückgesetzt\"};\n}\nelse {\n    return {payload: \"nicht zurückgesetzt.\"};\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 850,
+        "y": 4320,
+        "wires": [
+            [
+                "d89373e8.89067"
+            ]
+        ]
+    },
+    {
+        "id": "d89373e8.89067",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "top right",
+        "displayTime": "10",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 1010,
+        "y": 4320,
+        "wires": []
+    },
+    {
+        "id": "6de49a5.b1e01e4",
+        "type": "function",
+        "z": "32a5fb5f.529444",
+        "name": "",
+        "func": "if (msg.payload == 'OK') {\n    return {payload: \"Erfolgreich zurückgesetzt\"};\n}\nelse {\n    return {payload: \"nicht zurückgesetzt.\"};\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 990,
+        "y": 4200,
+        "wires": [
+            [
+                "fd716813.90d13"
+            ]
+        ]
+    },
+    {
+        "id": "fd716813.90d13",
+        "type": "ui_toast",
+        "z": "32a5fb5f.529444",
+        "position": "top right",
+        "displayTime": "10",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "topic": "",
+        "name": "",
+        "x": 1150,
+        "y": 4200,
+        "wires": []
     },
     {
         "id": "c299c2a9.4f5468",
@@ -3346,6 +6412,83 @@
         "collapse": true
     },
     {
+        "id": "f5956bfd.907b3",
+        "type": "ui_group",
+        "z": "",
+        "name": "Legionellenschaltung",
+        "tab": "d73e5ac9.262bd8",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "cd63ea7b.79475",
+        "type": "ui_group",
+        "z": "",
+        "name": "Daten",
+        "tab": "9a9bbad1.1646c8",
+        "order": 1,
+        "disp": true,
+        "width": "24",
+        "collapse": false
+    },
+    {
+        "id": "51d1642b.1da0d4",
+        "type": "ui_group",
+        "z": "",
+        "name": "Energiemessung Boiler",
+        "tab": "3c423aa7.42f6ee",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "ec5eb937.a49a98",
+        "type": "ui_group",
+        "z": "",
+        "name": "Betriebsmodus ändern",
+        "tab": "d73e5ac9.262bd8",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "b5d7ea8c.bb5888",
+        "type": "ui_group",
+        "z": "",
+        "name": "Energiemessung Sole",
+        "tab": "3c423aa7.42f6ee",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "bcdccd8e.77b9d",
+        "type": "ui_group",
+        "z": "",
+        "name": "Geschwindigkeit Kollektorpumpe",
+        "tab": "d73e5ac9.262bd8",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "db26a2fc.0e8fd8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Energiemessung",
+        "tab": "d73e5ac9.262bd8",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": true
+    },
+    {
         "id": "37366d63.5b6472",
         "type": "ui_tab",
         "z": "",
@@ -3361,7 +6504,7 @@
         "z": "",
         "name": "24h Verlauf",
         "icon": "fa-area-chart",
-        "order": 2,
+        "order": 3,
         "disabled": false,
         "hidden": false
     },
@@ -3370,9 +6513,39 @@
         "type": "ui_tab",
         "z": "",
         "name": "7d Verlauf",
-        "icon": "dashboard",
-        "order": 3,
+        "icon": "fa-area-chart",
+        "order": 4,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "d73e5ac9.262bd8",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Einstellungen",
+        "icon": "fa-cogs",
+        "order": 5,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "9a9bbad1.1646c8",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Schwingverhalten",
+        "icon": "fa-line-chart",
+        "order": 6,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "3c423aa7.42f6ee",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Energiedaten",
+        "icon": "fa-battery-three-quarters",
+        "order": 2,
         "disabled": false,
         "hidden": false
     }
-]]
+]
