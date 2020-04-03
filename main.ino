@@ -47,11 +47,11 @@ const int SOLE_EXIT_TEMPERATURE = 6;              //Temperatur zur Sonde, bei de
 const int SOLE_START_TEMPERATURE = 25;            //Temperatur im Kollektor (Luft), bei der der Solemodus gestartet wird
 const int SOLE_VL_EXIT_TEMPERATURE = 23;          //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
 const int MIN_KOLLEKTOR_LUFT = 50;                //Mindest-Regeltemperatur für den Kollektor-Vorlauf
-const int MAX_KOLLEKTOR_LUFT = 80;                //Maximal-Regeltemperatur für Kollektor Vorlauf
+const int MAX_KOLLEKTOR_LUFT = 75;                //Maximal-Regeltemperatur für Kollektor Vorlauf
 const int SOLL_KOLLEKTOR_LUFT_SOLEMODUS_2 = 50;   //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
 const int BOILER_DIRECT_EXIT_DIFF = -4;           //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
-const int MIN_DIFFERENZ_VL_RL_BOILER = 8;         //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
-const int MIN_DIFFERENZ_VL_RL_SOLE = 5;           //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
+const int MIN_DIFFERENZ_VL_RL_BOILER = 10;        //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
+const int MIN_DIFFERENZ_VL_RL_SOLE = 10;          //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
 const int MIN_WAERMER_KOLLEKTOR_VL_BOILER = 4;    //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
 const int MIN_WAERMER_KOLLEKTOR_LUFT_BOILER = 10; //mindest Temperaturunterschied zwischen Boiler und Kollektor LUFT, bei dem der Boilermodus gestartet wird
 
@@ -78,10 +78,9 @@ bool lastStateFlowMeterBoiler = LOW; //Lester Status des Flow Meter Boiler
 bool lastStateFlowMeterSole = LOW;   //Lester Status des Flow Meter Boiler
 
 //PID Variabeln
-double PIDInputKollektorPumpe = 0;         //PID Input
-double PIDOutputKollektorPumpe = 0;        //PID Output
-double PIDSetpointKollektorPumpe = 50;     //PID Setpoint
-double lastPIDSetpointKollektorPumpe = 50; //letzter PID Setpoint
+double PIDInputKollektorPumpe = 0;     //PID Input
+double PIDOutputKollektorPumpe = 0;    //PID Output
+double PIDSetpointKollektorPumpe = 50; //PID Setpoint
 
 // ====================================
 // 3. PIN-Adressen und BUS-Adressierung
@@ -183,14 +182,6 @@ void sendMQTT(String subtopic, int value)
   mqttClient.endMessage();
 }
 
-// //Sendet eine MQTT-Message mit dem Thema <subtopic> und dem String <value>
-// void sendMQTT(String subtopic, const char value[])
-// {
-//   mqttClient.beginMessage(topic + subtopic);
-//   mqttClient.print(value);
-//   mqttClient.endMessage();
-// }
-
 //Sendet eine MQTT-Message mit dem Thema <subtopic> und dem String <value>
 void sendMQTT(String subtopic, String value)
 {
@@ -202,13 +193,59 @@ void sendMQTT(String subtopic, String value)
   mqttClient.endMessage();
 }
 
+//Sendet alle Daten an Dashboard
+void sendMQTTAll()
+{
+  //Fuehlerwerte an MQTT Senden
+  sendMQTT("fuehlerKollektorVL", fuehlerKollektorVL.getMeanTemperature());
+  sendMQTT("fuehlerKollektorLuft", fuehlerKollektorLuft.getMeanTemperature());
+  sendMQTT("fuehlerBoiler/1", fuehlerBoiler1.getMeanTemperature());
+  sendMQTT("fuehlerBoiler/2", fuehlerBoiler2.getMeanTemperature());
+  sendMQTT("fuehlerBoiler/3", fuehlerBoiler3.getMeanTemperature());
+  sendMQTT("fuehlerBoilerVL", fuehlerBoilerVL.getMeanTemperature());
+  sendMQTT("fuehlerSoleVL", fuehlerSoleVL.getMeanTemperature());
+  sendMQTT("fuehlerBoilerRL", fuehlerBoilerRL.getMeanTemperature());
+  sendMQTT("fuehlerSoleRL", fuehlerSoleRL.getMeanTemperature());
+  sendMQTT("fuehlerSole", fuehlerSole.getMeanTemperature());
+
+  //Speed der Kollektorpumpe an Dashboard senden
+  if (!soleAlarm && !kollektorAlarm)
+  {
+    sendMQTT("speedKollektorPumpe", (int)round(PIDOutputKollektorPumpe));
+  }
+
+  //Informationen an Dashboard
+  sendMQTT("kollektorPumpe", digitalRead(RELAIS_KOLLEKTOR_PUMPE));         //Info an Dashboard: Kollektorpumpe
+  sendMQTT("solePumpe", digitalRead(RELAIS_SOLE_PUMPE));                   // Info an Dashboard, Solepumpe
+  sendMQTT("stellwerkSoleBoiler", digitalRead(STELLWERK_SOLE_BOILER) + 1); //Info an Dashboard, Stellwerk
+  sendMQTT("operationMode", operationMode);                                //Info an Dashboard, Modus
+}
+
+//Alle Fühler auslesen
+void fuehlerCalculateAll()
+{
+  //Alle Fühler auslesen
+  fuehlerKollektorVL.calculateTemperature();
+  fuehlerKollektorLuft.calculateTemperature();
+  fuehlerBoiler1.calculateTemperature();
+  fuehlerBoiler2.calculateTemperature();
+  fuehlerBoiler3.calculateTemperature();
+  fuehlerBoilerVL.calculateTemperature();
+  fuehlerSoleVL.calculateTemperature();
+  fuehlerBoilerRL.calculateTemperature();
+  fuehlerSoleRL.calculateTemperature();
+  fuehlerSole.calculateTemperature();
+}
+
 // Gibt Soll Vorlauftemperatur am Kollektor zurücksetzen
 void calculateTargetTemperature()
 {
   if (operationMode) //läuft die Anlage?
   {
-    //Different zwischen Kollektor Luft und VL bestimmen
+    //Differenz zwischen Kollektor Luft und VL bestimmen
     float differenzLuftVL = fuehlerKollektorVL.getMeanTemperature() - fuehlerKollektorLuft.getMeanTemperature();
+    double newPIDSetpointKollektorPumpe = PIDSetpointKollektorPumpe;  //neuer PID Setpoint
+    double lastPIDSetpointKollektorPumpe = PIDSetpointKollektorPumpe; //letzter PID Setpoint
     if (differenzLuftVL > 5)
     {
       differenzLuftVL = 5;
@@ -224,41 +261,48 @@ void calculateTargetTemperature()
       {
         if (fuehlerBoilerVL.getMeanTemperature() - fuehlerBoilerRL.getMeanTemperature() < MIN_DIFFERENZ_VL_RL_BOILER + 2) //VL und RL nähern sich zu stark an
         {
-          PIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 7 - differenzLuftVL); //Solltemperatur für Boilermodus
+          newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 7 - differenzLuftVL); //Solltemperatur für Boilermodus
         }
         else if (fuehlerBoilerVL.getMeanTemperature() - fuehlerBoilerRL.getMeanTemperature() > MIN_DIFFERENZ_VL_RL_BOILER + 5) //VL und RL sind weit voneinander entfernt
         {
-          PIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 2 - differenzLuftVL); //Solltemperatur für Boilermodus
+          newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 2 - differenzLuftVL); //Solltemperatur für Boilermodus
         }
         else if (PIDSetpointKollektorPumpe < fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 2 - differenzLuftVL)
         {
-          PIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 2 - differenzLuftVL); //Solltemperatur für Boilermodus
+          newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 2 - differenzLuftVL); //Solltemperatur für Boilermodus
         }
       }
       else //nicht am Initialisieren im Boilermodus
       {
-        PIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 2 - differenzLuftVL); //Solltemperatur für Boilermodus
+        newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 2 - differenzLuftVL); //Solltemperatur für Boilermodus
       }
     }
-
     else //Solemodus?
     {
-      PIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 2 - differenzLuftVL); //Solltemperatur für Solemodus
+      newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 2 - differenzLuftVL); //Solltemperatur für Solemodus
     }
 
-    if (PIDSetpointKollektorPumpe < 50)
+    if (newPIDSetpointKollektorPumpe > PIDSetpointKollektorPumpe)
     {
-      PIDSetpointKollektorPumpe = 50;
+      PIDSetpointKollektorPumpe = newPIDSetpointKollektorPumpe;
     }
-    else if (PIDSetpointKollektorPumpe > 80)
+    else if (newPIDSetpointKollektorPumpe < PIDSetpointKollektorPumpe - 5)
     {
-      PIDSetpointKollektorPumpe = 80;
+      PIDSetpointKollektorPumpe = newPIDSetpointKollektorPumpe;
+    }
+
+    if (PIDSetpointKollektorPumpe < MIN_KOLLEKTOR_LUFT)
+    {
+      PIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT;
+    }
+    else if (PIDSetpointKollektorPumpe > MAX_KOLLEKTOR_LUFT)
+    {
+      PIDSetpointKollektorPumpe = MAX_KOLLEKTOR_LUFT;
     }
 
     //Solltemperatur verändert?
     if (PIDSetpointKollektorPumpe != lastPIDSetpointKollektorPumpe)
     {
-      lastPIDSetpointKollektorPumpe = PIDSetpointKollektorPumpe;
       Serial.print("Neue Regel-Solltemperatur: ");
       Serial.println(PIDSetpointKollektorPumpe, 1);
       sendMQTT("message", (String) "Neue Regel-Solltemperatur: " + ceil(PIDSetpointKollektorPumpe));
@@ -339,6 +383,18 @@ void setup()
     ; // warten, bis die Serielle Schnittstelle sich verbindet
   }
   Serial.println("Setup gestartet");
+
+  // Setup der PINS
+  // Input
+  pinMode(FLOW_METER_BOILER, INPUT);
+  pinMode(FLOW_METER_SOLE, INPUT);
+
+  // Output
+  pinMode(RELAIS_SOLE_PUMPE, OUTPUT);
+  pinMode(RELAIS_KOLLEKTOR_PUMPE, OUTPUT);
+  pinMode(STELLWERK_SOLE_BOILER, OUTPUT);
+  pinMode(STELLWERK_BOILER_TEMP, OUTPUT);
+  pinMode(PWM_KOLLEKTOR_PUMPE, OUTPUT);
 
   //PID Setup
   PIDReglerKollektorPumpe.SetOutputLimits(PID_KOLLEKTOR_MIN_SPEED, 255);
@@ -508,16 +564,7 @@ void loop()
   if (timer1s.checkTimer(now))
   {
     //Alle Fühler auslesen
-    fuehlerKollektorVL.calculateTemperature();
-    fuehlerKollektorLuft.calculateTemperature();
-    fuehlerBoiler1.calculateTemperature();
-    fuehlerBoiler2.calculateTemperature();
-    fuehlerBoiler3.calculateTemperature();
-    fuehlerBoilerVL.calculateTemperature();
-    fuehlerSoleVL.calculateTemperature();
-    fuehlerBoilerRL.calculateTemperature();
-    fuehlerSoleRL.calculateTemperature();
-    fuehlerSole.calculateTemperature();
+    fuehlerCalculateAll();
 
     PIDInputKollektorPumpe = fuehlerKollektorLuft.getMeanTemperature(); //Kollektor Vorlauftemperatur in PID schreiben
 
@@ -553,11 +600,11 @@ void loop()
     {
       sendMQTT("alarm", "Alarm. Die Soletemperatur ist zu hoch."); //Alarmnachricht an Dashboard
       digitalWrite(RELAIS_SOLE_PUMPE, LOW);                        //Solepumpe ausschalten
-      sendMQTT("solePumpe", 0);                                    //Solepumpen-Status an Dashboard
+      digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH);                  //Kollektorpumpe einschalten
       digitalWrite(STELLWERK_SOLE_BOILER, LOW);                    //Wärme über Wärmetauscher abkühlen
       analogWrite(PWM_KOLLEKTOR_PUMPE, 255);                       //Kollektorpumpe auf 100%
-      sendMQTT("speedKollektorPumpe", 255);                        //Info an Dashboard, Kollektorpumpe bei 100%
-      sendMQTT("stellwerkSoleBoiler", 1);                          //Info an Dashboard, Stellwerk zeigt auf Boiler
+      sendMQTT("speedKollektorPumpe", 255);                        //Speed der Kollektorpumpe an Dashboard senden
+      operationMode = 4;                                           //Betriebsmodus Sole-Alarm
     }
 
     //Kollektor Alarm?
@@ -566,16 +613,15 @@ void loop()
       sendMQTT("alarm", "Alarm. Die Kollektortemperatur ist zu hoch.");
       digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH); //Kollektorpumpe einschalten
       analogWrite(PWM_KOLLEKTOR_PUMPE, 255);      //Kollektorpumpe auf 100%
-      sendMQTT("speedKollektorPumpe", 255);       //Info an Dashboard, Kollektorpumpe bei 100%
-      sendMQTT("kollektorPumpe", 1);              //Kollektorpumpe-Status an Dashboard
+      sendMQTT("speedKollektorPumpe", 255);       //Speed der Kollektorpumpe an Dashboard senden
       digitalWrite(STELLWERK_SOLE_BOILER, HIGH);  //Wärme in Boiler leiten
-      sendMQTT("stellwerkSoleBoiler", 2);         //Info an Dashboard, Stellwerk zeigt auf Boiler
+      operationMode = 5;                          //Betriebsmodus Kollektor-Alarm
     }
 
     while (soleAlarm || kollektorAlarm)
     {
-      //Sole Temperatur abfragen und prüfen, ob ausreichend abgekühlt
-      fuehlerSole.calculateTemperature();
+      //Alle Temperaturen auslesen
+      fuehlerCalculateAll();
       if (fuehlerSole.getLastTemperature() < ALARMTEMPERATUR_SOLE - MIN_DIFFERENZ_NACH_ALARM && soleAlarm)
       {
         soleAlarm = false;
@@ -583,16 +629,20 @@ void loop()
         soleModusStart();                                                  //Nach Alarm in Boilermodus starten
       }
 
-      //Kollektor VL und Luft Temperatur abfragen und prüfen, ob ausreichend abgekühlt
-      fuehlerKollektorLuft.calculateTemperature();
-      fuehlerKollektorVL.calculateTemperature();
+      //Kollektor VL und Luft prüfen, ob ausreichend abgekühlt
       if (fuehlerKollektorVL.getLastTemperature() < ALARMTEMPERATUR_KOLLEKTOR_VL - MIN_DIFFERENZ_NACH_ALARM && fuehlerKollektorLuft.getLastTemperature() < ALARMTEMPERATUR_KOLLEKTOR_LUFT - MIN_DIFFERENZ_NACH_ALARM && kollektorAlarm)
       {
         kollektorAlarm = false;
         sendMQTT("message", "Die Kollektortemperatue ist nicht mehr zu hoch."); //Dashboard Nachricht: Alarm beendet
         boilerModusStart();                                                     //Nach Alarm in Boilermodus starten
       }
-      delay(500);
+
+      //Fuehlerwerte an MQTT Senden
+      sendMQTTAll();
+
+      //Dashbord sagen, dass online
+      sendMQTT("alive", 1);
+      delay(5000);
     }
 
     //Prüfen, ob Initialisierung abgeschlossen ist
@@ -746,26 +796,8 @@ void loop()
 
   if (MQTTSendTimer.checkTimer(now)) //Daten an Dashboard senden
   {
-    //Fuehlerwerte an MQTT Senden
-    sendMQTT("fuehlerKollektorVL", fuehlerKollektorVL.getMeanTemperature());
-    sendMQTT("fuehlerKollektorLuft", fuehlerKollektorLuft.getMeanTemperature());
-    sendMQTT("fuehlerBoiler/1", fuehlerBoiler1.getMeanTemperature());
-    sendMQTT("fuehlerBoiler/2", fuehlerBoiler2.getMeanTemperature());
-    sendMQTT("fuehlerBoiler/3", fuehlerBoiler3.getMeanTemperature());
-    sendMQTT("fuehlerBoilerVL", fuehlerBoilerVL.getMeanTemperature());
-    sendMQTT("fuehlerSoleVL", fuehlerSoleVL.getMeanTemperature());
-    sendMQTT("fuehlerBoilerRL", fuehlerBoilerRL.getMeanTemperature());
-    sendMQTT("fuehlerSoleRL", fuehlerSoleRL.getMeanTemperature());
-    sendMQTT("fuehlerSole", fuehlerSole.getMeanTemperature());
-
-    //Speed der Kollektorpumpe an Dashboard senden
-    sendMQTT("speedKollektorPumpe", (int)round(PIDOutputKollektorPumpe));
-
-    //Informationen an Dashboard
-    sendMQTT("kollektorPumpe", digitalRead(RELAIS_KOLLEKTOR_PUMPE));         //Info an Dashboard: Kollektorpumpe
-    sendMQTT("solePumpe", digitalRead(RELAIS_SOLE_PUMPE));                   // Info an Dashboard, Solepumpe
-    sendMQTT("stellwerkSoleBoiler", digitalRead(STELLWERK_SOLE_BOILER) + 1); //Info an Dashboard, Stellwerk
-    sendMQTT("operationMode", operationMode);                                //Info an Dashboard, Modus
+    //Alle Daten an MQTT übermitteln
+    sendMQTTAll();
 
     MQTTSendTimer.executed();
   }
