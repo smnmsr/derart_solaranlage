@@ -40,14 +40,15 @@ const float FUEHLER_SOLE_KORREKTURFAKTOR = 1.0;           //Korrekturfaktor S7
 //Temperaturen
 const int ALARMTEMPERATUR_KOLLEKTOR_LUFT = 90;    //Alarmtemperatur für Kollektor (Lufttemperatur)
 const int ALARMTEMPERATUR_KOLLEKTOR_VL = 95;      //Alarmtemperatur für Kollektor (Vorlauftemperatur)
-const int ALARMTEMPERATUR_SOLE = 30;              //Alarmtemperatur für Sole-Pumpe
-const int ACHTUNG_TEMPERATUR_SOLE = 20;           //Alarmtemperatur für Sole-Pumpe
+const int ALARMTEMPERATUR_SOLE = 45;              //Alarmtemperatur für Sole-Pumpe
+const int ACHTUNG_TEMPERATUR_SOLE = 25;           //Alarmtemperatur für Sole-Pumpe
 const int MIN_DIFFERENZ_NACH_ALARM = 3;           //erst wenn die Temperatur um diesen Wert gesunken ist, geht der Alarmmodus aus
 const int SOLE_EXIT_TEMPERATURE = 6;              //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
 const int SOLE_START_TEMPERATURE = 25;            //Temperatur im Kollektor (Luft), bei der der Solemodus gestartet wird
 const int SOLE_VL_EXIT_TEMPERATURE = 23;          //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
 const int MIN_KOLLEKTOR_LUFT = 50;                //Mindest-Regeltemperatur für den Kollektor-Vorlauf
-const int MAX_KOLLEKTOR_LUFT = 75;                //Maximal-Regeltemperatur für Kollektor Vorlauf
+const int MAX_KOLLEKTOR_LUFT_BOILERMODUS = 75;    //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
+const int MAX_KOLLEKTOR_LUFT_SOLEMODUS = 70;      //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
 const int SOLL_KOLLEKTOR_LUFT_SOLEMODUS_2 = 50;   //Solltemperatzr, auf die der Kollektor VL geregelt werden soll, wenn Solemodus
 const int BOILER_DIRECT_EXIT_DIFF = -4;           //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
 const int MIN_DIFFERENZ_VL_RL_BOILER = 10;        //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
@@ -295,9 +296,14 @@ void calculateTargetTemperature()
     {
       PIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT;
     }
-    else if (PIDSetpointKollektorPumpe > MAX_KOLLEKTOR_LUFT)
+    else if (PIDSetpointKollektorPumpe > MAX_KOLLEKTOR_LUFT_SOLEMODUS)
     {
-      PIDSetpointKollektorPumpe = MAX_KOLLEKTOR_LUFT;
+      if (digitalRead(STELLWERK_SOLE_BOILER) && PIDSetpointKollektorPumpe > MAX_KOLLEKTOR_LUFT_BOILERMODUS) //Boilermodus?
+      {
+        PIDSetpointKollektorPumpe = MAX_KOLLEKTOR_LUFT_BOILERMODUS;
+      } else if (!digitalRead(STELLWERK_SOLE_BOILER)){
+        PIDSetpointKollektorPumpe = MAX_KOLLEKTOR_LUFT_SOLEMODUS;
+      }
     }
 
     //Solltemperatur verändert?
@@ -805,9 +811,9 @@ void loop()
   if (timer1m.checkTimer(now))
   {
     //Energieberechnung Sole Volumen, dass umgesetzt wird, bei gegebener Pumpenleistung. Berechnung erfolgt online
-    if (operationMode == 1)
+    if (operationMode && !(digitalRead(STELLWERK_SOLE_BOILER)))
     {
-      sendMQTT("flowMeterSole", (float)((-3.4015 * pow(10, -7)) * pow(PIDOutputKollektorPumpe, 3) + (2.0240 * pow(10, -4)) * pow(PIDOutputKollektorPumpe, 2) - 0.0095 * PIDOutputKollektorPumpe + 0.1153));
+      sendMQTT("flowMeterSole", (float)(1.467 * pow(10,14) * exp(-(pow((PIDOutputKollektorPumpe - 1352)/193.7,2))) + 4.173 * exp(-(pow((PIDOutputKollektorPumpe - 205)/90.28,2)))));
     }
 
     //Prüfen ob MQTT noch verbunden ist, allenfalls neu-verbinden
