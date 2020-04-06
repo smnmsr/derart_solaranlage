@@ -12,7 +12,6 @@
 // ============================================
 // 1. HEADER-Dateien, Definitionen und Libaries
 // ============================================
-#include "Wire.h"                   //Für I2C Bus
 #include "PID_v1.h"                 //Für PID-Regelung
 #include "Adafruit_LiquidCrystal.h" //Für Displays
 #include "Classes.h"                //Eigene Klassen
@@ -163,9 +162,38 @@ String topic = "derart/";                      //Standard MQTT-Topic
 String recievedTopic;                          //Empfangenes Thema
 char recievedPayload;                          //Empfangenes Zeichen
 
+//Ethernet Client Setup
+EthernetClient httpClient;
+
 // =============
 // 5. FUNKTIONEN
 // =============
+
+//Sendet eine SMS
+void sendSMS(String message, String reciever = "0041795085611", String from = "Solaranlage")
+{
+  message.replace(" ", "%20");
+  String data = "GET /API/httpsms.php?konto=3406&password=6e0624828ac4179bb25164ebfbea9024&service=7228&text=";
+  data += message;
+  data += "&from=";
+  data += from;
+  data += "&to=";
+  data += reciever;
+  data += " HTTP/1.0";
+  Serial.println("SMS wurde versendet");
+  if (httpClient.connect("www.lox24.eu", 80))
+  {
+    httpClient.println(data);
+    httpClient.println("Host: www.lox24.eu");
+    httpClient.println("Connection: close");
+    httpClient.println();
+    httpClient.stop();
+  }
+  else
+  {
+    Serial.println("Senden Fehlgeschlagen");
+  }
+}
 
 //Sendet eine MQTT-Message mit dem Thema <subtopic> und dem Fliesskommazahl-Wert <value>
 void sendMQTT(String subtopic, float value)
@@ -301,7 +329,13 @@ void calculateTargetTemperature()
       if (digitalRead(STELLWERK_SOLE_BOILER) && PIDSetpointKollektorPumpe > MAX_KOLLEKTOR_LUFT_BOILERMODUS) //Boilermodus?
       {
         PIDSetpointKollektorPumpe = MAX_KOLLEKTOR_LUFT_BOILERMODUS;
-      } else if (!digitalRead(STELLWERK_SOLE_BOILER)){
+      }
+      else if (!digitalRead(STELLWERK_SOLE_BOILER)) //Solemodus?
+      {
+        if (fuehlerSole.getMeanTemperature() > ACHTUNG_TEMPERATUR_SOLE)
+        {
+          PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_LUFT_SOLEMODUS_2;
+        }
         PIDSetpointKollektorPumpe = MAX_KOLLEKTOR_LUFT_SOLEMODUS;
       }
     }
@@ -329,6 +363,10 @@ void boilerModusStart()
   operationMode = 2;                                //Modus auf Boiler schalten
   tooLowValue = false;                              //tooLowValue zurücksetzen
   MQTTSendTimer.setDelayTime(5, 's');
+  if (!digitalRead(RELAIS_KOLLEKTOR_PUMPE))
+  {
+    sendSMS("Beim einschalten des Boilermodus ist ein Fehler aufgetreten"); //Alarmnachricht per SMS"
+  }
 }
 
 //Startet den Solemodus
@@ -352,6 +390,10 @@ void soleModusStart()
   operationMode = 1;                            //Modus auf Sole schalten
   tooLowValue = false;                          //tooLowValue zurücksetzen
   MQTTSendTimer.setDelayTime(5, 's');
+  if (!(digitalRead(RELAIS_KOLLEKTOR_PUMPE) && digitalRead(RELAIS_SOLE_PUMPE)))
+  {
+    sendSMS("Beim einschalten des Solemodus ist ein Fehler aufgetreten"); //Alarmnachricht per SMS"
+  }
 }
 
 //Schaltet die Anlage aus
@@ -375,6 +417,7 @@ void subscribeToMQTTTopics()
   mqttClient.subscribe("derart/toArduino/LegionellenModus");
   mqttClient.subscribe("derart/toArduino/Betriebsmodus");
   mqttClient.subscribe("derart/toArduino/SpeedKollektorpumpe");
+  mqttClient.subscribe("derart/toArduino/severalFunctions");
 }
 
 // ================
@@ -498,6 +541,7 @@ void loop()
       {
         turnOffModusStart();
         sendMQTT("message", "Anlage von Hand ausgeschaltet. Nach Initialisierung wieder Automatikbetrieb.");
+        sendSMS("0041797164443", "ein anderer Test");
       }
       else if (recievedPayload == '1')
       {
@@ -605,23 +649,33 @@ void loop()
     if (soleAlarm)
     {
       sendMQTT("alarm", "Alarm. Die Soletemperatur ist zu hoch."); //Alarmnachricht an Dashboard
+      sendSMS("Alarm. Die Soletemperatur ist zu hoch.");           //Alarmnachricht per SMS"
       digitalWrite(RELAIS_SOLE_PUMPE, LOW);                        //Solepumpe ausschalten
       digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH);                  //Kollektorpumpe einschalten
       digitalWrite(STELLWERK_SOLE_BOILER, LOW);                    //Wärme über Wärmetauscher abkühlen
       analogWrite(PWM_KOLLEKTOR_PUMPE, 255);                       //Kollektorpumpe auf 100%
       sendMQTT("speedKollektorPumpe", 255);                        //Speed der Kollektorpumpe an Dashboard senden
       operationMode = 4;                                           //Betriebsmodus Sole-Alarm
+      if (!digitalRead(RELAIS_KOLLEKTOR_PUMPE))
+      {
+        sendSMS("Achtung: wir sind im Alarmmodus, aber die Kollektorpumpe laeuft nicht"); //Alarmnachricht per SMS"
+      }
     }
 
     //Kollektor Alarm?
     if (kollektorAlarm)
     {
       sendMQTT("alarm", "Alarm. Die Kollektortemperatur ist zu hoch.");
-      digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH); //Kollektorpumpe einschalten
-      analogWrite(PWM_KOLLEKTOR_PUMPE, 255);      //Kollektorpumpe auf 100%
-      sendMQTT("speedKollektorPumpe", 255);       //Speed der Kollektorpumpe an Dashboard senden
-      digitalWrite(STELLWERK_SOLE_BOILER, HIGH);  //Wärme in Boiler leiten
-      operationMode = 5;                          //Betriebsmodus Kollektor-Alarm
+      sendSMS("Alarm. Die Kollektortemperatur ist zu hoch."); //Alarmnachricht per SMS"
+      digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH);             //Kollektorpumpe einschalten
+      analogWrite(PWM_KOLLEKTOR_PUMPE, 255);                  //Kollektorpumpe auf 100%
+      sendMQTT("speedKollektorPumpe", 255);                   //Speed der Kollektorpumpe an Dashboard senden
+      digitalWrite(STELLWERK_SOLE_BOILER, HIGH);              //Wärme in Boiler leiten
+      operationMode = 5;                                      //Betriebsmodus Kollektor-Alarm
+      if (!digitalRead(RELAIS_KOLLEKTOR_PUMPE))
+      {
+        sendSMS("Achtung: wir sind im Alarmmodus, aber die Kollektorpumpe laeuft nicht"); //Alarmnachricht per SMS"
+      }
     }
 
     while (soleAlarm || kollektorAlarm)
@@ -733,16 +787,6 @@ void loop()
           }
         }
       }
-
-      //Temperatur herunterregeln, wenn SOLE VL zu warm wird
-      if (fuehlerSole.getMeanTemperature() > ACHTUNG_TEMPERATUR_SOLE)
-      {
-        PIDSetpointKollektorPumpe = SOLL_KOLLEKTOR_LUFT_SOLEMODUS_2;
-      }
-      else if (PIDSetpointKollektorPumpe == SOLL_KOLLEKTOR_LUFT_SOLEMODUS_2)
-      {
-        calculateTargetTemperature();
-      }
     }
     break;
     case 2: //Im Modus Boiler?
@@ -813,7 +857,7 @@ void loop()
     //Energieberechnung Sole Volumen, dass umgesetzt wird, bei gegebener Pumpenleistung. Berechnung erfolgt online
     if (operationMode && !(digitalRead(STELLWERK_SOLE_BOILER)))
     {
-      sendMQTT("flowMeterSole", (float)(1.467 * pow(10,14) * exp(-(pow((PIDOutputKollektorPumpe - 1352)/193.7,2))) + 4.173 * exp(-(pow((PIDOutputKollektorPumpe - 205)/90.28,2)))));
+      sendMQTT("flowMeterSole", (float)(1.467 * pow(10, 14) * exp(-(pow((PIDOutputKollektorPumpe - 1352) / 193.7, 2))) + 4.173 * exp(-(pow((PIDOutputKollektorPumpe - 205) / 90.28, 2)))));
     }
 
     //Prüfen ob MQTT noch verbunden ist, allenfalls neu-verbinden
