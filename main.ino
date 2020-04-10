@@ -55,7 +55,7 @@ const int MIN_WAERMER_KOLLEKTOR_LUFT_BOILER = 10; //mindest Temperaturunterschie
 
 //PID Tuning Parameter
 const double PID_P_KOLLEKTOR = 5;         //Verstärkung des Proportionalen Anteils des PID-Reglers der Kollektorpumpe
-const double PID_I_KOLLEKTOR = 0.01;      //Verstärkung des Integralen Anteils des PID-Reglers der Kollektorpumpe
+const double PID_I_KOLLEKTOR = 0.02;      //Verstärkung des Integralen Anteils des PID-Reglers der Kollektorpumpe
 const double PID_D_KOLLEKTOR = 0;         //Verstärkung des differentialen Anteils des PID-Reglers der Kollektorpumpe
 const byte PID_KOLLEKTOR_MIN_SPEED = 70;  //Minimale Kollektorpumpen-Geschwindigkeit
 const byte PID_KOLLEKTOR_MAX_SPEED = 255; //Maximale Kollektorpumpen-Geschwindigkeit
