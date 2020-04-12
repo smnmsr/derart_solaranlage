@@ -5,9 +5,6 @@
 AnalogSensor::AnalogSensor(byte pin)
 {
   _pin = pin;                                      //Pin, an dem Sensor angeschlossen ist
-  _boardVoltage = 5;                               //Spannung des Boards
-  _analogResolution = 1024;                        //Auflösung des Analogen Eingangs
-  _analogStep = _boardVoltage / _analogResolution; //Spannung pro Step am Analogen Eingang
 }
 
 //Setzt den Pin bei einem AnalogSensor Objekt
@@ -18,12 +15,9 @@ void AnalogSensor::setPin(byte pin)
 
 //____________________________________________
 //Konstruktr der AnalogSensor Subklasse PT1000
-PT1000::PT1000(byte pin, int rVor = 1000, float correctionFactor = 1.0) : AnalogSensor(pin)
+PT1000::PT1000(byte pin, int rVor = 1000) : AnalogSensor(pin)
 {
   _rVor = rVor;                         //Vorwiderstand (Spannungsteiler)
-  _correctionFactor = correctionFactor; //Korrekturfaktor
-  _A = 0.00390802;                      //Konstante für PT1000 Berechnung
-  _B = -0.0000005802;                   //Konstante für PT1000 Berechnung
   _RN = 1000;                           //Normwiderstand des PT1000 bei 0 °C
   for (size_t i = 0; i < 10; i++)
   {
@@ -39,12 +33,6 @@ void PT1000::setRVor(int rVor)
   _rVor = rVor;
 }
 
-//Setzt einen Korrekturfaktor bei einem PT1000 Objekt
-void PT1000::setCorrectionFactor(float correctionFactor)
-{
-  _correctionFactor = correctionFactor;
-}
-
 //Berechnet die Temperatur, die der PT1000 misst
 void PT1000::calculateTemperature()
 {
@@ -55,7 +43,6 @@ void PT1000::calculateTemperature()
     _temperatures[9 - i] = _temperatures[8 - i];
   }
   _temperatures[0] = (-(_A * _RN) + sqrt(pow(_A * _RN, 2) - 4 * _B * _RN * (_RN - _r))) / (2 * _B * _RN); //Berechnet aus _R die Temperatur
-  _temperatures[0] *= _correctionFactor;
 }
 
 //Berechnet Temperatur und diese zurück
@@ -75,37 +62,6 @@ float PT1000::getMeanTemperature()
   {
     return _temperatures[0];
   }
-}
-
-//____________________________________________
-//Konstruktor der Potentiometer Klasse
-Potentiometer::Potentiometer(byte pin, int lowerLimit, int upperLimit, bool reverse) : AnalogSensor(pin)
-{
-  _lowerLimit = lowerLimit; //erst wenn dieses Limit überschritten wird, steigt der Wert
-  _upperLimit = upperLimit; //erst wenn dieses Limit unterschritten wird, sinkt der Wert
-  _val = 0;
-  _reverse = reverse;
-}
-
-//Liest Analog Eingang und gibt Potentiometer-Wert in  % zurück
-float Potentiometer::getValue()
-{
-  _val = ((analogRead(_pin) * _analogStep) / _boardVoltage) * 100; //Wert am Analogeingang in % der Bordspannung
-  _val -= _lowerLimit;
-  _val /= (_upperLimit - _lowerLimit) * 100;
-  if (_val < 0)
-  {
-    _val = 0;
-  }
-  else if (_val > 100)
-  {
-    _val = 100;
-  }
-  if (_reverse)
-  {
-    _val = -1 * (_val - 100);
-  }
-  return _val;
 }
 
 //____________________________________________

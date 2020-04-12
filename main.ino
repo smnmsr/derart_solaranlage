@@ -24,34 +24,21 @@
 // 2. Variabeln und Konstanten
 // ===========================
 // Konstanten
-//Korrekturfaktoren
-const float FUEHLER_KOLLEKTOR_VL_KORREKTURFAKTOR = 1.0;   //Korrekturfaktor S0
-const float FUEHLER_KOLLEKTOR_LUFT_KORREKTURFAKTOR = 1.0; //Korrekturfaktor S1
-const float FUEHLER_BOILER_1_KORREKTURFAKTOR = 1.0;       //Korrekturfaktor S2 oben
-const float FUEHLER_BOILER_2_KORREKTURFAKTOR = 1.0;       //Korrekturfaktor S2 mitte
-const float FUEHLER_BOILER_3_KORREKTURFAKTOR = 1.0;       //Korrekturfaktor S2 unten
-const float FUEHLER_BOILER_VL_KORREKTURFAKTOR = 1.0;      //Korrekturfaktor S4B
-const float FUEHLER_SOLE_VL_KORREKTURFAKTOR = 1.0;        //Korrekturfaktor S4S
-const float FUEHLER_BOILER_RL_KORREKTURFAKTOR = 1.0;      //Korrekturfaktor S6B
-const float FUEHLER_SOLE_RL_KORREKTURFAKTOR = 1.0;        //Korrekturfaktor S6S
-const float FUEHLER_SOLE_KORREKTURFAKTOR = 1.0;           //Korrekturfaktor S7
-
 //Temperaturen
-const int ALARMTEMPERATUR_KOLLEKTOR_LUFT = 90;    //Alarmtemperatur für Kollektor (Lufttemperatur)
-const int ALARMTEMPERATUR_KOLLEKTOR_VL = 95;      //Alarmtemperatur für Kollektor (Vorlauftemperatur)
-const int ALARMTEMPERATUR_SOLE = 45;              //Alarmtemperatur für Sole-Pumpe
-const int MIN_DIFFERENZ_NACH_ALARM = 3;           //erst wenn die Temperatur um diesen Wert gesunken ist, geht der Alarmmodus aus
-const int SOLE_EXIT_TEMPERATURE = 6;              //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
-const int SOLE_START_TEMPERATURE = 25;            //Temperatur im Kollektor (Luft), bei der der Solemodus gestartet wird
-const int SOLE_VL_EXIT_TEMPERATURE = 23;          //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
-const int MIN_KOLLEKTOR_LUFT = 45;                //Mindest-Regeltemperatur für den Kollektor-Vorlauf
-const int MAX_KOLLEKTOR_LUFT_BOILERMODUS = 77;    //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
-const int MAX_KOLLEKTOR_LUFT_SOLEMODUS = 70;      //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
-const int BOILER_DIRECT_EXIT_DIFF = -8;           //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
-const int MIN_DIFFERENZ_VL_RL_BOILER = 10;        //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
-const int MIN_DIFFERENZ_VL_RL_SOLE = 10;          //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
-const int MIN_WAERMER_KOLLEKTOR_VL_BOILER = 4;    //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
-const int MIN_WAERMER_KOLLEKTOR_LUFT_BOILER = 10; //mindest Temperaturunterschied zwischen Boiler und Kollektor LUFT, bei dem der Boilermodus gestartet wird
+const byte ALARMTEMPERATUR_KOLLEKTOR_LUFT = 90;    //Alarmtemperatur für Kollektor (Lufttemperatur)
+const byte ALARMTEMPERATUR_KOLLEKTOR_VL = 95;      //Alarmtemperatur für Kollektor (Vorlauftemperatur)
+const byte ALARMTEMPERATUR_SOLE = 45;              //Alarmtemperatur für Sole-Pumpe
+const byte MIN_DIFFERENZ_NACH_ALARM = 3;           //erst wenn die Temperatur um diesen Wert gesunken ist, geht der Alarmmodus aus
+const byte SOLE_EXIT_TEMPERATURE = 6;              //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
+const byte SOLE_START_TEMPERATURE = 25;            //Temperatur im Kollektor (Luft), bei der der Solemodus gestartet wird
+const byte SOLE_VL_EXIT_TEMPERATURE = 23;          //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
+const byte MIN_KOLLEKTOR_LUFT = 40;                //Mindest-Regeltemperatur für den Kollektor-Vorlauf
+const byte MAX_KOLLEKTOR_LUFT_BOILERMODUS = 77;    //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
+const byte MAX_KOLLEKTOR_LUFT_SOLEMODUS = 70;      //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
+const byte BOILER_DIRECT_EXIT_DIFF = 8;           //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
+const byte MIN_DIFFERENZ_VL_RL_BOILER = 10;        //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
+const byte MIN_DIFFERENZ_VL_RL_SOLE = 10;          //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
+const byte MIN_WAERMER_KOLLEKTOR_VL_BOILER = 4;    //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
 
 //PID Tuning Parameter
 const double PID_P_KOLLEKTOR = 5;         //Verstärkung des Proportionalen Anteils des PID-Reglers der Kollektorpumpe
@@ -115,16 +102,16 @@ const byte PWM_KOLLEKTOR_PUMPE = 9; //PWM-Ausgang Kollektorpumpe
 
 // Setup aller PT1000 Fühler
 // Schema: PT1000 <Name des Fühlers>(<PIN>,<Vorwiderstand>,<Korrekturfaktor>);
-PT1000 fuehlerKollektorVL(FUEHLER_KOLLEKTOR_VL_PIN, 1000, FUEHLER_KOLLEKTOR_VL_KORREKTURFAKTOR);
-PT1000 fuehlerKollektorLuft(FUEHLER_KOLLEKTOR_LUFT_PIN, 1000, FUEHLER_KOLLEKTOR_LUFT_KORREKTURFAKTOR);
-PT1000 fuehlerBoiler1(FUEHLER_BOILER_1_PIN, 1000, FUEHLER_BOILER_1_KORREKTURFAKTOR);
-PT1000 fuehlerBoiler2(FUEHLER_BOILER_2_PIN, 1000, FUEHLER_BOILER_2_KORREKTURFAKTOR);
-PT1000 fuehlerBoiler3(FUEHLER_BOILER_3_PIN, 1000, FUEHLER_BOILER_3_KORREKTURFAKTOR);
-PT1000 fuehlerBoilerVL(FUEHLER_BOILER_VL_PIN, 1000, FUEHLER_BOILER_VL_KORREKTURFAKTOR);
-PT1000 fuehlerSoleVL(FUEHLER_SOLE_VL_PIN, 1000, FUEHLER_SOLE_VL_KORREKTURFAKTOR);
-PT1000 fuehlerBoilerRL(FUEHLER_BOILER_RL_PIN, 1000, FUEHLER_BOILER_RL_KORREKTURFAKTOR);
-PT1000 fuehlerSoleRL(FUEHLER_SOLE_RL_PIN, 1000, FUEHLER_SOLE_RL_KORREKTURFAKTOR);
-PT1000 fuehlerSole(FUEHLER_SOLE_PIN, 1000, FUEHLER_SOLE_KORREKTURFAKTOR);
+PT1000 fuehlerKollektorVL(FUEHLER_KOLLEKTOR_VL_PIN, 1000);
+PT1000 fuehlerKollektorLuft(FUEHLER_KOLLEKTOR_LUFT_PIN, 1000);
+PT1000 fuehlerBoiler1(FUEHLER_BOILER_1_PIN, 1000);
+PT1000 fuehlerBoiler2(FUEHLER_BOILER_2_PIN, 1000);
+PT1000 fuehlerBoiler3(FUEHLER_BOILER_3_PIN, 1000);
+PT1000 fuehlerBoilerVL(FUEHLER_BOILER_VL_PIN, 1000);
+PT1000 fuehlerSoleVL(FUEHLER_SOLE_VL_PIN, 1000);
+PT1000 fuehlerBoilerRL(FUEHLER_BOILER_RL_PIN, 1000);
+PT1000 fuehlerSoleRL(FUEHLER_SOLE_RL_PIN, 1000);
+PT1000 fuehlerSole(FUEHLER_SOLE_PIN, 1000);
 
 // Setup der PWM gesteuerten Pumpen
 Pump kollektorPumpe(RELAIS_KOLLEKTOR_PUMPE, PWM_KOLLEKTOR_PUMPE);
@@ -288,25 +275,25 @@ void calculateTargetTemperature()
       {
         if (fuehlerBoilerVL.getMeanTemperature() - fuehlerBoilerRL.getMeanTemperature() < MIN_DIFFERENZ_VL_RL_BOILER + 2) //VL und RL nähern sich zu stark an
         {
-          newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 7 - differenzLuftVL); //Solltemperatur für Boilermodus
+          newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 5 - differenzLuftVL); //Solltemperatur für Boilermodus
         }
         else if (fuehlerBoilerVL.getMeanTemperature() - fuehlerBoilerRL.getMeanTemperature() > MIN_DIFFERENZ_VL_RL_BOILER + 5) //VL und RL sind weit voneinander entfernt
         {
-          newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 2 - differenzLuftVL); //Solltemperatur für Boilermodus
+          newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER - differenzLuftVL); //Solltemperatur für Boilermodus
         }
-        else if (PIDSetpointKollektorPumpe < fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 2 - differenzLuftVL)
+        else if (PIDSetpointKollektorPumpe < fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER - differenzLuftVL)
         {
-          newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 2 - differenzLuftVL); //Solltemperatur für Boilermodus
+          newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER - differenzLuftVL); //Solltemperatur für Boilermodus
         }
       }
       else //nicht am Initialisieren im Boilermodus
       {
-        newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 2 - differenzLuftVL); //Solltemperatur für Boilermodus
+        newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER - differenzLuftVL); //Solltemperatur für Boilermodus
       }
     }
     else //Solemodus?
     {
-      newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 2 - differenzLuftVL); //Solltemperatur für Solemodus
+      newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER - differenzLuftVL); //Solltemperatur für Solemodus
       if (fuehlerBoiler1.getMeanTemperature() > MAX_KOLLEKTOR_LUFT_SOLEMODUS)                                                           //Boiler berets heiss?
       {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler bereits heiss
@@ -724,13 +711,7 @@ void loop()
       if (!initializing)
       //Nicht am Initialisieren
       {
-        if (fuehlerKollektorLuft.getMeanTemperature() > fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_LUFT_BOILER)
-        //Kollektor Luft ist heiss genug für Boilermodus
-        {
-          boilerModusStart();
-          sendMQTT("message", "Boilermodus aus ausgeschaltenem Modus aufgrund hoher Kollektur-Luft-Temperatur gestartet. Initialisierung beginnt.");
-        }
-        else if (fuehlerKollektorLuft.getMeanTemperature() > SOLE_START_TEMPERATURE)
+        if (fuehlerKollektorLuft.getMeanTemperature() > SOLE_START_TEMPERATURE)
         //Kollektor-Luft ist heiss genug für Solemodus
         {
           soleModusStart();
@@ -809,7 +790,7 @@ void loop()
       if (!initializing)
       //Nicht mehr am Initialisieren?
       {
-        if (fuehlerBoilerVL.getMeanTemperature() < fuehlerBoiler1.getMeanTemperature() + BOILER_DIRECT_EXIT_DIFF)
+        if (fuehlerBoilerVL.getMeanTemperature() < fuehlerBoiler1.getMeanTemperature() - BOILER_DIRECT_EXIT_DIFF)
         //Boiler VL so kalt, dass direkt abgebrochen werden muss?
         {
           soleModusStart(); //Solemodus starten
