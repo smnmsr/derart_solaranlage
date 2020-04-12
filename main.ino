@@ -44,11 +44,11 @@ const int MIN_DIFFERENZ_NACH_ALARM = 3;           //erst wenn die Temperatur um 
 const int SOLE_EXIT_TEMPERATURE = 6;              //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
 const int SOLE_START_TEMPERATURE = 25;            //Temperatur im Kollektor (Luft), bei der der Solemodus gestartet wird
 const int SOLE_VL_EXIT_TEMPERATURE = 23;          //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
-const int MIN_KOLLEKTOR_LUFT = 50;                //Mindest-Regeltemperatur für den Kollektor-Vorlauf
-const int MAX_KOLLEKTOR_LUFT_BOILERMODUS = 75;    //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
+const int MIN_KOLLEKTOR_LUFT = 45;                //Mindest-Regeltemperatur für den Kollektor-Vorlauf
+const int MAX_KOLLEKTOR_LUFT_BOILERMODUS = 77;    //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
 const int MAX_KOLLEKTOR_LUFT_SOLEMODUS = 70;      //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
 const int BOILER_DIRECT_EXIT_DIFF = -4;           //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
-const int MIN_DIFFERENZ_VL_RL_BOILER = 10;        //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
+const int MIN_DIFFERENZ_VL_RL_BOILER = 12;        //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
 const int MIN_DIFFERENZ_VL_RL_SOLE = 10;          //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
 const int MIN_WAERMER_KOLLEKTOR_VL_BOILER = 4;    //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
 const int MIN_WAERMER_KOLLEKTOR_LUFT_BOILER = 10; //mindest Temperaturunterschied zwischen Boiler und Kollektor LUFT, bei dem der Boilermodus gestartet wird
@@ -267,12 +267,12 @@ void fuehlerCalculateAll()
 // Gibt Soll Vorlauftemperatur am Kollektor zurücksetzen
 void calculateTargetTemperature()
 {
-  if (operationMode) //läuft die Anlage?
+  //Differenz zwischen Kollektor Luft und VL bestimmen
+  float differenzLuftVL = fuehlerKollektorVL.getMeanTemperature() - fuehlerKollektorLuft.getMeanTemperature();
+  double newPIDSetpointKollektorPumpe = PIDSetpointKollektorPumpe;  //neuer PID Setpoint
+  double lastPIDSetpointKollektorPumpe = PIDSetpointKollektorPumpe; //letzter PID Setpoint
+  if (operationMode)                                                //läuft die Anlage?
   {
-    //Differenz zwischen Kollektor Luft und VL bestimmen
-    float differenzLuftVL = fuehlerKollektorVL.getMeanTemperature() - fuehlerKollektorLuft.getMeanTemperature();
-    double newPIDSetpointKollektorPumpe = PIDSetpointKollektorPumpe;  //neuer PID Setpoint
-    double lastPIDSetpointKollektorPumpe = PIDSetpointKollektorPumpe; //letzter PID Setpoint
     if (differenzLuftVL > 10)
     {
       differenzLuftVL = 10;
@@ -307,6 +307,14 @@ void calculateTargetTemperature()
     else //Solemodus?
     {
       newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER + 2 - differenzLuftVL); //Solltemperatur für Solemodus
+      if (fuehlerBoiler1.getMeanTemperature() > MAX_KOLLEKTOR_LUFT_SOLEMODUS)                                                           //Boiler berets heiss?
+      {
+        newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler bereits heiss
+      }
+      else if (fuehlerBoiler1.getMeanTemperature() > MAX_KOLLEKTOR_LUFT_SOLEMODUS - 2 && lastPIDSetpointKollektorPumpe == MIN_KOLLEKTOR_LUFT)
+      {
+        newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler bereits heiss
+      }
     }
 
     if (newPIDSetpointKollektorPumpe > PIDSetpointKollektorPumpe)
@@ -333,14 +341,17 @@ void calculateTargetTemperature()
         PIDSetpointKollektorPumpe = MAX_KOLLEKTOR_LUFT_SOLEMODUS;
       }
     }
-
-    //Solltemperatur verändert?
-    if (PIDSetpointKollektorPumpe != lastPIDSetpointKollektorPumpe)
-    {
-      Serial.print("Neue Regel-Solltemperatur: ");
-      Serial.println(PIDSetpointKollektorPumpe, 1);
-      sendMQTT("message", (String) "Neue Regel-Solltemperatur: " + ceil(PIDSetpointKollektorPumpe));
-    }
+  }
+  else
+  {
+    PIDSetpointKollektorPumpe = 0;
+  }
+  //Solltemperatur verändert?
+  if (PIDSetpointKollektorPumpe != lastPIDSetpointKollektorPumpe)
+  {
+    Serial.print("Neue Regel-Solltemperatur: ");
+    Serial.println(PIDSetpointKollektorPumpe, 1);
+    sendMQTT("message", (String) "Neue Regel-Solltemperatur: " + ceil(PIDSetpointKollektorPumpe));
   }
 }
 
@@ -535,7 +546,6 @@ void loop()
       {
         turnOffModusStart();
         sendMQTT("message", "Anlage von Hand ausgeschaltet. Nach Initialisierung wieder Automatikbetrieb.");
-        sendSMS("0041797164443", "ein anderer Test");
       }
       else if (recievedPayload == '1')
       {
