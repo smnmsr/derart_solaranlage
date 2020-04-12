@@ -47,8 +47,8 @@ const int SOLE_VL_EXIT_TEMPERATURE = 23;          //Temperatur im Sole Wärmetau
 const int MIN_KOLLEKTOR_LUFT = 45;                //Mindest-Regeltemperatur für den Kollektor-Vorlauf
 const int MAX_KOLLEKTOR_LUFT_BOILERMODUS = 77;    //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
 const int MAX_KOLLEKTOR_LUFT_SOLEMODUS = 70;      //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
-const int BOILER_DIRECT_EXIT_DIFF = -4;           //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
-const int MIN_DIFFERENZ_VL_RL_BOILER = 12;        //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
+const int BOILER_DIRECT_EXIT_DIFF = -8;           //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
+const int MIN_DIFFERENZ_VL_RL_BOILER = 10;        //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
 const int MIN_DIFFERENZ_VL_RL_SOLE = 10;          //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
 const int MIN_WAERMER_KOLLEKTOR_VL_BOILER = 4;    //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
 const int MIN_WAERMER_KOLLEKTOR_LUFT_BOILER = 10; //mindest Temperaturunterschied zwischen Boiler und Kollektor LUFT, bei dem der Boilermodus gestartet wird
@@ -139,7 +139,7 @@ Timer timer3m(3, 'm'); //3min Timer
 //Timer für bestimmte Funktionen
 Timer timerLegionellenschaltung(7, 'd');   //Legio-Timer (Zeit. nach der elektrisch auf hohe Boilertemperatur geheizt wird, falls diese nie erreicht wurde)
 Timer initialOperationModeTimeout(3, 'm'); //Zeit bevor ein Modus EXIT-Kriterien berücksichtigt (Achtung, Variabel)
-Timer exitTimeout(2, 'm');                 //Solange muss der Sollwert mindestens unterschritten sein, bevor Abbruch
+Timer exitTimeout(4, 'm');                 //Solange muss der Sollwert mindestens unterschritten sein, bevor Abbruch
 Timer flowMeterBoilerTimeout(1, 's');      //Durchflussmeter 1 Timeout
 Timer flowMeterSoleTimeout(1, 's');        //Durchflussmeter 2 Timeout
 Timer displayButtonTimeout(1000);          //Display-Button Timeout
@@ -815,7 +815,13 @@ void loop()
           soleModusStart(); //Solemodus starten
           sendMQTT("message", "Vom Boiler-Laden zum Solemodus gewechselt, da der Boiler Vorlauf viel zu kalt war. Sole-Initialisierung beginnt.");
         }
-        else if ((fuehlerBoilerVL.getMeanTemperature() < fuehlerBoiler1.getMeanTemperature()) || (fuehlerBoilerVL.getMeanTemperature() - fuehlerBoilerRL.getMeanTemperature() < MIN_DIFFERENZ_VL_RL_BOILER))
+        else if (fuehlerBoilerVL.getMeanTemperature() - fuehlerBoilerRL.getMeanTemperature() < MIN_DIFFERENZ_VL_RL_BOILER)
+        // Boiler VL und Rücklauf zu nahe beieinander?
+        {
+          soleModusStart(); //Solemodus starten
+          sendMQTT("message", "Vom Boiler-Laden zum Solemodus gewechselt, da der Boiler Vorlauf und Rücklauf zu nahe zueinander kamen. Sole-Initialisierung beginnt.");
+        }
+        else if (fuehlerBoilerVL.getMeanTemperature() < fuehlerBoiler1.getMeanTemperature())
         //Boiler VL hat Sollwert unterschritten?
         {
           if (!tooLowValue)
