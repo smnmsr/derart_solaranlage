@@ -159,7 +159,7 @@ EthernetClient httpClient;
 void sendSMS(String message, String reciever = "0041795085611", String from = "Solaranlage")
 {
   message.replace(" ", "%20");
-  String data = "GET /API/httpsms.php?konto=3406&password=6e0624828ac4179bb25164ebfbea9024&service=7228&text=";
+  String data = SMS_BASE_URL;
   data += message;
   data += "&from=";
   data += from;
@@ -274,7 +274,7 @@ void fuehlerCalculateAll()
 
   //Fehlermeldung per SMS, falls unrealistische Temperatur auftritt
   if (unrealisticTemperature && !temperatureErrorMessageSent) {
-    sendSMS("Ein Temperaturfuehler macht Probleme. Bei der Steuerung koennten schwerwiegende Probleme auftreten. Bitte Hardware kontrollieren. Nach Fehlerbehebung ist Neustart erforderlich");
+    sendSMS("Ein Temperaturfuehler macht Probleme. Bei der Steuerung koennten schwerwiegende Probleme auftreten. Bitte Hardware kontrollieren. Nach Fehlerbehebung ist Neustart erforderlich.");
     temperatureErrorMessageSent = true;
   }
 }
