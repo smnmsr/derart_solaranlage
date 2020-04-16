@@ -25,7 +25,7 @@ class PT1000 : public AnalogSensor
 public:
   PT1000(byte pin, int rVor);
   void setRVor(int rVor);
-  void calculateTemperature();
+  bool calculateTemperature();
   float getLastTemperature();
   float getMeanTemperature();
 

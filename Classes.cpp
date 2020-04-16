@@ -4,7 +4,7 @@
 //Konstruktor der AnalogSensor Klasse
 AnalogSensor::AnalogSensor(byte pin)
 {
-  _pin = pin;                                      //Pin, an dem Sensor angeschlossen ist
+  _pin = pin; //Pin, an dem Sensor angeschlossen ist
 }
 
 //Setzt den Pin bei einem AnalogSensor Objekt
@@ -17,8 +17,8 @@ void AnalogSensor::setPin(byte pin)
 //Konstruktr der AnalogSensor Subklasse PT1000
 PT1000::PT1000(byte pin, int rVor = 1000) : AnalogSensor(pin)
 {
-  _rVor = rVor;                         //Vorwiderstand (Spannungsteiler)
-  _RN = 1000;                           //Normwiderstand des PT1000 bei 0 °C
+  _rVor = rVor; //Vorwiderstand (Spannungsteiler)
+  _RN = 1000;   //Normwiderstand des PT1000 bei 0 °C
   for (size_t i = 0; i < 10; i++)
   {
     _temperatures[i] = 0; //Temperaturen (immer die letzten zehn)
@@ -34,7 +34,7 @@ void PT1000::setRVor(int rVor)
 }
 
 //Berechnet die Temperatur, die der PT1000 misst
-void PT1000::calculateTemperature()
+bool PT1000::calculateTemperature()
 {
   _voltage = ((analogRead(_pin) + analogRead(_pin) + analogRead(_pin)) * _analogStep) / 3; //Spannung am Analog Eingang
   _r = (_rVor * _voltage) / (_boardVoltage - _voltage);                                    //Widerstand des PT1000 (Spannungsteiler)
@@ -43,6 +43,14 @@ void PT1000::calculateTemperature()
     _temperatures[9 - i] = _temperatures[8 - i];
   }
   _temperatures[0] = (-(_A * _RN) + sqrt(pow(_A * _RN, 2) - 4 * _B * _RN * (_RN - _r))) / (2 * _B * _RN); //Berechnet aus _R die Temperatur
+  if (_temperatures[0] > 120 || _temperatures[0] < -30)
+  {
+    return false;
+  }
+  else
+  {
+    return true;
+  }
 }
 
 //Berechnet Temperatur und diese zurück
