@@ -42,7 +42,7 @@ const byte MIN_WAERMER_KOLLEKTOR_VL_BOILER = 4; //mindest Temperaturunterschied 
 
 //PID Tuning Parameter
 const double PID_P_KOLLEKTOR = 5;         //Verstärkung des Proportionalen Anteils des PID-Reglers der Kollektorpumpe
-const double PID_I_KOLLEKTOR = 0.015;      //Verstärkung des Integralen Anteils des PID-Reglers der Kollektorpumpe
+const double PID_I_KOLLEKTOR = 0.015;     //Verstärkung des Integralen Anteils des PID-Reglers der Kollektorpumpe
 const double PID_D_KOLLEKTOR = 0;         //Verstärkung des differentialen Anteils des PID-Reglers der Kollektorpumpe
 const byte PID_KOLLEKTOR_MIN_SPEED = 70;  //Minimale Kollektorpumpen-Geschwindigkeit
 const byte PID_KOLLEKTOR_MAX_SPEED = 255; //Maximale Kollektorpumpen-Geschwindigkeit
@@ -51,16 +51,16 @@ const byte PID_KOLLEKTOR_MAX_SPEED = 255; //Maximale Kollektorpumpen-Geschwindig
 const byte mac[] = {0xA8, 0x61, 0x0A, 0xAE, 0x3D, 0xB7}; //Hardware-Adresse des Ethernet-Boards (Kleber auf Board)
 
 //Variabeln
-byte operationMode = 0;              //Betriebsmodus: 0=aus, 1=Solemodus, 2=Boilermodus, 3=ManuellerModus
-unsigned long now = 0;               //Jeweils aktueller millis()-Wert
-bool displayOn = false;              //true, wenn Displays eingeschaltet sein soll
-bool boilerHighTemperatur = false;   //true, wenn Boiler auf höherer Temperatur ist
-bool kollektorAlarm = false;         //true, wenn kollektor zu heiss ist
-bool soleAlarm = false;              //true, wenn solepumpe zu heiss ist
-bool initializing = false;           //Ist derzeit ein neuer Modus am Initialisieren?
-bool tooLowValue = false;            //True, wenn Sollwert das erste mal unterschritten
-bool lastStateFlowMeterBoiler = LOW; //Lester Status des Flow Meter Boiler
-bool lastStateFlowMeterSole = LOW;   //Lester Status des Flow Meter Boiler
+byte operationMode = 0;                   //Betriebsmodus: 0=aus, 1=Solemodus, 2=Boilermodus, 3=ManuellerModus
+unsigned long now = 0;                    //Jeweils aktueller millis()-Wert
+bool displayOn = false;                   //true, wenn Displays eingeschaltet sein soll
+bool boilerHighTemperatur = false;        //true, wenn Boiler auf höherer Temperatur ist
+bool kollektorAlarm = false;              //true, wenn kollektor zu heiss ist
+bool soleAlarm = false;                   //true, wenn solepumpe zu heiss ist
+bool initializing = false;                //Ist derzeit ein neuer Modus am Initialisieren?
+bool tooLowValue = false;                 //True, wenn Sollwert das erste mal unterschritten
+bool lastStateFlowMeterBoiler = LOW;      //Lester Status des Flow Meter Boiler
+bool lastStateFlowMeterSole = LOW;        //Lester Status des Flow Meter Boiler
 bool temperatureErrorMessageSent = false; //Fehlermeldung wegen unrealistischer Temperatur bereits gesendet?
 
 //PID Variabeln
@@ -77,7 +77,7 @@ const byte FUEHLER_KOLLEKTOR_VL_PIN = A7;   //S0 Anschluss PIN
 const byte FUEHLER_KOLLEKTOR_LUFT_PIN = A0; //S1 Anschluss PIN
 const byte FUEHLER_BOILER_1_PIN = A1;       //S2 oben Anschluss PIN
 const byte FUEHLER_BOILER_2_PIN = A14;      //S2 mitte Anschluss PIN
-const byte FUEHLER_BOILER_3_PIN = A13;      //S2 unten Anschluss PIN
+const byte FUEHLER_BOILER_3_PIN = A12;      //S2 unten Anschluss PIN
 const byte FUEHLER_BOILER_VL_PIN = A2;      //S4B Anschluss PIN
 const byte FUEHLER_SOLE_VL_PIN = A3;        //S4S Anschluss PIN
 const byte FUEHLER_BOILER_RL_PIN = A4;      //S6B Anschluss PIN
@@ -93,6 +93,7 @@ const byte RELAIS_SOLE_PUMPE = 23;      //Relais-Ausgang Solepumpe
 const byte RELAIS_KOLLEKTOR_PUMPE = 25; //Relais-Ausgang Kollektorpumpe
 const byte STELLWERK_SOLE_BOILER = 27;  //Relais-Ausgang Stellwerk-Legionellen, high = höhere Temperatur
 const byte STELLWERK_BOILER_TEMP = 29;  //Relais-Ausgang Stellwerk Sole/Boiler, high = Boiler
+const byte RELAIS_BOILER = 33; //Relais-Ausgang für Sperrschuetz WWSP
 
 // PWM Pins
 const byte PWM_KOLLEKTOR_PUMPE = 9; //PWM-Ausgang Kollektorpumpe
@@ -143,8 +144,8 @@ EthernetClient client;
 MqttClient mqttClient(client);
 
 const char broker[] = "storage.moser-artz.ch"; //MQTT-Broker-Server
-const int port = 1883;                               //MQTT-Broker-Server-Port
-const String topic = "derart/";                      //Standard MQTT-Topic
+const int port = 1883;                         //MQTT-Broker-Server-Port
+const String topic = "derart/";                //Standard MQTT-Topic
 String recievedTopic;                          //Empfangenes Thema
 char recievedPayload;                          //Empfangenes Zeichen
 
@@ -241,39 +242,50 @@ void fuehlerCalculateAll()
 {
   bool unrealisticTemperature = false;
   //Alle Fühler auslesen
-  if (!fuehlerKollektorVL.calculateTemperature()) {
+  if (!fuehlerKollektorVL.calculateTemperature())
+  {
     unrealisticTemperature = true;
   }
-  if (!fuehlerKollektorLuft.calculateTemperature()) {
+  if (!fuehlerKollektorLuft.calculateTemperature())
+  {
     unrealisticTemperature = true;
   }
-  if (!fuehlerBoiler1.calculateTemperature()) {
+  if (!fuehlerBoiler1.calculateTemperature())
+  {
     unrealisticTemperature = true;
   }
-  if (!fuehlerBoiler2.calculateTemperature()) {
+  if (!fuehlerBoiler2.calculateTemperature())
+  {
     unrealisticTemperature = true;
   }
-  if (!fuehlerBoiler3.calculateTemperature()) {
+  if (!fuehlerBoiler3.calculateTemperature())
+  {
     unrealisticTemperature = true;
   }
-  if (!fuehlerBoilerVL.calculateTemperature()) {
+  if (!fuehlerBoilerVL.calculateTemperature())
+  {
     unrealisticTemperature = true;
   }
-  if (!fuehlerSoleVL.calculateTemperature()) {
+  if (!fuehlerSoleVL.calculateTemperature())
+  {
     unrealisticTemperature = true;
   }
-  if (!fuehlerBoilerRL.calculateTemperature()) {
+  if (!fuehlerBoilerRL.calculateTemperature())
+  {
     unrealisticTemperature = true;
   }
-  if (!fuehlerSoleRL.calculateTemperature()) {
+  if (!fuehlerSoleRL.calculateTemperature())
+  {
     unrealisticTemperature = true;
   }
-  if (!fuehlerSole.calculateTemperature()) {
+  if (!fuehlerSole.calculateTemperature())
+  {
     unrealisticTemperature = true;
   }
 
   //Fehlermeldung per SMS, falls unrealistische Temperatur auftritt
-  if (unrealisticTemperature && !temperatureErrorMessageSent) {
+  if (unrealisticTemperature && !temperatureErrorMessageSent)
+  {
     sendSMS("Ein Temperaturfuehler macht Probleme. Bei der Steuerung koennten schwerwiegende Probleme auftreten. Bitte Hardware kontrollieren. Nach Fehlerbehebung ist Neustart erforderlich.");
     temperatureErrorMessageSent = true;
   }
@@ -453,6 +465,17 @@ void subscribeToMQTTTopics()
   mqttClient.subscribe("derart/toArduino/severalFunctions");
 }
 
+void boilerAdditionalHeatingOn()
+{
+  digitalWrite(RELAIS_BOILER, HIGH);
+  sendMQTT("boilerAdditionalHeating", "on");
+}
+void boilerAdditionalHeatingOff()
+{
+  digitalWrite(RELAIS_BOILER, LOW);
+  sendMQTT("boilerAdditionalHeating", "off");
+}
+
 // ================
 // 6. Setup-Sequenz
 // ================
@@ -477,6 +500,7 @@ void setup()
   pinMode(STELLWERK_SOLE_BOILER, OUTPUT);
   pinMode(STELLWERK_BOILER_TEMP, OUTPUT);
   pinMode(PWM_KOLLEKTOR_PUMPE, OUTPUT);
+  pinMode(RELAIS_BOILER, OUTPUT);
 
   //PID Setup
   PIDReglerKollektorPumpe.SetOutputLimits(PID_KOLLEKTOR_MIN_SPEED, 255);
@@ -517,6 +541,7 @@ void setup()
   //erster Betriebsmodus nach dem Starten (Ohne Initialisierungszeit)
   turnOffModusStart();
   initializing = false;
+  boilerAdditionalHeatingOff();
 
   Serial.println("Setup beendet");
 }
@@ -563,6 +588,7 @@ void loop()
         timerLegionellenschaltung.setLastTime(now);
         boilerHighTemperatur = false;
         digitalWrite(STELLWERK_BOILER_TEMP, LOW);
+        boilerAdditionalHeatingOff();
         sendMQTT("boilerTermostat", "normal");
         sendMQTT("message", "Boiler wieder bei normaler Solltemperatur für elektrisches Heizen.");
         Serial.println("Legionellenschaltung aus der Ferne ausgeschaltet");
@@ -797,7 +823,6 @@ void loop()
           if (fuehlerSoleVL.getMeanTemperature() - fuehlerSoleRL.getMeanTemperature() > MIN_DIFFERENZ_VL_RL_SOLE)
           {
             tooLowValue = false; //Abbruch abbrechen
-            sendMQTT("message", "Solltemperatur für Solemodus wurde wieder erreicht, Modus wird nicht abgebrochen.");
           }
         }
       }
@@ -828,7 +853,6 @@ void loop()
           {
             tooLowValue = true;           //Abbruchvariable setzen
             exitTimeout.setLastTime(now); //Abbruchtimer setzen
-            sendMQTT("message", "Solltemperatur für Solemodus wurde unterschritten, Modus wird demnächst abgebrochen.");
           }
           else if (tooLowValue && exitTimeout.checkTimer(now))
           {
@@ -849,7 +873,6 @@ void loop()
         //Sollwerte fur Boilermodus alle wieder erreicht?
         {
           tooLowValue = false; //Abbruch abbrechen
-          sendMQTT("message", "Solltemperatur für Boilermodus wurde wieder erreicht, Modus wird nicht abgebrochen.");
         }
       }
 
@@ -875,7 +898,6 @@ void loop()
           {
             tooLowValue = true;           //Abbruchvariable setzen
             exitTimeout.setLastTime(now); //Abbruchtimer setzen
-            sendMQTT("message", "Solltemperatur für Boilermodus wurde unterschritten, Modus wird demnächst abgebrochen.");
           }
           else if (tooLowValue && exitTimeout.checkTimer(now))
           {
@@ -969,6 +991,7 @@ void loop()
       {
         boilerHighTemperatur = false;
         digitalWrite(STELLWERK_BOILER_TEMP, LOW);
+        boilerAdditionalHeatingOff();
         sendMQTT("boilerTermostat", "normal");
         sendMQTT("message", "Boiler wieder bei normaler Solltemperatur für elektrisches Heizen.");
       }
@@ -977,6 +1000,13 @@ void loop()
 
     timer3m.executed();
   }
+  if (fuehlerBoiler2.getMeanTemperature() < 50){
+    boilerAdditionalHeatingOn();
+  } else if (fuehlerBoiler2.getMeanTemperature() > 55 && boilerHighTemperatur == false)
+  {
+    boilerAdditionalHeatingOff();
+  }
+  
 
   if (timerLegionellenschaltung.checkTimer(now))
   {
@@ -984,6 +1014,7 @@ void loop()
     boilerHighTemperatur = true;
     boilerTimeout.setLastTime(now);       //Timer stellen
     timerLegionellenschaltung.executed(); //Timer zurücksetzen
+    boilerAdditionalHeatingOn();
     sendMQTT("message", "Boiler bei erhöhter Solltemperatur für elektrisches Heizen. (Legionellenschaltung)");
     sendMQTT("boilerTermostat", "hoch");
   }
@@ -992,6 +1023,7 @@ void loop()
   {
     boilerHighTemperatur = false;
     digitalWrite(STELLWERK_BOILER_TEMP, LOW);
+    boilerAdditionalHeatingOff();
     sendMQTT("boilerTermostat", "normal");
     sendMQTT("message", "Boiler wieder bei normaler Solltemperatur für elektrisches Heizen.");
   }
