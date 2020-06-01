@@ -36,9 +36,11 @@ const byte MIN_KOLLEKTOR_LUFT = 40;             //Mindest-Regeltemperatur für d
 const byte MAX_KOLLEKTOR_LUFT_BOILERMODUS = 77; //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
 const byte MAX_KOLLEKTOR_LUFT_SOLEMODUS = 70;   //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
 const byte BOILER_DIRECT_EXIT_DIFF = 8;         //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
-const byte MIN_DIFFERENZ_VL_RL_BOILER = 10;     //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
+const byte MIN_DIFFERENZ_VL_RL_BOILER = 12;     //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
 const byte MIN_DIFFERENZ_VL_RL_SOLE = 10;       //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
 const byte MIN_WAERMER_KOLLEKTOR_VL_BOILER = 4; //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
+const byte BOILER_FULL_TEMPERATURE = 65;        //hat der Boiler oben mindestens diese Temperatur, wird bevorzugt in den Boden gearbeitet
+const byte BOILER_NOT_FULL_TEMPERATUR = 60;     //hat der Boiler oben weniger als diese Temperatur, wird bevorzugt in den Boden gearbeitet
 
 //PID Tuning Parameter
 const double PID_P_KOLLEKTOR = 5;         //Verstärkung des Proportionalen Anteils des PID-Reglers der Kollektorpumpe
@@ -93,7 +95,7 @@ const byte RELAIS_SOLE_PUMPE = 23;      //Relais-Ausgang Solepumpe
 const byte RELAIS_KOLLEKTOR_PUMPE = 25; //Relais-Ausgang Kollektorpumpe
 const byte STELLWERK_SOLE_BOILER = 27;  //Relais-Ausgang Stellwerk-Legionellen, high = höhere Temperatur
 const byte STELLWERK_BOILER_TEMP = 29;  //Relais-Ausgang Stellwerk Sole/Boiler, high = Boiler
-const byte RELAIS_BOILER = 33; //Relais-Ausgang für Sperrschuetz WWSP
+const byte RELAIS_BOILER = 33;          //Relais-Ausgang für Sperrschuetz WWSP
 
 // PWM Pins
 const byte PWM_KOLLEKTOR_PUMPE = 9; //PWM-Ausgang Kollektorpumpe
@@ -334,11 +336,11 @@ void calculateTargetTemperature()
     else //Solemodus?
     {
       newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER - differenzLuftVL); //Solltemperatur für Solemodus
-      if (fuehlerBoiler1.getMeanTemperature() > MAX_KOLLEKTOR_LUFT_SOLEMODUS)                                                       //Boiler berets heiss?
+      if (fuehlerBoiler1.getMeanTemperature() > BOILER_FULL_TEMPERATURE)                                                   //Boiler berets heiss?
       {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler bereits heiss
       }
-      else if (fuehlerBoiler1.getMeanTemperature() > MAX_KOLLEKTOR_LUFT_SOLEMODUS - 5 && lastPIDSetpointKollektorPumpe == MIN_KOLLEKTOR_LUFT)
+      else if (fuehlerBoiler1.getMeanTemperature() > BOILER_NOT_FULL_TEMPERATUR && lastPIDSetpointKollektorPumpe == MIN_KOLLEKTOR_LUFT)
       {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler bereits heiss
       }
@@ -1000,13 +1002,14 @@ void loop()
 
     timer3m.executed();
   }
-  if (fuehlerBoiler2.getMeanTemperature() < 50){
+  if (fuehlerBoiler2.getMeanTemperature() < 50 && !operationMode)
+  {
     boilerAdditionalHeatingOn();
-  } else if (fuehlerBoiler2.getMeanTemperature() > 55 && boilerHighTemperatur == false)
+  }
+  else if ((fuehlerBoiler2.getMeanTemperature() > 55 && boilerHighTemperatur == false) || operationMode)
   {
     boilerAdditionalHeatingOff();
   }
-  
 
   if (timerLegionellenschaltung.checkTimer(now))
   {
