@@ -1002,11 +1002,11 @@ void loop()
 
     timer3m.executed();
   }
-  if (fuehlerBoiler2.getMeanTemperature() < 50 && !operationMode)
+  if (((fuehlerBoiler1.getMeanTemperature()+fuehlerBoiler2.getMeanTemperature())/2) < 50 && !operationMode)
   {
     boilerAdditionalHeatingOn();
   }
-  else if ((fuehlerBoiler2.getMeanTemperature() > 55 && boilerHighTemperatur == false) || operationMode)
+  else if ((((fuehlerBoiler1.getMeanTemperature()+fuehlerBoiler2.getMeanTemperature())/2) > 55 && boilerHighTemperatur == false) || operationMode)
   {
     boilerAdditionalHeatingOff();
   }
