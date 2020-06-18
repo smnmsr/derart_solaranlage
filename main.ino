@@ -78,8 +78,8 @@ double PIDSetpointKollektorPumpe = 50; //PID Setpoint
 const byte FUEHLER_KOLLEKTOR_VL_PIN = A7;   //S0 Anschluss PIN
 const byte FUEHLER_KOLLEKTOR_LUFT_PIN = A0; //S1 Anschluss PIN
 const byte FUEHLER_BOILER_1_PIN = A1;       //S2 oben Anschluss PIN
-const byte FUEHLER_BOILER_2_PIN = A14;      //S2 mitte Anschluss PIN
-const byte FUEHLER_BOILER_3_PIN = A13;      //S2 unten Anschluss PIN
+const byte FUEHLER_BOILER_2_PIN = A13;      //S2 mitte Anschluss PIN
+const byte FUEHLER_BOILER_3_PIN = A14;      //S2 unten Anschluss PIN
 const byte FUEHLER_BOILER_VL_PIN = A2;      //S4B Anschluss PIN
 const byte FUEHLER_SOLE_VL_PIN = A3;        //S4S Anschluss PIN
 const byte FUEHLER_BOILER_RL_PIN = A4;      //S6B Anschluss PIN
@@ -375,13 +375,13 @@ void calculateTargetTemperature()
   {
     PIDSetpointKollektorPumpe = 0;
   }
-  //Solltemperatur verändert?
-  if (PIDSetpointKollektorPumpe != lastPIDSetpointKollektorPumpe)
-  {
-    Serial.print("Neue Regel-Solltemperatur: ");
-    Serial.println(PIDSetpointKollektorPumpe, 1);
-    sendMQTT("message", (String) "Neue Regel-Solltemperatur: " + ceil(PIDSetpointKollektorPumpe));
-  }
+  //Solltemperatur verändert? --> Nachrichten auslösen
+  // if (PIDSetpointKollektorPumpe != lastPIDSetpointKollektorPumpe)
+  // {
+  //   Serial.print("Neue Regel-Solltemperatur: ");
+  //   Serial.println(PIDSetpointKollektorPumpe, 1);
+  //   sendMQTT("message", (String) "Neue Regel-Solltemperatur: " + ceil(PIDSetpointKollektorPumpe));
+  // }
 }
 
 //Startet den Boilermodus
