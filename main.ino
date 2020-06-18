@@ -375,13 +375,14 @@ void calculateTargetTemperature()
   {
     PIDSetpointKollektorPumpe = 0;
   }
-  //Solltemperatur verändert? --> Nachrichten auslösen
-  // if (PIDSetpointKollektorPumpe != lastPIDSetpointKollektorPumpe)
-  // {
-  //   Serial.print("Neue Regel-Solltemperatur: ");
-  //   Serial.println(PIDSetpointKollektorPumpe, 1);
-  //   sendMQTT("message", (String) "Neue Regel-Solltemperatur: " + ceil(PIDSetpointKollektorPumpe));
-  // }
+  //Solltemperatur verändert?
+  if (PIDSetpointKollektorPumpe != lastPIDSetpointKollektorPumpe)
+  {
+    //Serial.print("Neue Regel-Solltemperatur: ");
+    //Serial.println(PIDSetpointKollektorPumpe, 1);
+    //sendMQTT("message", (String) "Neue Regel-Solltemperatur: " + ceil(PIDSetpointKollektorPumpe));
+    sendMQTT("controlTemperature",(int)(ceil(PIDSetpointKollektorPumpe)));
+  }
 }
 
 //Startet den Boilermodus
