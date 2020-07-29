@@ -145,7 +145,7 @@ PID PIDReglerKollektorPumpe(&PIDInputKollektorPumpe, &PIDOutputKollektorPumpe, &
 EthernetClient client;
 MqttClient mqttClient(client);
 
-const char broker[] = "storage.moser-artz.ch"; //MQTT-Broker-Server
+const char broker[] = "192.168.1.101"; //MQTT-Broker-Server
 const int port = 1883;                         //MQTT-Broker-Server-Port
 const String topic = "derart/";                //Standard MQTT-Topic
 String recievedTopic;                          //Empfangenes Thema
@@ -971,11 +971,11 @@ void loop()
     //Prüfen, welcher Sendeintervall geeignet ist
     if (operationMode)
     {
-      MQTTSendTimer.setDelayTime(5, 's');
+      MQTTSendTimer.setDelayTime(20, 's');
     }
     else if (fuehlerKollektorLuft.getMeanTemperature() > SOLE_START_TEMPERATURE - 5)
     {
-      MQTTSendTimer.setDelayTime(5, 's');
+      MQTTSendTimer.setDelayTime(20, 's');
     }
     else if (fuehlerKollektorLuft.getMeanTemperature() > SOLE_START_TEMPERATURE - 10)
     {
@@ -983,7 +983,7 @@ void loop()
     }
     else
     {
-      MQTTSendTimer.setDelayTime(30, 'm');
+      MQTTSendTimer.setDelayTime(15, 'm');
     }
 
     //Prüfen, ob Boiler über 65 Grad ist
