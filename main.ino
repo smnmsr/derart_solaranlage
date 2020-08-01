@@ -12,13 +12,14 @@
 // ============================================
 // 1. HEADER-Dateien, Definitionen und Libaries
 // ============================================
-#include "PID_v1.h"                 //Für PID-Regelung
-#include "Adafruit_LiquidCrystal.h" //Für Displays
-#include "Classes.h"                //Eigene Klassen
-#include <SPI.h>                    //Ethernet
-#include <Ethernet.h>               //Ethernet
-#include <ArduinoMqttClient.h>      //MQTT
-#include "secrets.h"                //MQTT Passwörter
+#include "PID_v1.h"            //Für PID-Regelung
+#include "Classes.h"           //Eigene Klassen
+#include <SPI.h>               //Ethernet
+#include <Ethernet.h>          //Ethernet
+#include <EthernetUdp.h>       //EthernetUdp
+#include <NTPClient.h> //NTP-Libary
+#include <ArduinoMqttClient.h> //MQTT
+#include "secrets.h"           //MQTT Passwörter
 
 // ===========================
 // 2. Variabeln und Konstanten
@@ -64,6 +65,7 @@ bool tooLowValue = false;                 //True, wenn Sollwert das erste mal un
 bool lastStateFlowMeterBoiler = LOW;      //Lester Status des Flow Meter Boiler
 bool lastStateFlowMeterSole = LOW;        //Lester Status des Flow Meter Boiler
 bool temperatureErrorMessageSent = false; //Fehlermeldung wegen unrealistischer Temperatur bereits gesendet?
+bool badWeather = false;                  //Bei Schlechtwetter wird nicht versucht, den Boiler zu heizen
 
 //PID Variabeln
 double PIDInputKollektorPumpe = 0;     //PID Input
@@ -145,14 +147,19 @@ PID PIDReglerKollektorPumpe(&PIDInputKollektorPumpe, &PIDOutputKollektorPumpe, &
 EthernetClient client;
 MqttClient mqttClient(client);
 
-const char broker[] = "192.168.1.101"; //MQTT-Broker-Server
-const int port = 1883;                         //MQTT-Broker-Server-Port
-const String topic = "derart/";                //Standard MQTT-Topic
-String recievedTopic;                          //Empfangenes Thema
-char recievedPayload;                          //Empfangenes Zeichen
+const char broker[] = "192.168.1.123"; //MQTT-Broker-Server
+const int port = 1883;                 //MQTT-Broker-Server-Port
+const String topic = "derart/";        //Standard MQTT-Topic
+String recievedTopic;                  //Empfangenes Thema
+char recievedPayload;                  //Empfangenes Zeichen
 
 //Ethernet Client Setup
-EthernetClient httpClient;
+EthernetClient httpClient;    //httpClient für SMS
+
+//NTP Client Setup
+const char ntpServer[] = "europe.pool.ntp.org"; //NTP Server
+EthernetUDP ntpUDP;           //UDP Client für NTP Server
+NTPClient timeClient(ntpUDP,ntpServer, 7200, 60000); //NTP Client
 
 // =============
 // 5. FUNKTIONEN
@@ -336,13 +343,25 @@ void calculateTargetTemperature()
     else //Solemodus?
     {
       newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER - differenzLuftVL); //Solltemperatur für Solemodus
-      if (fuehlerBoiler1.getMeanTemperature() > BOILER_FULL_TEMPERATURE)                                                   //Boiler berets heiss?
+      if (fuehlerBoiler1.getMeanTemperature() > BOILER_FULL_TEMPERATURE)                                                            //Boiler berets heiss?
       {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler bereits heiss
       }
       else if (fuehlerBoiler1.getMeanTemperature() > BOILER_NOT_FULL_TEMPERATUR && lastPIDSetpointKollektorPumpe == MIN_KOLLEKTOR_LUFT)
       {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler bereits heiss
+      }
+    }
+
+    if (timeClient.getHours() < 11 || (timeClient.getHours() == 11 && timeClient.getMinutes() <= 30)) {
+      newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT-5; //Sole mit hoher Drehzahl, da zu früh um Boiler zu heizen
+    }
+
+    if (badWeather) {
+      newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT-5; //Sole mit hoher Drehzahl, da zu schlechtes Wetter für Boiler
+      if(timeClient.getHours() == 0)
+      {
+        badWeather = false; //Schlechtwetter-Reset
       }
     }
 
@@ -381,7 +400,7 @@ void calculateTargetTemperature()
     //Serial.print("Neue Regel-Solltemperatur: ");
     //Serial.println(PIDSetpointKollektorPumpe, 1);
     //sendMQTT("message", (String) "Neue Regel-Solltemperatur: " + ceil(PIDSetpointKollektorPumpe));
-    sendMQTT("controlTemperature",(int)(ceil(PIDSetpointKollektorPumpe)));
+    sendMQTT("controlTemperature", (int)(ceil(PIDSetpointKollektorPumpe)));
   }
 }
 
@@ -540,6 +559,12 @@ void setup()
   Serial.println();
 
   subscribeToMQTTTopics();
+    Serial.println("Du hast die MQTT Topics abonniert!");
+  Serial.println();
+
+  timeClient.begin();
+    Serial.println("Du bist mit dem Zeitserver verbunden!");
+  Serial.println();
 
   //erster Betriebsmodus nach dem Starten (Ohne Initialisierungszeit)
   turnOffModusStart();
@@ -555,6 +580,7 @@ void setup()
 void loop()
 {
   //Dieser Programmteil wird in jeder Schleife durchgefuehrt
+  timeClient.update();
 
   //Prüfen, ob der Durchflussmesser Boiler einen Impuls abgeben
   if (flowMeterBoilerTimeout.checkTimer(now))
@@ -686,6 +712,17 @@ void loop()
           kollektorPumpStart();
         }
         break;
+      }
+    }
+        if (recievedTopic == "derart/toArduino/bBadWeather")
+    {
+      if (recievedPayload == '0')
+      {
+        badWeather = false;
+      }
+      else if (recievedPayload == '1')
+      {
+        badWeather = true;
       }
     }
   }
@@ -962,7 +999,7 @@ void loop()
         Serial.println("MQTT-Verbindung wiederhergestellt.");
         subscribeToMQTTTopics();
       }
-    }
+    }   
 
     timer1m.executed();
   }
@@ -1003,11 +1040,11 @@ void loop()
 
     timer3m.executed();
   }
-  if (((fuehlerBoiler1.getMeanTemperature()+fuehlerBoiler2.getMeanTemperature())/2) < 50 && !operationMode)
+  if (((fuehlerBoiler1.getMeanTemperature() + fuehlerBoiler2.getMeanTemperature()) / 2) < 50 && !operationMode)
   {
     boilerAdditionalHeatingOn();
   }
-  else if ((((fuehlerBoiler1.getMeanTemperature()+fuehlerBoiler2.getMeanTemperature())/2) > 55 && boilerHighTemperatur == false) || operationMode)
+  else if ((((fuehlerBoiler1.getMeanTemperature() + fuehlerBoiler2.getMeanTemperature()) / 2) > 55 && boilerHighTemperatur == false) || operationMode)
   {
     boilerAdditionalHeatingOff();
   }
