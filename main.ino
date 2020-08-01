@@ -354,11 +354,11 @@ void calculateTargetTemperature()
     }
 
     if (timeClient.getHours() < 11 || (timeClient.getHours() == 11 && timeClient.getMinutes() <= 30)) {
-      newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT-5; //Sole mit hoher Drehzahl, da zu früh um Boiler zu heizen
+      newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da zu früh um Boiler zu heizen
     }
 
     if (badWeather) {
-      newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT-5; //Sole mit hoher Drehzahl, da zu schlechtes Wetter für Boiler
+      newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da zu schlechtes Wetter für Boiler
       if(timeClient.getHours() == 0)
       {
         badWeather = false; //Schlechtwetter-Reset
@@ -485,6 +485,7 @@ void subscribeToMQTTTopics()
   mqttClient.subscribe("derart/toArduino/Betriebsmodus");
   mqttClient.subscribe("derart/toArduino/SpeedKollektorpumpe");
   mqttClient.subscribe("derart/toArduino/severalFunctions");
+  mqttClient.subscribe("derart/toArduino/BadWeather");
 }
 
 void boilerAdditionalHeatingOn()
@@ -714,15 +715,17 @@ void loop()
         break;
       }
     }
-        if (recievedTopic == "derart/toArduino/bBadWeather")
+    if (recievedTopic == "derart/toArduino/BadWeather")
     {
       if (recievedPayload == '0')
       {
         badWeather = false;
+        sendMQTT("message", "Das Wetter ist gut.");
       }
       else if (recievedPayload == '1')
       {
         badWeather = true;
+        sendMQTT("message", "Das Wetter ist schlecht.");
       }
     }
   }
