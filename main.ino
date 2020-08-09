@@ -33,7 +33,7 @@ const byte MIN_DIFFERENZ_NACH_ALARM = 3;        //erst wenn die Temperatur um di
 const byte SOLE_EXIT_TEMPERATURE = 6;           //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
 const byte SOLE_START_TEMPERATURE = 25;         //Temperatur im Kollektor (Luft), bei der der Solemodus gestartet wird
 const byte SOLE_VL_EXIT_TEMPERATURE = 23;       //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
-const byte MIN_KOLLEKTOR_LUFT = 40;             //Mindest-Regeltemperatur für den Kollektor-Vorlauf
+const byte MIN_KOLLEKTOR_LUFT = 38;             //Mindest-Regeltemperatur für den Kollektor-Vorlauf
 const byte MAX_KOLLEKTOR_LUFT_BOILERMODUS = 77; //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
 const byte MAX_KOLLEKTOR_LUFT_SOLEMODUS = 70;   //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
 const byte BOILER_DIRECT_EXIT_DIFF = 8;         //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
@@ -311,11 +311,6 @@ void calculateTargetTemperature()
   double lastPIDSetpointKollektorPumpe = PIDSetpointKollektorPumpe; //letzter PID Setpoint
   if (operationMode)                                                //läuft die Anlage?
   {
-    if (!manualSpeed)
-    { //Pumpengeschwindigkeit auf standard setzen, wenn nicht auf manuell
-      PIDReglerKollektorPumpe.SetOutputLimits(PID_KOLLEKTOR_MIN_SPEED, PID_KOLLEKTOR_MAX_SPEED);
-    }
-
     if (differenzLuftVL > 10)
     {
       differenzLuftVL = 10;
@@ -347,7 +342,11 @@ void calculateTargetTemperature()
         newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER - differenzLuftVL); //Solltemperatur für Boilermodus
         if (floor(fuehlerBoiler1.getMeanTemperature()) > BOILER_FULL_TEMPERATURE && !manualSpeed)                                     //Boiler heiss genug und nicht manuelle Geschwindigkeit?
         {
-          PIDReglerKollektorPumpe.SetOutputLimits(100, PID_KOLLEKTOR_MAX_SPEED); //mindest-Geschwindigkeit fuer Boiler erhöhen
+          PIDReglerKollektorPumpe.SetOutputLimits(120, PID_KOLLEKTOR_MAX_SPEED); //mindest-Geschwindigkeit fuer Boiler erhöhen
+        }
+        else if (!manualSpeed)
+        { //Pumpengeschwindigkeit auf standard setzen, wenn nicht auf manuell
+          PIDReglerKollektorPumpe.SetOutputLimits(PID_KOLLEKTOR_MIN_SPEED, PID_KOLLEKTOR_MAX_SPEED);
         }
       }
     }
@@ -424,15 +423,16 @@ void calculateTargetTemperature()
 //Startet den Boilermodus
 void boilerModusStart()
 {
-  digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH);       //Kollektorpumpe einschalten
-  digitalWrite(RELAIS_SOLE_PUMPE, LOW);             //Solepumpe ausschalten
-  digitalWrite(STELLWERK_SOLE_BOILER, HIGH);        //Stellwerk auf Boiler umschalten
-  PIDReglerKollektorPumpe.SetMode(1);               //PID-Regler Kollektorpumpe einschalten
-  initializing = true;                              //Initialisierung starten
-  initialOperationModeTimeout.setDelayTime(6, 'm'); //Initialisierungszeit setzen
-  initialOperationModeTimeout.setLastTime(now);     //Initialisierungs Timer starten
-  operationMode = 2;                                //Modus auf Boiler schalten
-  tooLowValue = false;                              //tooLowValue zurücksetzen
+  digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH);                                                //Kollektorpumpe einschalten
+  digitalWrite(RELAIS_SOLE_PUMPE, LOW);                                                      //Solepumpe ausschalten
+  digitalWrite(STELLWERK_SOLE_BOILER, HIGH);                                                 //Stellwerk auf Boiler umschalten
+  PIDReglerKollektorPumpe.SetMode(1);                                                        //PID-Regler Kollektorpumpe einschalten
+  initializing = true;                                                                       //Initialisierung starten
+  initialOperationModeTimeout.setDelayTime(6, 'm');                                          //Initialisierungszeit setzen
+  initialOperationModeTimeout.setLastTime(now);                                              //Initialisierungs Timer starten
+  operationMode = 2;                                                                         //Modus auf Boiler schalten
+  tooLowValue = false;                                                                       //tooLowValue zurücksetzen
+  PIDReglerKollektorPumpe.SetOutputLimits(PID_KOLLEKTOR_MIN_SPEED, PID_KOLLEKTOR_MAX_SPEED); //PID-Regler auf Standard-Geschwindigkeit setzen
   MQTTSendTimer.setDelayTime(5, 's');
   if (!digitalRead(RELAIS_KOLLEKTOR_PUMPE))
   {
@@ -457,9 +457,10 @@ void soleModusStart()
     initialOperationModeTimeout.setDelayTime(3, 'm'); //Initialisierungszeit, wenn MNodus 2-->1
     break;
   }
-  initialOperationModeTimeout.setLastTime(now); //Initialisierungs Timer starten
-  operationMode = 1;                            //Modus auf Sole schalten
-  tooLowValue = false;                          //tooLowValue zurücksetzen
+  initialOperationModeTimeout.setLastTime(now);                                              //Initialisierungs Timer starten
+  operationMode = 1;                                                                         //Modus auf Sole schalten
+  tooLowValue = false;                                                                       //tooLowValue zurücksetzen
+  PIDReglerKollektorPumpe.SetOutputLimits(PID_KOLLEKTOR_MIN_SPEED, PID_KOLLEKTOR_MAX_SPEED); //PID-Regler auf Standard-Geschwindigkeit setzen
   MQTTSendTimer.setDelayTime(5, 's');
   if (!(digitalRead(RELAIS_KOLLEKTOR_PUMPE) && digitalRead(RELAIS_SOLE_PUMPE)))
   {
