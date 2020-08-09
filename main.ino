@@ -28,7 +28,7 @@
 //Temperaturen
 const byte ALARMTEMPERATUR_KOLLEKTOR_LUFT = 90; //Alarmtemperatur für Kollektor (Lufttemperatur)
 const byte ALARMTEMPERATUR_KOLLEKTOR_VL = 95;   //Alarmtemperatur für Kollektor (Vorlauftemperatur)
-const byte ALARMTEMPERATUR_SOLE = 45;           //Alarmtemperatur für Sole-Pumpe
+const byte ALARMTEMPERATUR_SOLE = 30;           //Alarmtemperatur für Sole-Pumpe
 const byte MIN_DIFFERENZ_NACH_ALARM = 3;        //erst wenn die Temperatur um diesen Wert gesunken ist, geht der Alarmmodus aus
 const byte SOLE_EXIT_TEMPERATURE = 6;           //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
 const byte SOLE_START_TEMPERATURE = 25;         //Temperatur im Kollektor (Luft), bei der der Solemodus gestartet wird
@@ -141,6 +141,7 @@ Timer displayTimeout(2, 'm');              //Display-Ausschaltzeit
 Timer boilerTimeout(1, 'd');               //Boiler-Ausschaltzeit
 Timer MQTTSendTimer(5, 's');               //Sendeinterval Daten an Dashboard (Achtung, Variabel)
 Timer boilerEnoughFull(1, 'd');            //Timeout-Zeit, wenn Boiler heiss war und in der Zeit Sole priorisiert werden kann
+Timer soleTooHot(10, 'm');                 //Timer für Sole-Alarm
 
 //PWM Setup
 PID PIDReglerKollektorPumpe(&PIDInputKollektorPumpe, &PIDOutputKollektorPumpe, &PIDSetpointKollektorPumpe, PID_P_KOLLEKTOR, PID_I_KOLLEKTOR, PID_D_KOLLEKTOR, REVERSE);
@@ -780,10 +781,14 @@ void loop()
   if (timer5s.checkTimer(now))
   {
     //Überprüfen, ob Alarmwerte überschritten wurden
-    if (fuehlerSole.getLastTemperature() > ALARMTEMPERATUR_SOLE)
+    if (fuehlerSole.getLastTemperature() > ALARMTEMPERATUR_SOLE && soleTooHot.checkTimer(now))
     {
       soleAlarm = true;
     }
+    else if (fuehlerSole.getLastTemperature() < ALARMTEMPERATUR_SOLE) {
+      soleTooHot.setLastTime(now);
+    }
+    
     if (fuehlerKollektorLuft.getLastTemperature() > ALARMTEMPERATUR_KOLLEKTOR_LUFT || fuehlerKollektorVL.getLastTemperature() > ALARMTEMPERATUR_KOLLEKTOR_VL)
     {
       kollektorAlarm = true;
