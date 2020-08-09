@@ -17,7 +17,7 @@
 #include <SPI.h>               //Ethernet
 #include <Ethernet.h>          //Ethernet
 #include <EthernetUdp.h>       //EthernetUdp
-#include <NTPClient.h> //NTP-Libary
+#include <NTPClient.h>         //NTP-Libary
 #include <ArduinoMqttClient.h> //MQTT
 #include "secrets.h"           //MQTT Passwörter
 
@@ -66,6 +66,7 @@ bool lastStateFlowMeterBoiler = LOW;      //Lester Status des Flow Meter Boiler
 bool lastStateFlowMeterSole = LOW;        //Lester Status des Flow Meter Boiler
 bool temperatureErrorMessageSent = false; //Fehlermeldung wegen unrealistischer Temperatur bereits gesendet?
 bool badWeather = false;                  //Bei Schlechtwetter wird nicht versucht, den Boiler zu heizen
+bool manualSpeed = false;                 //Ist die Pumpengeschwindigkeit auf Manuell?
 
 //PID Variabeln
 double PIDInputKollektorPumpe = 0;     //PID Input
@@ -139,6 +140,7 @@ Timer displayButtonTimeout(1000);          //Display-Button Timeout
 Timer displayTimeout(2, 'm');              //Display-Ausschaltzeit
 Timer boilerTimeout(1, 'd');               //Boiler-Ausschaltzeit
 Timer MQTTSendTimer(5, 's');               //Sendeinterval Daten an Dashboard (Achtung, Variabel)
+Timer boilerEnoughFull(1, 'd');            //Timeout-Zeit, wenn Boiler heiss war und in der Zeit Sole priorisiert werden kann
 
 //PWM Setup
 PID PIDReglerKollektorPumpe(&PIDInputKollektorPumpe, &PIDOutputKollektorPumpe, &PIDSetpointKollektorPumpe, PID_P_KOLLEKTOR, PID_I_KOLLEKTOR, PID_D_KOLLEKTOR, REVERSE);
@@ -154,12 +156,12 @@ String recievedTopic;                  //Empfangenes Thema
 char recievedPayload;                  //Empfangenes Zeichen
 
 //Ethernet Client Setup
-EthernetClient httpClient;    //httpClient für SMS
+EthernetClient httpClient; //httpClient für SMS
 
 //NTP Client Setup
-const char ntpServer[] = "europe.pool.ntp.org"; //NTP Server
-EthernetUDP ntpUDP;           //UDP Client für NTP Server
-NTPClient timeClient(ntpUDP,ntpServer, 7200, 60000); //NTP Client
+const char ntpServer[] = "europe.pool.ntp.org";       //NTP Server
+EthernetUDP ntpUDP;                                   //UDP Client für NTP Server
+NTPClient timeClient(ntpUDP, ntpServer, 7200, 60000); //NTP Client
 
 // =============
 // 5. FUNKTIONEN
@@ -309,6 +311,11 @@ void calculateTargetTemperature()
   double lastPIDSetpointKollektorPumpe = PIDSetpointKollektorPumpe; //letzter PID Setpoint
   if (operationMode)                                                //läuft die Anlage?
   {
+    if (!manualSpeed)
+    { //Pumpengeschwindigkeit auf standard setzen, wenn nicht auf manuell
+      PIDReglerKollektorPumpe.SetOutputLimits(PID_KOLLEKTOR_MIN_SPEED, PID_KOLLEKTOR_MAX_SPEED);
+    }
+
     if (differenzLuftVL > 10)
     {
       differenzLuftVL = 10;
@@ -338,6 +345,10 @@ void calculateTargetTemperature()
       else //nicht am Initialisieren im Boilermodus
       {
         newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER - differenzLuftVL); //Solltemperatur für Boilermodus
+        if (floor(fuehlerBoiler1.getMeanTemperature()) > BOILER_FULL_TEMPERATURE && !manualSpeed)                                     //Boiler heiss genug und nicht manuelle Geschwindigkeit?
+        {
+          PIDReglerKollektorPumpe.SetOutputLimits(100, PID_KOLLEKTOR_MAX_SPEED); //mindest-Geschwindigkeit fuer Boiler erhöhen
+        }
       }
     }
     else //Solemodus?
@@ -351,18 +362,24 @@ void calculateTargetTemperature()
       {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler bereits heiss
       }
-    }
-
-    if (timeClient.getHours() < 11 || (timeClient.getHours() == 11 && timeClient.getMinutes() <= 30)) {
-      newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da zu früh um Boiler zu heizen
-    }
-
-    if (badWeather) {
-      newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da zu schlechtes Wetter für Boiler
-      if(timeClient.getHours() == 0)
+      else if (fuehlerBoiler1.getMeanTemperature() > BOILER_NOT_FULL_TEMPERATUR && !(boilerEnoughFull.checkTimer(now)))
       {
-        badWeather = false; //Schlechtwetter-Reset
+        newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler in den letzten 24h heiss war
       }
+      if (badWeather)
+      {
+        newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da zu schlechtes Wetter für Boiler
+      }
+    }
+
+    if (timeClient.getHours() == 0 && badWeather)
+    {
+      badWeather = false; //Schlechtwetter-Reset
+    }
+
+    if (timeClient.getHours() < 11 || (timeClient.getHours() == 11 && timeClient.getMinutes() <= 30))
+    {
+      newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da zu früh um Boiler zu heizen
     }
 
     if (newPIDSetpointKollektorPumpe > PIDSetpointKollektorPumpe)
@@ -560,11 +577,11 @@ void setup()
   Serial.println();
 
   subscribeToMQTTTopics();
-    Serial.println("Du hast die MQTT Topics abonniert!");
+  Serial.println("Du hast die MQTT Topics abonniert!");
   Serial.println();
 
   timeClient.begin();
-    Serial.println("Du bist mit dem Zeitserver verbunden!");
+  Serial.println("Du bist mit dem Zeitserver verbunden!");
   Serial.println();
 
   //erster Betriebsmodus nach dem Starten (Ohne Initialisierungszeit)
@@ -666,10 +683,12 @@ void loop()
       {
       case '0':
         PIDReglerKollektorPumpe.SetOutputLimits(PID_KOLLEKTOR_MIN_SPEED, PID_KOLLEKTOR_MAX_SPEED);
+        manualSpeed = false;
         sendMQTT("message", "Pumpen-Geschwindigkeit wieder bei Auto.");
         break;
       case '1':
         PIDReglerKollektorPumpe.SetOutputLimits(70, 71);
+        manualSpeed = true;
         sendMQTT("message", "Kollektorpumpe: Manuell sehr langsam");
         if (!operationMode)
         //Wenn die Anlage nicht läuft, wird die Pumpe gestartet
@@ -679,6 +698,7 @@ void loop()
         break;
       case '2':
         PIDReglerKollektorPumpe.SetOutputLimits(110, 111);
+        manualSpeed = true;
         sendMQTT("message", "Kollektorpumpe: Manuell langsam");
         if (!operationMode)
         //Wenn die Anlage nicht läuft, wird die Pumpe gestartet
@@ -688,6 +708,7 @@ void loop()
         break;
       case '3':
         PIDReglerKollektorPumpe.SetOutputLimits(150, 151);
+        manualSpeed = true;
         sendMQTT("message", "Kollektorpumpe: Manuell mittel");
         if (!operationMode)
         //Wenn die Anlage nicht läuft, wird die Pumpe gestartet
@@ -697,6 +718,7 @@ void loop()
         break;
       case '4':
         PIDReglerKollektorPumpe.SetOutputLimits(190, 191);
+        manualSpeed = true;
         sendMQTT("message", "Kollektorpumpe: Manuell schnell");
         if (!operationMode)
         //Wenn die Anlage nicht läuft, wird die Pumpe gestartet
@@ -706,6 +728,7 @@ void loop()
         break;
       case '5':
         PIDReglerKollektorPumpe.SetOutputLimits(250, 255);
+        manualSpeed = true;
         sendMQTT("message", "Kollektorpumpe: Manuell sehr schnell");
         if (!operationMode)
         //Wenn die Anlage nicht läuft, wird die Pumpe gestartet
@@ -720,12 +743,10 @@ void loop()
       if (recievedPayload == '0')
       {
         badWeather = false;
-        sendMQTT("message", "Das Wetter ist gut.");
       }
       else if (recievedPayload == '1')
       {
         badWeather = true;
-        sendMQTT("message", "Das Wetter ist schlecht.");
       }
     }
   }
@@ -1002,7 +1023,7 @@ void loop()
         Serial.println("MQTT-Verbindung wiederhergestellt.");
         subscribeToMQTTTopics();
       }
-    }   
+    }
 
     timer1m.executed();
   }
@@ -1030,6 +1051,7 @@ void loop()
     if (fuehlerBoiler1.getMeanTemperature() > 65)
     {
       timerLegionellenschaltung.setLastTime(now); //Legionellenschaltung hinauszögern
+      boilerEnoughFull.setLastTime(now);          //Boiler als genuegend voll setzen
       if (boilerHighTemperatur)                   //Legionellenschaltung ausschalten, falls eingeschaltet
       {
         boilerHighTemperatur = false;
