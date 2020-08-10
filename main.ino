@@ -28,7 +28,8 @@
 //Temperaturen
 const byte ALARMTEMPERATUR_KOLLEKTOR_LUFT = 90; //Alarmtemperatur für Kollektor (Lufttemperatur)
 const byte ALARMTEMPERATUR_KOLLEKTOR_VL = 95;   //Alarmtemperatur für Kollektor (Vorlauftemperatur)
-const byte ALARMTEMPERATUR_SOLE = 30;           //Alarmtemperatur für Sole-Pumpe
+const byte ALARMTEMPERATUR_SOLE = 32;           //Alarmtemperatur für Sole-Pumpe
+const byte CRITICAL_TEMPERATURE_SOLE = 30;      //Kritische Sole-Temperatur
 const byte MIN_DIFFERENZ_NACH_ALARM = 3;        //erst wenn die Temperatur um diesen Wert gesunken ist, geht der Alarmmodus aus
 const byte SOLE_EXIT_TEMPERATURE = 6;           //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
 const byte SOLE_START_TEMPERATURE = 25;         //Temperatur im Kollektor (Luft), bei der der Solemodus gestartet wird
@@ -67,6 +68,7 @@ bool lastStateFlowMeterSole = LOW;        //Lester Status des Flow Meter Boiler
 bool temperatureErrorMessageSent = false; //Fehlermeldung wegen unrealistischer Temperatur bereits gesendet?
 bool badWeather = false;                  //Bei Schlechtwetter wird nicht versucht, den Boiler zu heizen
 bool manualSpeed = false;                 //Ist die Pumpengeschwindigkeit auf Manuell?
+bool soleCriticalTemp = false;            //Sole läuft Heiss?
 
 //PID Variabeln
 double PIDInputKollektorPumpe = 0;     //PID Input
@@ -370,6 +372,20 @@ void calculateTargetTemperature()
       {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da zu schlechtes Wetter für Boiler
       }
+      if (fuehlerSole.getMeanTemperature() > CRITICAL_TEMPERATURE_SOLE) //Sole VL zu heiss?
+      {
+        newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT + 10;
+        soleCriticalTemp = true;
+      }
+      else if (soleCriticalTemp && fuehlerSole.getMeanTemperature() > CRITICAL_TEMPERATURE_SOLE - 2)
+      {
+        newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT + 10;
+        soleCriticalTemp = true;
+      }
+      else if(fuehlerSole.getMeanTemperature() <= CRITICAL_TEMPERATURE_SOLE - 2) {
+        newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT;
+        soleCriticalTemp = false;
+      }
     }
 
     if (timeClient.getHours() == 0 && badWeather)
@@ -377,7 +393,7 @@ void calculateTargetTemperature()
       badWeather = false; //Schlechtwetter-Reset
     }
 
-    if (timeClient.getHours() < 11 || (timeClient.getHours() == 11 && timeClient.getMinutes() <= 30))
+    if (timeClient.getHours() < 11 || (timeClient.getHours() == 11 && timeClient.getMinutes() <= 30) && !soleCriticalTemp)
     {
       newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da zu früh um Boiler zu heizen
     }
@@ -785,10 +801,11 @@ void loop()
     {
       soleAlarm = true;
     }
-    else if (fuehlerSole.getLastTemperature() < ALARMTEMPERATUR_SOLE) {
+    else if (fuehlerSole.getLastTemperature() < ALARMTEMPERATUR_SOLE)
+    {
       soleTooHot.setLastTime(now);
     }
-    
+
     if (fuehlerKollektorLuft.getLastTemperature() > ALARMTEMPERATUR_KOLLEKTOR_LUFT || fuehlerKollektorVL.getLastTemperature() > ALARMTEMPERATUR_KOLLEKTOR_VL)
     {
       kollektorAlarm = true;

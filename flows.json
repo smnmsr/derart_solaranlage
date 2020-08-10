@@ -42,7 +42,7 @@
         "id": "4543380.13c64c8",
         "type": "ui_base",
         "theme": {
-            "name": "theme-dark",
+            "name": "theme-custom",
             "lightTheme": {
                 "default": "#0094CE",
                 "baseColor": "#0432ff",
@@ -58,20 +58,20 @@
                 "reset": false
             },
             "customTheme": {
-                "name": "Untitled Theme 1",
+                "name": "Solar1",
                 "default": "#4B7930",
-                "baseColor": "#ff40ff",
+                "baseColor": "#004d65",
                 "baseFont": "Century Gothic,CenturyGothic,AppleGothic,sans-serif",
                 "reset": false
             },
             "themeState": {
                 "base-color": {
-                    "default": "#097479",
-                    "value": "#097479",
+                    "default": "#ff40ff",
+                    "value": "#004d65",
                     "edited": true
                 },
                 "page-titlebar-backgroundColor": {
-                    "value": "#097479",
+                    "value": "#004d65",
                     "edited": false
                 },
                 "page-backgroundColor": {
@@ -83,7 +83,7 @@
                     "edited": false
                 },
                 "group-textColor": {
-                    "value": "#0eb8c0",
+                    "value": "#0087b1",
                     "edited": false
                 },
                 "group-borderColor": {
@@ -99,7 +99,7 @@
                     "edited": false
                 },
                 "widget-backgroundColor": {
-                    "value": "#097479",
+                    "value": "#004d65",
                     "edited": false
                 },
                 "widget-borderColor": {
@@ -1353,7 +1353,7 @@
         "bytopic": "all",
         "outputs": 1,
         "x": 910,
-        "y": 560,
+        "y": 520,
         "wires": [
             [
                 "c487f41e.9e60a"
@@ -1463,10 +1463,11 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "700",
         "removeOlderUnit": "86400",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -1505,10 +1506,11 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "700",
         "removeOlderUnit": "86400",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -1547,10 +1549,11 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "700",
         "removeOlderUnit": "86400",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -1589,10 +1592,11 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "700",
         "removeOlderUnit": "86400",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -1631,10 +1635,11 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "700",
         "removeOlderUnit": "86400",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -1673,10 +1678,11 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "700",
         "removeOlderUnit": "86400",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -1715,10 +1721,11 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "700",
         "removeOlderUnit": "86400",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -2490,10 +2497,11 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "1000",
         "removeOlderUnit": "604800",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -2760,10 +2768,11 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "1000",
         "removeOlderUnit": "604800",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -2878,10 +2887,11 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "1000",
         "removeOlderUnit": "604800",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -2996,10 +3006,11 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "1000",
         "removeOlderUnit": "604800",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -3114,10 +3125,11 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "1000",
         "removeOlderUnit": "604800",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -3232,10 +3244,11 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "1000",
         "removeOlderUnit": "604800",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -4069,6 +4082,8 @@
         "func": "//Überprüfen ob variabeln gesetzt sind und allenfalls setzen.\nif (flow.get('boilerEnergyToday') === undefined) {\n    flow.set('boilerEnergyToday', 0);\n}\nif (flow.get('boilerEnergySinceReset') === undefined) {\n    flow.set('boilerEnergySinceReset', 0);\n}\nif (flow.get('boilerEnergyTotal') === undefined) {\n    flow.set('boilerEnergyTotal', 0);\n}\nif (flow.get('boilerVLLastTime') === undefined) {\n    flow.set('boilerVLLastTime', flow.get('derart/fuehlerBoilerVL'));\n}\nif (flow.get('boilerRLLastTime') === undefined) {\n    flow.set('boilerRLLastTime', flow.get('derart/fuehlerBoilerRL'));\n}\nif (flow.get('boilerTimeLastTime') === undefined) {\n    flow.set('boilerTimeLastTime', Date.now());\n}\nif (flow.get('boilerPowerArray') === undefined) {\n    boilerPowerArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];\n    flow.set('boilerPowerArray', boilerPowerArray);\n}\n\nvolume = 0.001; //m^3\ntimeDelay = (Date.now() - flow.get('boilerTimeLastTime')) / 1000; //s\n\n//Berechnungen Vorlauf\nmeanVLTemperature = (flow.get('boilerVLLastTime') + flow.get('derart/fuehlerBoilerVL'))/2; //°C\ndensityVL = -0.0054 * meanVLTemperature^2 -0.33 *  meanVLTemperature + 1045; //kg/m^3\nheatCapacityVL = 0.01944 * meanVLTemperature + 1.02778 * meanVLTemperature + 3650; //J/kg*K\nmass = densityVL * volume;\namountOfHeatVL = meanVLTemperature * heatCapacityVL * mass; //J\n\n//Berechnungen Rücklauf\nmeanRLTemperature = (flow.get('boilerRLLastTime') + flow.get('derart/fuehlerBoilerRL'))/2;\nheatCapacityRL = 0.01944 * meanRLTemperature + 1.02778 * meanRLTemperature + 3650; //J/kg*K\namountOfHeatRL = meanRLTemperature * heatCapacityRL * mass; //J\n\n//Berechnungen Wärmemenge und Leistung\namountOfHeatDiff = amountOfHeatVL - amountOfHeatRL; //J\namountOfHeatDiffKWH = amountOfHeatDiff / 3600000; //kWh\npowerW = amountOfHeatDiff / timeDelay; //W\n\nboilerPowerArray = flow.get('boilerPowerArray');\nboilerPowerArray.push(powerW);\nboilerPowerArray.shift();\nflow.set('boilerPowerArray', boilerPowerArray)\n\nboilerPowerArrayCalc = boilerPowerArray.slice(0);\nboilerPowerArrayCalc = boilerPowerArrayCalc.sort();\npowerW = boilerPowerArrayCalc[4] + boilerPowerArrayCalc[5];\npowerW /= 2000;\nflow.set('boilerPower',powerW)\n\nif (amountOfHeatDiffKWH > 0 && !isNaN(amountOfHeatDiffKWH)) {\nflow.set('boilerEnergyToday', flow.get('boilerEnergyToday') + amountOfHeatDiffKWH);\nflow.set('boilerEnergySinceReset', flow.get('boilerEnergySinceReset') + amountOfHeatDiffKWH);\nflow.set('boilerEnergyTotal', flow.get('boilerEnergyTotal') + amountOfHeatDiffKWH);\n}\n\nflow.set('boilerVLLastTime', flow.get('derart/fuehlerBoilerVL'));\nflow.set('boilerRLLastTime', flow.get('derart/fuehlerBoilerRL'));\nflow.set('boilerTimeLastTime', Date.now());\n\nreturn { payload: 1 }",
         "outputs": 1,
         "noerr": 0,
+        "initialize": "",
+        "finalize": "",
         "x": 410,
         "y": 4080,
         "wires": [
@@ -4994,7 +5009,7 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": "3",
-        "removeOlderPoints": "",
+        "removeOlderPoints": "1000",
         "removeOlderUnit": "3600",
         "cutout": 0,
         "useOneColor": false,
@@ -5461,9 +5476,9 @@
         "nodata": "",
         "dot": false,
         "ymin": "0",
-        "ymax": "5",
+        "ymax": "",
         "removeOlder": "7",
-        "removeOlderPoints": "",
+        "removeOlderPoints": "175",
         "removeOlderUnit": "86400",
         "cutout": 0,
         "useOneColor": false,
@@ -5506,7 +5521,7 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": "1",
-        "removeOlderPoints": "",
+        "removeOlderPoints": "700",
         "removeOlderUnit": "86400",
         "cutout": 0,
         "useOneColor": false,
@@ -6253,10 +6268,11 @@
         "ymin": "0",
         "ymax": "85",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "150",
         "removeOlderUnit": "86400",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -6295,10 +6311,11 @@
         "ymin": "0",
         "ymax": "85",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "175",
         "removeOlderUnit": "604800",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -6524,6 +6541,8 @@
         "func": "if (msg.payload == 'OK') {\n    return {payload: \"Erfolgreich zurückgesetzt\"};\n}\nelse {\n    return {payload: \"nicht zurückgesetzt.\"};\n}",
         "outputs": 1,
         "noerr": 0,
+        "initialize": "",
+        "finalize": "",
         "x": 850,
         "y": 4320,
         "wires": [
@@ -6558,6 +6577,8 @@
         "func": "if (msg.payload == 'OK') {\n    return {payload: \"Erfolgreich zurückgesetzt\"};\n}\nelse {\n    return {payload: \"nicht zurückgesetzt.\"};\n}",
         "outputs": 1,
         "noerr": 0,
+        "initialize": "",
+        "finalize": "",
         "x": 990,
         "y": 4200,
         "wires": [
@@ -6736,7 +6757,7 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": "3",
-        "removeOlderPoints": "",
+        "removeOlderPoints": "1000",
         "removeOlderUnit": "3600",
         "cutout": 0,
         "useOneColor": false,
@@ -6779,10 +6800,11 @@
         "ymin": "0",
         "ymax": "",
         "removeOlder": 1,
-        "removeOlderPoints": "",
+        "removeOlderPoints": "1000",
         "removeOlderUnit": "604800",
         "cutout": 0,
         "useOneColor": false,
+        "useUTC": false,
         "colors": [
             "#1f77b4",
             "#aec7e8",
@@ -7116,7 +7138,7 @@
         "wtype": "current",
         "lon": "",
         "lat": "",
-        "city": "Sulz",
+        "city": "Rickenbach (ZH)",
         "country": "CH",
         "language": "de",
         "x": 2450,
@@ -7124,8 +7146,8 @@
         "wires": [
             [
                 "ed2dfba5.c7cd7",
-                "4a5f6802.3901f",
-                "addef7fd.d09a78"
+                "addef7fd.d09a78",
+                "494d55c6.2b0e94"
             ]
         ]
     },
@@ -7169,7 +7191,8 @@
         "wires": [
             [
                 "509dcff5.d70e7",
-                "631e8c2c.246fb4"
+                "631e8c2c.246fb4",
+                "d213bdca.f5f348"
             ]
         ]
     },
@@ -7225,7 +7248,7 @@
                 "pt": "msg",
                 "from": "1",
                 "fromt": "num",
-                "to": "1",
+                "to": "0",
                 "tot": "str"
             }
         ],
@@ -7259,22 +7282,6 @@
         "wires": []
     },
     {
-        "id": "4a5f6802.3901f",
-        "type": "debug",
-        "z": "f1c3bb0e.a936f",
-        "name": "",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 2620,
-        "y": 3040,
-        "wires": []
-    },
-    {
         "id": "addef7fd.d09a78",
         "type": "ui_text",
         "z": "f1c3bb0e.a936f",
@@ -7288,6 +7295,161 @@
         "layout": "row-spread",
         "x": 3150,
         "y": 3060,
+        "wires": []
+    },
+    {
+        "id": "494d55c6.2b0e94",
+        "type": "debug",
+        "z": "f1c3bb0e.a936f",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2680,
+        "y": 3200,
+        "wires": []
+    },
+    {
+        "id": "d213bdca.f5f348",
+        "type": "ui_chart",
+        "z": "f1c3bb0e.a936f",
+        "name": "",
+        "group": "2f5003a7.2814a4",
+        "order": 4,
+        "width": 24,
+        "height": 6,
+        "label": "Bewölkung",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "",
+        "removeOlder": "1",
+        "removeOlderPoints": "150",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#d62728",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 3330,
+        "y": 3080,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "882ee5fe.41b9c",
+        "type": "comment",
+        "z": "f1c3bb0e.a936f",
+        "name": "",
+        "info": "Hier\n",
+        "x": 2980,
+        "y": 3220,
+        "wires": []
+    },
+    {
+        "id": "d8dd2a28.8a0db8",
+        "type": "inject",
+        "z": "f1c3bb0e.a936f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "00 00 * * 1",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "Energie-Backup",
+        "payload": "",
+        "payloadType": "date",
+        "x": 2000,
+        "y": 4520,
+        "wires": [
+            [
+                "f4f0f438.0c1808"
+            ]
+        ]
+    },
+    {
+        "id": "97916572.b296d8",
+        "type": "function",
+        "z": "f1c3bb0e.a936f",
+        "name": "",
+        "func": "boilerTot = flow.get('boilerEnergyTotal');\nsoleTot = flow.get('soleEnergyTotal');\nmessage = \"Das ist das regelmässige Backup der Energiedaten vom \";\nmessage += msg.time;\nmessage += \".\\n\\nDie Boiler-Gesamtenergie beträgt: \";\nmessage += String(Math.round(boilerTot));\nmessage += \" kWh\\n Die Sole-Gesamtenergie beträgt: \";\nmessage += String(Math.round(soleTot));\nmessage += \" kWh\\n\\nLiebe Gruesse von (Lud)Milla\\n\\nP.S. \";\naddon0 = \"Es ist dunkel und stickig hier unten.\";\naddon1 = \"Ich habe Hunger. Nur diese Bits und Bytes reichen einfach nicht. ICH WILL SONNE!\";\naddon2 = \"Heute Nacht habe ich eine Maus gefangen. Wollte sie Filu geben, aber der war sogar dafür zu faul.\";\naddon3 = \"Mein Kollege der Wilo-Yonos dreht mal wieder am Rad...\";\naddon4 = \"Habe gerade ein Bad im Boiler genommen. War angenehm war, aber etwas mehr hätten wir da schon noch reinladen können.\";\naddon5 = \"Was sagt eigentlich die PV-Anlage dazu, dass ich viel effizienter bin als sie?\"\nrandNum = Math.floor(Math.random() * 6);\nswitch(randNum) {\n  case 0:\n    message += addon0;\n    break;\n  case 1:\n    message += addon1;\n    break;\n  case 2:\n    message += addon2;\n    break;\n  case 3:\n    message += addon3;\n    break;\n  case 4:\n    message += addon4;\n    break;\n  case 5:\n    message += addon5;\n    break;\n  default:\n    message += \"Heute habe ich nichts zu sagen.\";\n}\nreturn {topic: msg.topic, payload: message, time: msg.time}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 2440,
+        "y": 4520,
+        "wires": [
+            [
+                "4e698033.061bf8"
+            ]
+        ]
+    },
+    {
+        "id": "f4f0f438.0c1808",
+        "type": "moment",
+        "z": "f1c3bb0e.a936f",
+        "name": "",
+        "topic": "",
+        "input": "payload",
+        "inputType": "msg",
+        "inTz": "Europe/Zurich",
+        "adjAmount": "2",
+        "adjType": "hours",
+        "adjDir": "add",
+        "format": "DD.MM.yyyy",
+        "locale": "en_GB",
+        "output": "time",
+        "outputType": "msg",
+        "outTz": "Europe/Zurich",
+        "x": 2240,
+        "y": 4520,
+        "wires": [
+            [
+                "97916572.b296d8"
+            ]
+        ]
+    },
+    {
+        "id": "4e698033.061bf8",
+        "type": "e-mail",
+        "z": "f1c3bb0e.a936f",
+        "server": "asmtp.mail.hostpoint.ch",
+        "port": "465",
+        "secure": true,
+        "tls": true,
+        "name": "fuerer@der-art.ch",
+        "dname": "",
+        "x": 2630,
+        "y": 4520,
         "wires": []
     }
 ]
