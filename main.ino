@@ -380,7 +380,6 @@ void calculateTargetTemperature()
       else if (soleCriticalTemp && fuehlerSole.getMeanTemperature() > CRITICAL_TEMPERATURE_SOLE - 2)
       {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT + 10;
-        soleCriticalTemp = true;
       }
       else if(fuehlerSole.getMeanTemperature() <= CRITICAL_TEMPERATURE_SOLE - 2 && soleCriticalTemp) {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT;
@@ -1085,6 +1084,10 @@ void loop()
       }
       sendMQTT("boilerLegionellenTemperatur", "Temperatur erreicht");
     }
+
+    //Aktuelle System-Zeit senden
+    sendMQTT("timeHours",timeClient.getHours());
+    sendMQTT("timeMinutes",timeClient.getMinutes());
 
     timer3m.executed();
   }
