@@ -382,7 +382,7 @@ void calculateTargetTemperature()
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT + 10;
         soleCriticalTemp = true;
       }
-      else if(fuehlerSole.getMeanTemperature() <= CRITICAL_TEMPERATURE_SOLE - 2) {
+      else if(fuehlerSole.getMeanTemperature() <= CRITICAL_TEMPERATURE_SOLE - 2 && soleCriticalTemp) {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT;
         soleCriticalTemp = false;
       }
