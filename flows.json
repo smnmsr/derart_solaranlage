@@ -431,7 +431,7 @@
         "id": "c6ec464d.b9e02",
         "type": "ui_group",
         "z": "",
-        "name": "Raspberry PI",
+        "name": "System",
         "tab": "5e1d7d27.def5ac",
         "order": 5,
         "disp": true,
@@ -6990,11 +6990,11 @@
         "z": "f1c3bb0e.a936f",
         "name": "",
         "group": "c6ec464d.b9e02",
-        "order": 0,
+        "order": 2,
         "width": 0,
         "height": 0,
         "passthru": false,
-        "label": "Herunterfahren",
+        "label": "Raspberry Herunterfahren",
         "tooltip": "",
         "color": "",
         "bgcolor": "",
@@ -7002,7 +7002,7 @@
         "payload": "Herunterfahren?",
         "payloadType": "str",
         "topic": "",
-        "x": 1780,
+        "x": 1810,
         "y": 3560,
         "wires": [
             [
@@ -7020,7 +7020,7 @@
         "width": 0,
         "height": 0,
         "passthru": false,
-        "label": "Neustarten",
+        "label": "Raspberry Neustarten",
         "tooltip": "",
         "color": "",
         "bgcolor": "",
@@ -7028,7 +7028,7 @@
         "payload": "Neustarten?",
         "payloadType": "str",
         "topic": "",
-        "x": 1770,
+        "x": 1800,
         "y": 3620,
         "wires": [
             [
@@ -7451,5 +7451,130 @@
         "x": 2630,
         "y": 4520,
         "wires": []
+    },
+    {
+        "id": "58ba4f2a.9c1b28",
+        "type": "mqtt in",
+        "z": "f1c3bb0e.a936f",
+        "name": "",
+        "topic": "derart/timeHours",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "5985cf37.8d0c48",
+        "x": 1940,
+        "y": 4600,
+        "wires": [
+            [
+                "3b2d343d.af5efc"
+            ]
+        ]
+    },
+    {
+        "id": "e9ae2a84.10fc48",
+        "type": "mqtt in",
+        "z": "f1c3bb0e.a936f",
+        "name": "",
+        "topic": "derart/timeMinutes",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "5985cf37.8d0c48",
+        "x": 1950,
+        "y": 4640,
+        "wires": [
+            [
+                "55787f27.6b075"
+            ]
+        ]
+    },
+    {
+        "id": "3b2d343d.af5efc",
+        "type": "function",
+        "z": "f1c3bb0e.a936f",
+        "name": "",
+        "func": "flow.set('timeHours',msg.payload)\nreturn {payload: null}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 2140,
+        "y": 4600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "55787f27.6b075",
+        "type": "function",
+        "z": "f1c3bb0e.a936f",
+        "name": "",
+        "func": "flow.set('timeMinutes',msg.payload)\nreturn {payload: null}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 2140,
+        "y": 4640,
+        "wires": [
+            [
+                "a21e81b2.025ba8"
+            ]
+        ]
+    },
+    {
+        "id": "1fabd115.68a087",
+        "type": "ui_text",
+        "z": "f1c3bb0e.a936f",
+        "group": "c6ec464d.b9e02",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Arduino Systemzeit",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 2650,
+        "y": 4620,
+        "wires": []
+    },
+    {
+        "id": "f1d54482.75d248",
+        "type": "function",
+        "z": "f1c3bb0e.a936f",
+        "name": "",
+        "func": "h = flow.get('timeHours');\nm = flow.get('timeMinutes');\ntime = String(h) + \":\" + String(m) + \" Uhr\";\nreturn {payload: time}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 2480,
+        "y": 4620,
+        "wires": [
+            [
+                "1fabd115.68a087"
+            ]
+        ]
+    },
+    {
+        "id": "a21e81b2.025ba8",
+        "type": "delay",
+        "z": "f1c3bb0e.a936f",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "2",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 2320,
+        "y": 4620,
+        "wires": [
+            [
+                "f1d54482.75d248"
+            ]
+        ]
     }
 ]
