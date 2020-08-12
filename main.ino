@@ -360,10 +360,6 @@ void calculateTargetTemperature()
       {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler bereits heiss
       }
-      else if (fuehlerBoiler1.getMeanTemperature() > BOILER_NOT_FULL_TEMPERATUR && lastPIDSetpointKollektorPumpe == MIN_KOLLEKTOR_LUFT)
-      {
-        newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler bereits heiss
-      }
       else if (fuehlerBoiler1.getMeanTemperature() > BOILER_NOT_FULL_TEMPERATUR && !(boilerEnoughFull.checkTimer(now)))
       {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler in den letzten 24h heiss war
@@ -381,7 +377,8 @@ void calculateTargetTemperature()
       {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT + 10;
       }
-      else if(fuehlerSole.getMeanTemperature() <= CRITICAL_TEMPERATURE_SOLE - 2 && soleCriticalTemp) {
+      else if (fuehlerSole.getMeanTemperature() <= CRITICAL_TEMPERATURE_SOLE - 2 && soleCriticalTemp)
+      {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT;
         soleCriticalTemp = false;
       }
@@ -1086,8 +1083,8 @@ void loop()
     }
 
     //Aktuelle System-Zeit senden
-    sendMQTT("timeHours",timeClient.getHours());
-    sendMQTT("timeMinutes",timeClient.getMinutes());
+    sendMQTT("timeHours", timeClient.getHours());
+    sendMQTT("timeMinutes", timeClient.getMinutes());
 
     timer3m.executed();
   }
