@@ -40,7 +40,7 @@ const byte MAX_KOLLEKTOR_LUFT_SOLEMODUS = 70;   //Maximal-Regeltemperatur für K
 const byte BOILER_DIRECT_EXIT_DIFF = 8;         //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
 const byte MIN_DIFFERENZ_VL_RL_BOILER = 12;     //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
 const byte MIN_DIFFERENZ_VL_RL_SOLE = 10;       //Wenn VL und RL weniger als Diese Differenz haben, wird der Modus abgebrochen
-const byte MIN_WAERMER_KOLLEKTOR_VL_BOILER = 4; //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
+const byte MIN_WAERMER_KOLLEKTOR_VL_BOILER = 3; //mindest Temperaturunterschied zwischen Boiler und Kollektor VL, bei dem der Boilermodus gestartet wird
 const byte BOILER_FULL_TEMPERATURE = 65;        //hat der Boiler oben mindestens diese Temperatur, wird bevorzugt in den Boden gearbeitet
 const byte BOILER_NOT_FULL_TEMPERATUR = 60;     //hat der Boiler oben weniger als diese Temperatur, wird bevorzugt in den Boden gearbeitet
 
@@ -325,7 +325,7 @@ void calculateTargetTemperature()
 
     if (digitalRead(STELLWERK_SOLE_BOILER)) //Boilermodus?
     {
-      if (!initializing)
+      if (!initializing) //nicht am initialisieren?
       {
         if (fuehlerBoilerVL.getMeanTemperature() - fuehlerBoilerRL.getMeanTemperature() < MIN_DIFFERENZ_VL_RL_BOILER + 2) //VL und RL nähern sich zu stark an
         {
@@ -339,18 +339,18 @@ void calculateTargetTemperature()
         {
           newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER - differenzLuftVL); //Solltemperatur für Boilermodus
         }
-      }
-      else //nicht am Initialisieren im Boilermodus
-      {
-        newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER - differenzLuftVL); //Solltemperatur für Boilermodus
-        if (floor(fuehlerBoiler1.getMeanTemperature()) > BOILER_FULL_TEMPERATURE && !manualSpeed)                                     //Boiler heiss genug und nicht manuelle Geschwindigkeit?
+        if (floor(fuehlerBoiler1.getMeanTemperature()) > BOILER_FULL_TEMPERATURE && !manualSpeed) //Boiler heiss genug und nicht manuelle Geschwindigkeit?
         {
-          PIDReglerKollektorPumpe.SetOutputLimits(120, PID_KOLLEKTOR_MAX_SPEED); //mindest-Geschwindigkeit fuer Boiler erhöhen
+          PIDReglerKollektorPumpe.SetOutputLimits(105, PID_KOLLEKTOR_MAX_SPEED); //mindest-Geschwindigkeit fuer Boiler erhöhen
         }
         else if (!manualSpeed)
         { //Pumpengeschwindigkeit auf standard setzen, wenn nicht auf manuell
           PIDReglerKollektorPumpe.SetOutputLimits(PID_KOLLEKTOR_MIN_SPEED, PID_KOLLEKTOR_MAX_SPEED);
         }
+      }
+      else //nicht am Initialisieren im Boilermodus
+      {
+        newPIDSetpointKollektorPumpe = ceil(fuehlerBoiler1.getMeanTemperature() + MIN_WAERMER_KOLLEKTOR_VL_BOILER - differenzLuftVL); //Solltemperatur für Boilermodus
       }
     }
     else //Solemodus?
