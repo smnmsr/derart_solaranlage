@@ -34,7 +34,7 @@ const byte MIN_DIFFERENZ_NACH_ALARM = 3;        //erst wenn die Temperatur um di
 const byte SOLE_EXIT_TEMPERATURE = 6;           //Temperatur zur Sonde, bei der der Solemodus abgebrochen wird
 const byte SOLE_START_TEMPERATURE = 25;         //Temperatur im Kollektor (Luft), bei der der Solemodus gestartet wird
 const byte SOLE_VL_EXIT_TEMPERATURE = 23;       //Temperatur im Sole Wärmetauscher VL, bei der der Solemodus abgebrochen wird
-const byte MIN_KOLLEKTOR_LUFT = 38;             //Mindest-Regeltemperatur für den Kollektor-Vorlauf
+const byte MIN_KOLLEKTOR_LUFT = 36;             //Mindest-Regeltemperatur für den Kollektor-Vorlauf
 const byte MAX_KOLLEKTOR_LUFT_BOILERMODUS = 77; //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
 const byte MAX_KOLLEKTOR_LUFT_SOLEMODUS = 70;   //Maximal-Regeltemperatur für Kollektor Vorlauf bei Boilermodus
 const byte BOILER_DIRECT_EXIT_DIFF = 8;         //Maximaler Temperaturunterschied zwischen Boilertemperatur und Boiler VL bevor direkter Abbruch
@@ -341,7 +341,7 @@ void calculateTargetTemperature()
         }
         if (floor(fuehlerBoiler1.getMeanTemperature()) > BOILER_FULL_TEMPERATURE && !manualSpeed) //Boiler heiss genug und nicht manuelle Geschwindigkeit?
         {
-          PIDReglerKollektorPumpe.SetOutputLimits(105, PID_KOLLEKTOR_MAX_SPEED); //mindest-Geschwindigkeit fuer Boiler erhöhen
+          PIDReglerKollektorPumpe.SetOutputLimits(115, PID_KOLLEKTOR_MAX_SPEED); //mindest-Geschwindigkeit fuer Boiler erhöhen
         }
         else if (!manualSpeed)
         { //Pumpengeschwindigkeit auf standard setzen, wenn nicht auf manuell
@@ -370,12 +370,12 @@ void calculateTargetTemperature()
       }
       if (fuehlerSole.getMeanTemperature() > CRITICAL_TEMPERATURE_SOLE) //Sole VL zu heiss?
       {
-        newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT + 10;
+        newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT + 14;
         soleCriticalTemp = true;
       }
       else if (soleCriticalTemp && fuehlerSole.getMeanTemperature() > CRITICAL_TEMPERATURE_SOLE - 2)
       {
-        newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT + 10;
+        newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT + 14;
       }
       else if (fuehlerSole.getMeanTemperature() <= CRITICAL_TEMPERATURE_SOLE - 2 && soleCriticalTemp)
       {
