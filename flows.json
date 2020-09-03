@@ -1498,7 +1498,7 @@
         "height": 6,
         "label": "Luft Kollektor",
         "chartType": "line",
-        "legend": "false",
+        "legend": "true",
         "xformat": "HH:mm",
         "interpolate": "bezier",
         "nodata": "",
@@ -1513,8 +1513,8 @@
         "useUTC": false,
         "colors": [
             "#1f77b4",
-            "#aec7e8",
             "#ff7f0e",
+            "#98df8a",
             "#2ca02c",
             "#98df8a",
             "#d62728",
@@ -6963,7 +6963,7 @@
         "wires": [
             [
                 "22bd5940.c9d73e",
-                "f9be8e4d.c1ae38"
+                "2a5b448a.95009c"
             ]
         ]
     },
@@ -7579,36 +7579,44 @@
         ]
     },
     {
-        "id": "f9be8e4d.c1ae38",
-        "type": "change",
+        "id": "2a5b448a.95009c",
+        "type": "function",
         "z": "f1c3bb0e.a936f",
         "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "payload",
-                "tot": "msg"
-            },
-            {
-                "t": "set",
-                "p": "topic",
-                "pt": "msg",
-                "to": "Solltemperatur",
-                "tot": "str"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
+        "func": "value = Number(msg.payload);\nreturn {payload: value, topic:\"Solltemperatur\"}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
         "x": 400,
         "y": 2940,
         "wires": [
             [
-                "f4df7b18.cdc218"
+                "a4dcfef5.ee8ff8"
+            ]
+        ]
+    },
+    {
+        "id": "a4dcfef5.ee8ff8",
+        "type": "trigger",
+        "z": "f1c3bb0e.a936f",
+        "name": "",
+        "op1": "",
+        "op2": "0",
+        "op1type": "pay",
+        "op2type": "str",
+        "duration": "-15",
+        "extend": false,
+        "units": "min",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 630,
+        "y": 2940,
+        "wires": [
+            [
+                "ecc83b19.c913"
             ]
         ]
     }
