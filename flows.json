@@ -6962,7 +6962,8 @@
         "y": 3000,
         "wires": [
             [
-                "22bd5940.c9d73e"
+                "22bd5940.c9d73e",
+                "f9be8e4d.c1ae38"
             ]
         ]
     },
@@ -7574,6 +7575,40 @@
         "wires": [
             [
                 "f1d54482.75d248"
+            ]
+        ]
+    },
+    {
+        "id": "f9be8e4d.c1ae38",
+        "type": "change",
+        "z": "f1c3bb0e.a936f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Solltemperatur",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 2940,
+        "wires": [
+            [
+                "f4df7b18.cdc218"
             ]
         ]
     }
