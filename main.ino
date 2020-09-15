@@ -69,6 +69,7 @@ bool temperatureErrorMessageSent = false; //Fehlermeldung wegen unrealistischer 
 bool badWeather = false;                  //Bei Schlechtwetter wird nicht versucht, den Boiler zu heizen
 bool manualSpeed = false;                 //Ist die Pumpengeschwindigkeit auf Manuell?
 bool soleCriticalTemp = false;            //Sole läuft Heiss?
+bool solePriority = false;                //Sole Priorität?
 
 //PID Variabeln
 double PIDInputKollektorPumpe = 0;     //PID Input
@@ -325,6 +326,7 @@ void calculateTargetTemperature()
 
     if (digitalRead(STELLWERK_SOLE_BOILER)) //Boilermodus?
     {
+      solePriority = false;
       if (!initializing) //nicht am initialisieren?
       {
         if (fuehlerBoilerVL.getMeanTemperature() - fuehlerBoilerRL.getMeanTemperature() < MIN_DIFFERENZ_VL_RL_BOILER + 2) //VL und RL nähern sich zu stark an
@@ -359,10 +361,19 @@ void calculateTargetTemperature()
       if (fuehlerBoiler1.getMeanTemperature() > BOILER_FULL_TEMPERATURE)                                                            //Boiler berets heiss?
       {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler bereits heiss
+        solePriority = true; //Sole Priorität setzen
       }
-      else if (fuehlerBoiler1.getMeanTemperature() > BOILER_NOT_FULL_TEMPERATUR && !(boilerEnoughFull.checkTimer(now)))
+      else if (fuehlerBoiler1.getMeanTemperature() > BOILER_NOT_FULL_TEMPERATUR+1 && !(boilerEnoughFull.checkTimer(now)))
       {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler in den letzten 24h heiss war
+        solePriority = true; //Sole Priorität setzen
+      }
+      else if (fuehlerBoiler1.getMeanTemperature() > BOILER_NOT_FULL_TEMPERATUR && !(boilerEnoughFull.checkTimer(now)) && solePriority)
+      { //Umschaltung bald
+        newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler in den letzten 24h heiss war
+      }
+      else {
+        solePriority = false; //Sole Priorität beenden
       }
       if (badWeather)
       {
@@ -422,6 +433,7 @@ void calculateTargetTemperature()
   else
   {
     PIDSetpointKollektorPumpe = 0;
+    solePriority = false;
   }
   //Solltemperatur verändert?
   if (PIDSetpointKollektorPumpe != lastPIDSetpointKollektorPumpe)
