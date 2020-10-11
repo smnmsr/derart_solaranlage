@@ -101,6 +101,7 @@ const byte RELAIS_SOLE_PUMPE = 23;      //Relais-Ausgang Solepumpe
 const byte RELAIS_KOLLEKTOR_PUMPE = 25; //Relais-Ausgang Kollektorpumpe
 const byte STELLWERK_SOLE_BOILER = 27;  //Relais-Ausgang Stellwerk-Legionellen, high = höhere Temperatur
 const byte STELLWERK_BOILER_TEMP = 29;  //Relais-Ausgang Stellwerk Sole/Boiler, high = Boiler
+const byte STELLWERK_WP_KREIS = 31;  //Relais-Ausgang Stellwerk WP-Kreis, low = direkt, high = ueber Waermetauscher
 const byte RELAIS_BOILER = 33;          //Relais-Ausgang für Sperrschuetz WWSP
 
 // PWM Pins
@@ -213,6 +214,14 @@ void sendMQTT(String subtopic, int value)
   mqttClient.endMessage();
 }
 
+//Sendet eine MQTT-Message mit dem Thema <subtopic> und dem ganzzahligen, positiven Long-Wert <value>
+void sendMQTT(String subtopic, unsigned long value)
+{
+  mqttClient.beginMessage(topic + subtopic);
+  mqttClient.print(value);
+  mqttClient.endMessage();
+}
+
 //Sendet eine MQTT-Message mit dem Thema <subtopic> und dem String <value>
 void sendMQTT(String subtopic, String value)
 {
@@ -248,7 +257,8 @@ void sendMQTTAll()
   //Informationen an Dashboard
   sendMQTT("kollektorPumpe", digitalRead(RELAIS_KOLLEKTOR_PUMPE));         //Info an Dashboard: Kollektorpumpe
   sendMQTT("solePumpe", digitalRead(RELAIS_SOLE_PUMPE));                   // Info an Dashboard, Solepumpe
-  sendMQTT("stellwerkSoleBoiler", digitalRead(STELLWERK_SOLE_BOILER) + 1); //Info an Dashboard, Stellwerk
+  sendMQTT("stellwerkSoleBoiler", digitalRead(STELLWERK_SOLE_BOILER) + 1); //Info an Dashboard, Stellwerk Sole/Boiler
+  sendMQTT("stellwerkWP", digitalRead(STELLWERK_WP_KREIS) + 1); //Info an Dashboard, Stellwerk WP-Kreis
   sendMQTT("operationMode", operationMode);                                //Info an Dashboard, Modus
 }
 
@@ -451,6 +461,7 @@ void boilerModusStart()
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH);                                                //Kollektorpumpe einschalten
   digitalWrite(RELAIS_SOLE_PUMPE, LOW);                                                      //Solepumpe ausschalten
   digitalWrite(STELLWERK_SOLE_BOILER, HIGH);                                                 //Stellwerk auf Boiler umschalten
+  digitalWrite(STELLWERK_WP_KREIS, HIGH);                                                      //Stellwerk ueber Warmetauscher lassen
   PIDReglerKollektorPumpe.SetMode(1);                                                        //PID-Regler Kollektorpumpe einschalten
   initializing = true;                                                                       //Initialisierung starten
   initialOperationModeTimeout.setDelayTime(6, 'm');                                          //Initialisierungszeit setzen
@@ -471,6 +482,7 @@ void soleModusStart()
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH); //Kollektorpumpe ausschalten
   digitalWrite(RELAIS_SOLE_PUMPE, HIGH);      //Solepumpe einschalten
   digitalWrite(STELLWERK_SOLE_BOILER, LOW);   //Stellwerk auf Sole umschalten
+  digitalWrite(STELLWERK_WP_KREIS, HIGH);                                                      //Stellwerk ueber Warmetauscher lassen
   PIDReglerKollektorPumpe.SetMode(1);         //PID-Regler Kollektorpumpe einschalten
   initializing = true;                        //Initialisierung starten
   switch (operationMode)                      //Initialisierungszeit setzen
@@ -499,6 +511,7 @@ void turnOffModusStart()
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, LOW);        //Kollektorpumpe ausschalten
   digitalWrite(RELAIS_SOLE_PUMPE, LOW);             //Solepumpe ausschalten
   digitalWrite(STELLWERK_SOLE_BOILER, LOW);         //Stellwerk auf Sole umschalten
+  digitalWrite(STELLWERK_WP_KREIS, LOW);            //Stellwerk ueber Warmetauscher lassen
   PIDReglerKollektorPumpe.SetMode(0);               //PID-Regler Kollektorpumpe ausschalten
   PIDOutputKollektorPumpe = 0;                      //Speed auf Null setzen
   kollektorPumpe.stop();                            //kollektorpumpe stoppen
@@ -564,6 +577,7 @@ void setup()
   pinMode(RELAIS_SOLE_PUMPE, OUTPUT);
   pinMode(RELAIS_KOLLEKTOR_PUMPE, OUTPUT);
   pinMode(STELLWERK_SOLE_BOILER, OUTPUT);
+  pinMode(STELLWERK_WP_KREIS, OUTPUT);
   pinMode(STELLWERK_BOILER_TEMP, OUTPUT);
   pinMode(PWM_KOLLEKTOR_PUMPE, OUTPUT);
   pinMode(RELAIS_BOILER, OUTPUT);
@@ -608,12 +622,21 @@ void setup()
 
   timeClient.begin();
   Serial.println("Du bist mit dem Zeitserver verbunden!");
+  sendMQTT("startTime",1);
   Serial.println();
 
   //erster Betriebsmodus nach dem Starten (Ohne Initialisierungszeit)
   turnOffModusStart();
   initializing = false;
-  boilerAdditionalHeatingOff();
+
+  //Boiler bei Start immer auf 65 Grad heizen
+  digitalWrite(STELLWERK_BOILER_TEMP, HIGH); //Boiler auf höhere Temperatur stellen
+  boilerHighTemperatur = true;
+  boilerTimeout.setLastTime(now);       //Timer stellen
+  timerLegionellenschaltung.executed(); //Timer zurücksetzen
+  boilerAdditionalHeatingOn();
+  sendMQTT("message", "Boiler bei erhöhter Solltemperatur für elektrisches Heizen. (Legionellenschaltung)");
+  sendMQTT("boilerTermostat", "hoch");
 
   Serial.println("Setup beendet");
 }
@@ -831,6 +854,7 @@ void loop()
       digitalWrite(RELAIS_SOLE_PUMPE, LOW);                        //Solepumpe ausschalten
       digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH);                  //Kollektorpumpe einschalten
       digitalWrite(STELLWERK_SOLE_BOILER, LOW);                    //Wärme über Wärmetauscher abkühlen
+      digitalWrite(STELLWERK_WP_KREIS, HIGH);                      //Wärme an WP-kreis geben
       analogWrite(PWM_KOLLEKTOR_PUMPE, 255);                       //Kollektorpumpe auf 100%
       sendMQTT("speedKollektorPumpe", 255);                        //Speed der Kollektorpumpe an Dashboard senden
       operationMode = 4;                                           //Betriebsmodus Sole-Alarm
@@ -849,6 +873,7 @@ void loop()
       analogWrite(PWM_KOLLEKTOR_PUMPE, 255);                  //Kollektorpumpe auf 100%
       sendMQTT("speedKollektorPumpe", 255);                   //Speed der Kollektorpumpe an Dashboard senden
       digitalWrite(STELLWERK_SOLE_BOILER, HIGH);              //Wärme in Boiler leiten
+      digitalWrite(STELLWERK_WP_KREIS, HIGH);                      //Wärme an WP-kreis geben
       operationMode = 5;                                      //Betriebsmodus Kollektor-Alarm
       if (!digitalRead(RELAIS_KOLLEKTOR_PUMPE))
       {
