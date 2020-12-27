@@ -139,10 +139,7 @@ Timer timerLegionellenschaltung(7, 'd');   //Legio-Timer (Zeit. nach der elektri
 Timer initialOperationModeTimeout(3, 'm'); //Zeit bevor ein Modus EXIT-Kriterien berücksichtigt (Achtung, Variabel)
 Timer exitTimeout(4, 'm');                 //Solange muss der Sollwert mindestens unterschritten sein, bevor Abbruch
 Timer flowMeterBoilerTimeout(1, 's');      //Durchflussmeter 1 Timeout
-Timer flowMeterSoleTimeout(1, 's');        //Durchflussmeter 2 Timeout
-Timer displayButtonTimeout(1000);          //Display-Button Timeout
-Timer displayTimeout(2, 'm');              //Display-Ausschaltzeit
-Timer boilerTimeout(1, 'd');               //Boiler-Ausschaltzeit
+Timer boilerTimeout(2, 'd');               //Boiler-Ausschaltzeit
 Timer MQTTSendTimer(5, 's');               //Sendeinterval Daten an Dashboard (Achtung, Variabel)
 Timer boilerEnoughFull(1, 'd');            //Timeout-Zeit, wenn Boiler heiss war und in der Zeit Sole priorisiert werden kann
 Timer soleTooHot(10, 'm');                 //Timer für Sole-Alarm
@@ -1145,7 +1142,7 @@ void loop()
     sendMQTT("boilerTermostat", "hoch");
   }
 
-  if (boilerHighTemperatur && boilerTimeout.checkTimer(now))
+  if (boilerHighTemperatur && (boilerTimeout.checkTimer(now) || fuehlerBoiler1.getMeanTemperature() > BOILER_FULL_TEMPERATURE))
   {
     boilerHighTemperatur = false;
     digitalWrite(STELLWERK_BOILER_TEMP, LOW);
