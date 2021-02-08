@@ -1142,8 +1142,14 @@ void loop()
 
     // Helligkeitswert auslesen
     uint16_t lum = luxMitte.getLuminosity(TSL2591_FULLSPECTRUM);
-    float lux = luxMitte.calculateLux(lum, 0);
-    sendMQTT("brightnessMiddle", lux);
+    uint16_t ir = luxMitte.getLuminosity(TSL2591_INFRARED);
+    uint16_t vis = luxMitte.getLuminosity(TSL2591_VISIBLE);
+    float lux = luxMitte.calculateLux(lum, ir);
+
+    sendMQTT("luxMiddle", lux);
+    sendMQTT("fullMiddle", (unsigned long) lum);
+    sendMQTT("visibleMiddle", (unsigned long)  vis);
+    sendMQTT("irMiddle", (unsigned long) ir);
 
     timer3m.executed();
   }
