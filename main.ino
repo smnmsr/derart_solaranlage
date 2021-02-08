@@ -104,7 +104,7 @@ const byte RELAIS_SOLE_PUMPE = 23;      //Relais-Ausgang Solepumpe
 const byte RELAIS_KOLLEKTOR_PUMPE = 25; //Relais-Ausgang Kollektorpumpe
 const byte STELLWERK_SOLE_BOILER = 27;  //Relais-Ausgang Stellwerk-Legionellen, high = höhere Temperatur
 const byte STELLWERK_BOILER_TEMP = 29;  //Relais-Ausgang Stellwerk Sole/Boiler, high = Boiler
-const byte STELLWERK_WP_KREIS = 31;  //Relais-Ausgang Stellwerk WP-Kreis, low = direkt, high = ueber Waermetauscher
+const byte STELLWERK_WP_KREIS = 31;     //Relais-Ausgang Stellwerk WP-Kreis, low = direkt, high = ueber Waermetauscher
 const byte RELAIS_BOILER = 33;          //Relais-Ausgang für Sperrschuetz WWSP
 
 // PWM Pins
@@ -129,7 +129,6 @@ PT1000 fuehlerSole(FUEHLER_SOLE_PIN, 1000);
 
 // Helligkeitssensor
 Adafruit_TSL2591 luxMitte = Adafruit_TSL2591(2591); // Lichtsensor Mitte
-
 
 // Setup der PWM gesteuerten Pumpen
 Pump kollektorPumpe(RELAIS_KOLLEKTOR_PUMPE, PWM_KOLLEKTOR_PUMPE);
@@ -262,7 +261,7 @@ void sendMQTTAll()
   sendMQTT("kollektorPumpe", digitalRead(RELAIS_KOLLEKTOR_PUMPE));         //Info an Dashboard: Kollektorpumpe
   sendMQTT("solePumpe", digitalRead(RELAIS_SOLE_PUMPE));                   // Info an Dashboard, Solepumpe
   sendMQTT("stellwerkSoleBoiler", digitalRead(STELLWERK_SOLE_BOILER) + 1); //Info an Dashboard, Stellwerk Sole/Boiler
-  sendMQTT("stellwerkWP", digitalRead(STELLWERK_WP_KREIS) + 1); //Info an Dashboard, Stellwerk WP-Kreis
+  sendMQTT("stellwerkWP", digitalRead(STELLWERK_WP_KREIS) + 1);            //Info an Dashboard, Stellwerk WP-Kreis
   sendMQTT("operationMode", operationMode);                                //Info an Dashboard, Modus
 }
 
@@ -375,18 +374,19 @@ void calculateTargetTemperature()
       if (fuehlerBoiler1.getMeanTemperature() > BOILER_FULL_TEMPERATURE)                                                            //Boiler berets heiss?
       {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler bereits heiss
-        solePriority = true; //Sole Priorität setzen
+        solePriority = true;                               //Sole Priorität setzen
       }
-      else if (fuehlerBoiler1.getMeanTemperature() > BOILER_NOT_FULL_TEMPERATUR+1 && !(boilerEnoughFull.checkTimer(now)))
+      else if (fuehlerBoiler1.getMeanTemperature() > BOILER_NOT_FULL_TEMPERATUR + 1 && !(boilerEnoughFull.checkTimer(now)))
       {
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler in den letzten 24h heiss war
-        solePriority = true; //Sole Priorität setzen
+        solePriority = true;                               //Sole Priorität setzen
       }
       else if (fuehlerBoiler1.getMeanTemperature() > BOILER_NOT_FULL_TEMPERATUR && !(boilerEnoughFull.checkTimer(now)) && solePriority)
-      { //Umschaltung bald
+      {                                                    //Umschaltung bald
         newPIDSetpointKollektorPumpe = MIN_KOLLEKTOR_LUFT; //Sole mit hoher Drehzahl, da Boiler in den letzten 24h heiss war
       }
-      else {
+      else
+      {
         solePriority = false; //Sole Priorität beenden
       }
       if (badWeather)
@@ -465,7 +465,7 @@ void boilerModusStart()
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH);                                                //Kollektorpumpe einschalten
   digitalWrite(RELAIS_SOLE_PUMPE, LOW);                                                      //Solepumpe ausschalten
   digitalWrite(STELLWERK_SOLE_BOILER, HIGH);                                                 //Stellwerk auf Boiler umschalten
-  digitalWrite(STELLWERK_WP_KREIS, HIGH);                                                      //Stellwerk ueber Warmetauscher lassen
+  digitalWrite(STELLWERK_WP_KREIS, HIGH);                                                    //Stellwerk ueber Warmetauscher lassen
   PIDReglerKollektorPumpe.SetMode(1);                                                        //PID-Regler Kollektorpumpe einschalten
   initializing = true;                                                                       //Initialisierung starten
   initialOperationModeTimeout.setDelayTime(6, 'm');                                          //Initialisierungszeit setzen
@@ -486,7 +486,7 @@ void soleModusStart()
   digitalWrite(RELAIS_KOLLEKTOR_PUMPE, HIGH); //Kollektorpumpe ausschalten
   digitalWrite(RELAIS_SOLE_PUMPE, HIGH);      //Solepumpe einschalten
   digitalWrite(STELLWERK_SOLE_BOILER, LOW);   //Stellwerk auf Sole umschalten
-  digitalWrite(STELLWERK_WP_KREIS, HIGH);                                                      //Stellwerk ueber Warmetauscher lassen
+  digitalWrite(STELLWERK_WP_KREIS, HIGH);     //Stellwerk ueber Warmetauscher lassen
   PIDReglerKollektorPumpe.SetMode(1);         //PID-Regler Kollektorpumpe einschalten
   initializing = true;                        //Initialisierung starten
   switch (operationMode)                      //Initialisierungszeit setzen
@@ -559,24 +559,6 @@ void boilerAdditionalHeatingOff()
   sendMQTT("boilerAdditionalHeating", "off");
 }
 
-// Helligkeitssensor Konfigurieren
-void configureSensor(Adafruit_TSL2591 sens)
-{
-  // You can change the gain on the fly, to adapt to brighter/dimmer light situations
-  sens.setGain(TSL2591_GAIN_LOW);    // 1x gain (bright light)
-  //sens.setGain(TSL2591_GAIN_MED);      // 25x gain
-  //tssensl.setGain(TSL2591_GAIN_HIGH);   // 428x gain
-  
-  // Changing the integration time gives you a longer time over which to sense light
-  // longer timelines are slower, but are good in very low light situtations!
-  // sens.setTiming(TSL2591_INTEGRATIONTIME_100MS);  // shortest integration time (bright light)
-  sens.setTiming(TSL2591_INTEGRATIONTIME_200MS);
-  // sens.setTiming(TSL2591_INTEGRATIONTIME_300MS);
-  // sens.setTiming(TSL2591_INTEGRATIONTIME_400MS);
-  // sens.setTiming(TSL2591_INTEGRATIONTIME_500MS);
-  // sens.setTiming(TSL2591_INTEGRATIONTIME_600MS);  // longest integration time (dim light)
-}
-
 // ================
 // 6. Setup-Sequenz
 // ================
@@ -644,7 +626,7 @@ void setup()
 
   timeClient.begin();
   Serial.println("Du bist mit dem Zeitserver verbunden!");
-  sendMQTT("startTime",1);
+  sendMQTT("startTime", 1);
   Serial.println();
 
   //erster Betriebsmodus nach dem Starten (Ohne Initialisierungszeit)
@@ -661,17 +643,16 @@ void setup()
   sendMQTT("boilerTermostat", "hoch");
 
   // Helligkeitssensor starten und konfigurieren
-  Serial.begin(9600);
-  
-  if (luxMitte.begin()) 
+  if (luxMitte.begin())
   {
     Serial.println(F("Helligkeitssensor gefunden"));
-  } 
-  else 
+  }
+  else
   {
     Serial.println(F("Kein Helligkeitssensor gefunden.?"));
   }
-  configureSensor(luxMitte);
+  luxMitte.setGain(TSL2591_GAIN_LOW); // 1x gain (bright light)
+  luxMitte.setTiming(TSL2591_INTEGRATIONTIME_200MS);
   Serial.println(F("Helligkeitssensor konfiguriert"));
 
   Serial.println("Setup beendet");
@@ -909,7 +890,7 @@ void loop()
       analogWrite(PWM_KOLLEKTOR_PUMPE, 255);                  //Kollektorpumpe auf 100%
       sendMQTT("speedKollektorPumpe", 255);                   //Speed der Kollektorpumpe an Dashboard senden
       digitalWrite(STELLWERK_SOLE_BOILER, HIGH);              //Wärme in Boiler leiten
-      digitalWrite(STELLWERK_WP_KREIS, HIGH);                      //Wärme an WP-kreis geben
+      digitalWrite(STELLWERK_WP_KREIS, HIGH);                 //Wärme an WP-kreis geben
       operationMode = 5;                                      //Betriebsmodus Kollektor-Alarm
       if (!digitalRead(RELAIS_KOLLEKTOR_PUMPE))
       {
@@ -1160,9 +1141,9 @@ void loop()
     sendMQTT("timeMinutes", timeClient.getMinutes());
 
     // Helligkeitswert auslesen
-    unsigned long brightnessMiddle = luxMitte.getLuminosity(TSL2591_FULLSPECTRUM);
-    sendMQTT("brightnessMiddle", brightnessMiddle);
-
+    uint16_t lum = luxMitte.getLuminosity(TSL2591_FULLSPECTRUM);
+    float lux = luxMitte.calculateLux(lum, 0);
+    sendMQTT("brightnessMiddle", lux);
 
     timer3m.executed();
   }
