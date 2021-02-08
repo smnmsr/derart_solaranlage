@@ -20,6 +20,9 @@
 #include <NTPClient.h>         //NTP-Libary
 #include <ArduinoMqttClient.h> //MQTT
 #include "secrets.h"           //MQTT Passwörter
+#include <Wire.h>              // I2C-Libary
+#include <Adafruit_Sensor.h>   // Adafruit i2c sensors
+#include "Adafruit_TSL2591.h"  // LUX-Meter
 
 // ===========================
 // 2. Variabeln und Konstanten
@@ -123,6 +126,10 @@ PT1000 fuehlerSoleVL(FUEHLER_SOLE_VL_PIN, 1000);
 PT1000 fuehlerBoilerRL(FUEHLER_BOILER_RL_PIN, 1000);
 PT1000 fuehlerSoleRL(FUEHLER_SOLE_RL_PIN, 1000);
 PT1000 fuehlerSole(FUEHLER_SOLE_PIN, 1000);
+
+// Helligkeitssensor
+Adafruit_TSL2591 luxMitte = Adafruit_TSL2591(2591); // Lichtsensor Mitte
+
 
 // Setup der PWM gesteuerten Pumpen
 Pump kollektorPumpe(RELAIS_KOLLEKTOR_PUMPE, PWM_KOLLEKTOR_PUMPE);
@@ -552,6 +559,24 @@ void boilerAdditionalHeatingOff()
   sendMQTT("boilerAdditionalHeating", "off");
 }
 
+// Helligkeitssensor Konfigurieren
+void configureSensor(Adafruit_TSL2591 sens)
+{
+  // You can change the gain on the fly, to adapt to brighter/dimmer light situations
+  sens.setGain(TSL2591_GAIN_LOW);    // 1x gain (bright light)
+  //sens.setGain(TSL2591_GAIN_MED);      // 25x gain
+  //tssensl.setGain(TSL2591_GAIN_HIGH);   // 428x gain
+  
+  // Changing the integration time gives you a longer time over which to sense light
+  // longer timelines are slower, but are good in very low light situtations!
+  // sens.setTiming(TSL2591_INTEGRATIONTIME_100MS);  // shortest integration time (bright light)
+  sens.setTiming(TSL2591_INTEGRATIONTIME_200MS);
+  // sens.setTiming(TSL2591_INTEGRATIONTIME_300MS);
+  // sens.setTiming(TSL2591_INTEGRATIONTIME_400MS);
+  // sens.setTiming(TSL2591_INTEGRATIONTIME_500MS);
+  // sens.setTiming(TSL2591_INTEGRATIONTIME_600MS);  // longest integration time (dim light)
+}
+
 // ================
 // 6. Setup-Sequenz
 // ================
@@ -634,6 +659,20 @@ void setup()
   boilerAdditionalHeatingOn();
   sendMQTT("message", "Boiler bei erhöhter Solltemperatur für elektrisches Heizen. (Legionellenschaltung)");
   sendMQTT("boilerTermostat", "hoch");
+
+  // Helligkeitssensor starten und konfigurieren
+  Serial.begin(9600);
+  
+  if (luxMitte.begin()) 
+  {
+    Serial.println(F("Helligkeitssensor gefunden"));
+  } 
+  else 
+  {
+    Serial.println(F("Kein Helligkeitssensor gefunden.?"));
+  }
+  configureSensor(luxMitte);
+  Serial.println(F("Helligkeitssensor konfiguriert"));
 
   Serial.println("Setup beendet");
 }
@@ -1119,6 +1158,11 @@ void loop()
     //Aktuelle System-Zeit senden
     sendMQTT("timeHours", timeClient.getHours());
     sendMQTT("timeMinutes", timeClient.getMinutes());
+
+    // Helligkeitswert auslesen
+    unsigned long brightnessMiddle = luxMitte.getLuminosity(TSL2591_FULLSPECTRUM);
+    sendMQTT("brightnessMiddle", brightnessMiddle);
+
 
     timer3m.executed();
   }
