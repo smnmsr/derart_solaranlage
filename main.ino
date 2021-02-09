@@ -22,7 +22,7 @@
 #include "secrets.h"           //MQTT Passwörter
 #include <Wire.h>              // I2C-Libary
 #include <Adafruit_Sensor.h>   // Adafruit i2c sensors
-#include "Adafruit_TSL2591.h"  // LUX-Meter
+#include "Adafruit_TSL2591.h"  // LUX-Meter Libary
 
 // ===========================
 // 2. Variabeln und Konstanten
