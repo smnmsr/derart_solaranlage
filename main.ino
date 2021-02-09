@@ -1141,15 +1141,29 @@ void loop()
     sendMQTT("timeMinutes", timeClient.getMinutes());
 
     // Helligkeitswert auslesen
+    luxMitte.enable();
     uint16_t lum = luxMitte.getLuminosity(TSL2591_FULLSPECTRUM);
+    if (lum == 0xFFFF)
+    {
+      lum = 0;
+    }
     uint16_t ir = luxMitte.getLuminosity(TSL2591_INFRARED);
+    if (ir == 0xFFFF)
+    {
+      ir = 0;
+    }
     uint16_t vis = luxMitte.getLuminosity(TSL2591_VISIBLE);
+    if (vis == 0xFFFF)
+    {
+      vis = 0;
+    }
     float lux = luxMitte.calculateLux(lum, ir);
+    luxMitte.disable();
 
     sendMQTT("luxMiddle", lux);
-    sendMQTT("fullMiddle", (unsigned long) lum);
-    sendMQTT("visibleMiddle", (unsigned long)  vis);
-    sendMQTT("irMiddle", (unsigned long) ir);
+    sendMQTT("fullMiddle", (unsigned long)lum);
+    sendMQTT("visibleMiddle", (unsigned long)vis);
+    sendMQTT("irMiddle", (unsigned long)ir);
 
     timer3m.executed();
   }
