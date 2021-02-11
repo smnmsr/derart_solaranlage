@@ -652,7 +652,7 @@ void setup()
     Serial.println(F("Kein Helligkeitssensor gefunden.?"));
   }
   luxMitte.setGain(TSL2591_GAIN_LOW); // 1x gain (bright light)
-  luxMitte.setTiming(TSL2591_INTEGRATIONTIME_200MS);
+  luxMitte.setTiming(TSL2591_INTEGRATIONTIME_100MS);
   Serial.println(F("Helligkeitssensor konfiguriert"));
 
   Serial.println("Setup beendet");
@@ -1141,24 +1141,14 @@ void loop()
     sendMQTT("timeMinutes", timeClient.getMinutes());
 
     // Helligkeitswert auslesen
-    luxMitte.enable();
     uint16_t lum = luxMitte.getLuminosity(TSL2591_FULLSPECTRUM);
-    if (lum == 0xFFFF)
+    uint16_t ir = luxMitte.getLuminosity(TSL2591_INFRARED);
+    uint16_t vis = luxMitte.getLuminosity(TSL2591_VISIBLE);
+    if (lum == 0xFFFF && vis < 1000) // bei Dunkelheit macht Sensor z.T. Overflow - dann gleich Null setzen
     {
       lum = 0;
     }
-    uint16_t ir = luxMitte.getLuminosity(TSL2591_INFRARED);
-    if (ir == 0xFFFF)
-    {
-      ir = 0;
-    }
-    uint16_t vis = luxMitte.getLuminosity(TSL2591_VISIBLE);
-    if (vis == 0xFFFF)
-    {
-      vis = 0;
-    }
     float lux = luxMitte.calculateLux(lum, ir);
-    luxMitte.disable();
 
     sendMQTT("luxMiddle", lux);
     sendMQTT("fullMiddle", (unsigned long)lum);
