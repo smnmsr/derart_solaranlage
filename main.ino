@@ -1144,16 +1144,16 @@ void loop()
     uint16_t lum = luxMitte.getLuminosity(TSL2591_FULLSPECTRUM);
     uint16_t ir = luxMitte.getLuminosity(TSL2591_INFRARED);
     uint16_t vis = luxMitte.getLuminosity(TSL2591_VISIBLE);
-    if (lum == 0xFFFF && vis < 1000) // bei Dunkelheit macht Sensor z.T. Overflow - dann gleich Null setzen
-    {
-      lum = 0;
-    }
+
     float lux = luxMitte.calculateLux(lum, ir);
 
     sendMQTT("luxMiddle", lux);
     sendMQTT("fullMiddle", (unsigned long)lum);
     sendMQTT("visibleMiddle", (unsigned long)vis);
     sendMQTT("irMiddle", (unsigned long)ir);
+
+    //Debugging
+    Serial.println("Ich lebe!");
 
     timer3m.executed();
   }
