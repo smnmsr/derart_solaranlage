@@ -144,7 +144,7 @@ Timer timer3m(3, 'm'); //3min Timer
 Timer timerLegionellenschaltung(7, 'd');   //Legio-Timer (Zeit. nach der elektrisch auf hohe Boilertemperatur geheizt wird, falls diese nie erreicht wurde)
 Timer initialOperationModeTimeout(3, 'm'); //Zeit bevor ein Modus EXIT-Kriterien berücksichtigt (Achtung, Variabel)
 Timer exitTimeout(4, 'm');                 //Solange muss der Sollwert mindestens unterschritten sein, bevor Abbruch
-Timer flowMeterBoilerTimeout(1, 's');      //Durchflussmeter 1 Timeout
+Timer flowMeterBoilerTimeout(2, 's');      //Durchflussmeter 1 Timeout
 Timer boilerTimeout(2, 'd');               //Boiler-Ausschaltzeit
 Timer MQTTSendTimer(5, 's');               //Sendeinterval Daten an Dashboard (Achtung, Variabel)
 Timer boilerEnoughFull(1, 'd');            //Timeout-Zeit, wenn Boiler heiss war und in der Zeit Sole priorisiert werden kann
@@ -666,8 +666,8 @@ void loop()
   //Dieser Programmteil wird in jeder Schleife durchgefuehrt
   timeClient.update();
 
-  //Prüfen, ob der Durchflussmesser Boiler einen Impuls abgeben
-  if (flowMeterBoilerTimeout.checkTimer(now))
+  //Prüfen, ob der Durchflussmesser Boiler einen Impuls abgibt
+  if (flowMeterBoilerTimeout.checkTimer(now) && (operationMode == 2 || operationMode == 3))
   {
     if (digitalRead(FLOW_METER_BOILER) && !lastStateFlowMeterBoiler)
     {
