@@ -6981,7 +6981,7 @@
     "authType": "",
     "x": 2990,
     "y": 800,
-    "wires": [["c6cdc9e9.ca1f38"]]
+    "wires": [[]]
   },
   {
     "id": "6dccb4aa.6c96b4",
@@ -6995,7 +6995,7 @@
     "finalize": "",
     "x": 2760,
     "y": 800,
-    "wires": [["e9a65e36.f8ab6", "c6cdc9e9.ca1f38"]]
+    "wires": [["e9a65e36.f8ab6"]]
   },
   {
     "id": "fc8f0940.c6c658",
@@ -7015,24 +7015,7 @@
     "outputs": 1,
     "x": 2270,
     "y": 760,
-    "wires": [["2ecde6e1.125e82"]]
-  },
-  {
-    "id": "c6cdc9e9.ca1f38",
-    "type": "debug",
-    "z": "f1c3bb0e.a936f",
-    "name": "",
-    "active": true,
-    "tosidebar": true,
-    "console": false,
-    "tostatus": false,
-    "complete": "true",
-    "targetType": "full",
-    "statusVal": "",
-    "statusType": "auto",
-    "x": 2940,
-    "y": 860,
-    "wires": []
+    "wires": [["2ecde6e1.125e82", "52ac3e6b.844fe"]]
   },
   {
     "id": "1be46c53.39d684",
@@ -7081,5 +7064,34 @@
     "x": 2560,
     "y": 800,
     "wires": [["6dccb4aa.6c96b4"]]
+  },
+  {
+    "id": "52ac3e6b.844fe",
+    "type": "counter",
+    "z": "f1c3bb0e.a936f",
+    "name": "",
+    "init": "0",
+    "step": "1",
+    "lower": "",
+    "upper": "",
+    "mode": "increment",
+    "outputs": 2,
+    "x": 2560,
+    "y": 760,
+    "wires": [["e9d6d40e.c39af8"], []]
+  },
+  {
+    "id": "e9d6d40e.c39af8",
+    "type": "function",
+    "z": "f1c3bb0e.a936f",
+    "name": "",
+    "func": "if (msg.payload > 2) {\n    return {reset: true};\n} else {\n    return null;\n}",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "x": 2220,
+    "y": 640,
+    "wires": [["52ac3e6b.844fe", "fc8f0940.c6c658", "1be46c53.39d684"]]
   }
 ]
