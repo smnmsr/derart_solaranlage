@@ -102,10 +102,10 @@ const byte FLOW_METER_SOLE = 32;   // S5S Anschluss PIN Durchflussmesser Solekre
 // Digital Out Pins
 const byte RELAIS_SOLE_PUMPE = 23;      //R0 Relais-Ausgang Solepumpe
 const byte RELAIS_KOLLEKTOR_PUMPE = 25; //R1 Relais-Ausgang Kollektorpumpe
-const byte STELLWERK_SOLE_BOILER = 29;  //R2A Relais-Ausgang Stellwerk Sole/Boiler, high = Boiler
-const byte STELLWERK_WP_KREIS = 27;     //R2B Relais-Ausgang Stellwerk WP-Kreis, low = direkt, high = ueber Waermetauscher
-const byte STELLWERK_BOILER_TEMP = 33;  //R4 Relais-Ausgang Stellwerk Solltemperatur Boilereinsatz, high = höhere Temperatur
-const byte RELAIS_BOILER = 35;          //R5 Relais-Ausgang für Sperrschuetz WWSP
+const byte STELLWERK_SOLE_BOILER = 29;  //R2B Relais-Ausgang Stellwerk Sole/Boiler, high = Boiler
+const byte STELLWERK_WP_KREIS = 27;     //R2A Relais-Ausgang Stellwerk WP-Kreis, low = direkt, high = ueber Waermetauscher
+const byte STELLWERK_BOILER_TEMP = 31;  //R4 Relais-Ausgang Stellwerk Solltemperatur Boilereinsatz, high = höhere Temperatur
+const byte RELAIS_BOILER = 33;          //R5 Relais-Ausgang für Sperrschuetz WWSP
 
 // PWM Pins
 const byte PWM_KOLLEKTOR_PUMPE = 9; //PWM-Ausgang Kollektorpumpe
