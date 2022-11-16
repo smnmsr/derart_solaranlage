@@ -9,8 +9,6 @@
 //  6. Setup Sequenz
 //  7. Programmschleife
 
-// Testkommentar
-
 // ============================================
 // 1. HEADER-Dateien, Definitionen und Libaries
 // ============================================
