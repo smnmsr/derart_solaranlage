@@ -1,0 +1,3 @@
+[submodule "ITEADLIB_Arduino_Nextion"]
+	path = ITEADLIB_Arduino_Nextion
+	url = https://github.com/itead/ITEADLIB_Arduino_Nextion
